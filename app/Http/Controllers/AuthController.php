@@ -1,12 +1,10 @@
 <?php
 
-
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use Illuminate\Validation\Rule;
 use Validator;
 
 class AuthController extends Controller
@@ -50,13 +48,7 @@ class AuthController extends Controller
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:100',
-                Rule::unique('users', 'email'),
-            ],
+            'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
         ]);
 
@@ -65,9 +57,9 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'name' => $request->get('name'),
+            'email' => $request->get('email'),
+            'password' => bcrypt($request->get('password')), // Corrected to use $request->get('password')
         ]);
 
         return response()->json([
