@@ -79,6 +79,11 @@ class AuthController extends Controller
         return response()->json(['message' => 'User successfully signed out']);
     }
 
+    public function getAllUsers(){
+        $users=User::get();
+        if($users)
+            return response()->json(['users' => $users],201);
+    }
     /**
      * Refresh a token.
      *

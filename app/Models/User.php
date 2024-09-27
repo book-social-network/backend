@@ -14,7 +14,9 @@ class User extends Model implements JWTSubject, AuthenticatableContract
 
     protected $connection = 'mongodb'; // Kết nối MongoDB
     protected $collection = 'users'; // Tên collection
-    protected $keyType = 'string';
+    protected $primaryKey = '_id'; // Đảm bảo sử dụng '_id' cho MongoDB
+    public $incrementing = false; // Đặt thành false vì khóa chính không tự động tăng
+
     protected $fillable = [
         'name', 'email', 'password',
     ];
