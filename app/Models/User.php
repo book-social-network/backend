@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
@@ -16,7 +17,9 @@ class User extends Model implements JWTSubject, AuthenticatableContract
     protected $collection = 'users'; // Tên collection
     protected $keyType = 'string';
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
     ];
 
     // Implement JWTSubject methods
