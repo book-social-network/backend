@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mongodb'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -34,11 +34,7 @@ return [
     */
 
     'connections' => [
-        'mongodb' => [
-            'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb+srv://nvht1111:nvht1111@testing.q6sz4.mongodb.net/?retryWrites=true&w=majority&appName=Testing&connectTimeoutMS=30000&serverSelectionTimeoutMS=5000'),
-            'database' => 'store',
-        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DATABASE_URL'),

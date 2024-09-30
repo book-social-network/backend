@@ -2,39 +2,57 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements JWTSubject, AuthenticatableContract
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, Authenticatable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    protected $connection = 'mongodb'; // Kết nối MongoDB
-    protected $collection = 'users'; // Tên collection
-    protected $primaryKey = '_id'; // Đảm bảo sử dụng '_id' cho MongoDB
-    public $incrementing = false; // Đặt thành false vì khóa chính không tự động tăng
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    // Implement JWTSubject methods
-    public function getJWTIdentifier()
-    {
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+    public function getJWTIdentifier() {
         return $this->getKey();
     }
-    public function getAuthIdentifierName()
-    {
-        return '_id'; // Chỉ định rằng khóa chính là '_id'
-    }
-    public function getJWTCustomClaims()
-    {
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims() {
         return [];
     }
 }
