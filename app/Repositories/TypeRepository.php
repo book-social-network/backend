@@ -9,12 +9,17 @@ class TypeRepository implements TypeInterface{
     public function getAllType(){
         return Type::get();
     }
+    public function getType($id){
+        return Type::find($id);
+    }
+
     public function insertType($data){
-        Type::create($data);
+        return Type::create($data);
     }
     public function updateType($data, $id){
         $Type=Type::find($id);
-        $Type->update($data);
+        $Type->name=$data['name'];
+        $Type->save();
     }
     public function deleteType($id){
 
