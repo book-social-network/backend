@@ -23,4 +23,8 @@ class Post extends Model
     public function detailGroupUser(){
         return $this->belongsTo(DetailGroupUser::class);
     }
+    public function book()
+    {
+        return $this->belongsToMany(Book::class, 'detail_post_books', 'post_id', 'book_id');
+    }
 }

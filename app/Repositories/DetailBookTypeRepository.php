@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Book;
+use App\Models\DetailBookType;
+use App\Models\Type;
+use App\Repositories\Interfaces\DetailBookTypeInterface;
+
+class DetailBookTypeRepository implements DetailBookTypeInterface{
+    public function getAllTypeOfBook($idBook){
+        $book=Book::find($idBook);
+        return $book->type();
+    }
+    public function getAllBookOfType($idType){
+        $type=Type::find($idType);
+        return $type->book();
+    }
+    public function insertDetailBookType($data){
+        DetailBookType::create($data);
+    }
+    public function deleteDetailBookType($id){
+        $DetailBookType=DetailBookType::find($id);
+        if(!empty($DetailBookType)){
+            $DetailBookType->delete();
+        }
+    }
+}
