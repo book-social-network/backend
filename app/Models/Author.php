@@ -14,6 +14,7 @@ class Author extends Model
         'id',
         'name',
         'born',
+        'dob',
         'died',
         'description',
         'image',

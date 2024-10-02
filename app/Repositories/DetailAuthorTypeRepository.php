@@ -8,6 +8,9 @@ use App\Models\Type;
 use App\Repositories\Interfaces\DetailAuthorTypeInterface;
 
 class DetailAuthorTypeRepository implements DetailAuthorTypeInterface{
+    public function getDetailAuthorType($id){
+        return DetailAuthorType::find($id);
+    }
     public function getAllTypeWithAuthor($idAuthor){
         $author=Author::find($idAuthor);
         return $author->type()->get();
@@ -17,7 +20,7 @@ class DetailAuthorTypeRepository implements DetailAuthorTypeInterface{
         return $type->author()->get();
     }
     public function insertDetailAuthorType($data){
-        DetailAuthorType::create($data);
+        return DetailAuthorType::create($data);
     }
     public function deleteDetailAuthorType($id){
         $DetailAuthorType=DetailAuthorType::find($id);

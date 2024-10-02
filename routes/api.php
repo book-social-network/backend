@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\DetailGroupUserController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TypeController;
@@ -66,4 +67,17 @@ Route::group([
     Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
     Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);
     Route::delete('/delete/{id}', [DetailGroupUserController::class, 'delete']);
+});
+
+Route::group([
+    'prefix' => 'author'
+], function ($router) {
+    Route::get('/get-all', [AuthorController::class,'index']);
+    Route::get('/get/{id}', [AuthorController::class,'getAuthor']);
+    Route::post('/insert', [AuthorController::class, 'insert']);
+    Route::post('/update/{id}', [AuthorController::class, 'update']);
+    Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
+    Route::post('/insert-type', [AuthorController::class, 'insertTypeBookForAuthor']);
+    Route::delete('/delete-type/{id}', [AuthorController::class, 'deleteTypeBookForAuthor']);
+    Route::get('/get-all-type/{idAuthor}',[AuthorController::class,'getAllTypeOfAuthor']);
 });

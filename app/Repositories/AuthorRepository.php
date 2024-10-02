@@ -15,7 +15,7 @@ class AuthorRepository implements AuthorInterface{
         return Author::find($id);
     }
     public function insertAuthor($data){
-        Author::create($data);
+        return Author::create($data);
     }
     public function updateAuthor($data, $id){
         $author=Author::find($id);

@@ -8,6 +8,9 @@ use App\Models\Type;
 use App\Repositories\Interfaces\DetailBookTypeInterface;
 
 class DetailBookTypeRepository implements DetailBookTypeInterface{
+    public function getDetailBookType($id){
+        return DetailBookType::find($id);
+    }
     public function getAllTypeOfBook($idBook){
         $book=Book::find($idBook);
         return $book->type()->get();

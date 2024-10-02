@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('authors', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('born');
-            $table->date('dob');
+            $table->string('born')->nullable();
+            $table->date('dob')->nullable();
             $table->date('died')->nullable();
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('image');
             $table->timestamps();
         });
