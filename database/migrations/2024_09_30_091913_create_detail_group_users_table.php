@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('detail_group_users', function (Blueprint $table) {
             $table->id();
-            $table->date('time_join');
+            $table->date('time_join')->default(now());
             $table->binary('state');
+            $table->string('role')->default('member');
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
         });

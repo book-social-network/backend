@@ -14,7 +14,7 @@ class NotificationRepository implements NotificationInterface{
         return Notification::find($id);
     }
     public function insertNotification($data){
-        Notification::create($data);
+        return Notification::create($data);
     }
     public function deleteNotification($id){
         $Notification=Notification::find($id);
@@ -22,5 +22,16 @@ class NotificationRepository implements NotificationInterface{
             $Notification->delete();
         }
     }
-
+    public function getNotificationsByUser($idUser){
+        $Notifications=Notification::where('to_id', $idUser);
+        if(!empty($Notification)){
+            return $Notifications;
+        }
+    }
+    public function getNotificationsByGroup($idGroup){
+        $Notifications=Notification::where('to_id', $idGroup);
+        if(!empty($Notification)){
+            return $Notifications;
+        }
+    }
 }

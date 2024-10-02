@@ -13,7 +13,7 @@ class GroupRepository implements GroupInterface{
         return Group::get();
     }
     public function insertGroup($data){
-        Group::create($data);
+        return Group::create($data);
     }
     public function updateGroup($data, $id){
         $Group=Group::find($id);

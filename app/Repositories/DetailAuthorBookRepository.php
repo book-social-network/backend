@@ -10,11 +10,11 @@ use App\Repositories\Interfaces\DetailAuthorBookInterface;
 class DetailAuthorBookRepository implements DetailAuthorBookInterface{
     public function getAllBookOfAuthor($idAuthor){
         $author=Author::find($idAuthor);
-        return $author->book();
+        return $author->book()->get();
     }
     public function getAllAuthorOfBook($idBook){
         $book=Book::find($idBook);
-        return $book->author();
+        return $book->author()->get();
     }
     public function insertDetailAuthorBook($data){
         DetailAuthorBook::create($data);

@@ -10,11 +10,11 @@ use App\Repositories\Interfaces\DetailPostBookInterface;
 class DetailPostBookRepository implements DetailPostBookInterface{
     public function getAllPostOfBook($idBook){
         $book=Book::find($idBook);
-        return $book->post();
+        return $book->post()->get();
     }
     public function getBookOfPost($idPost){
         $post=Post::find($idPost);
-        return $post->book();
+        return $post->book()->get();
     }
     public function insertDetailPostBook($data){
         DetailPostBook::create($data);

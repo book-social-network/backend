@@ -20,7 +20,7 @@ class TypeController extends Controller
             'name' => 'required|unique:types|string|max:255'
         ]);
         $type=$this->type->insertType($request->all());
-        return response()->json($type, 201);
+        return response()->json($type);
     }
 
     public function update(Request $request,$id){

@@ -9,4 +9,6 @@ interface NotificationInterface
     public function getNotification($id);
     public function insertNotification($data);
     public function deleteNotification($id);
+    public function getNotificationsByUser($idUser);
+    public function getNotificationsByGroup($idGroup);
 }

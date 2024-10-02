@@ -9,7 +9,7 @@ class Group extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $table='posts';
+    protected $table='groups';
     protected $fillable=[
         'id',
         'name',
@@ -17,8 +17,7 @@ class Group extends Model
         'state',
 
     ];
-    public function user()
-    {
-        return $this->belongsToMany(User::class, 'detail_group_users', 'user_id', 'group_id');
+    public function user() {
+        return $this->belongsToMany(User::class, 'detail_group_users', 'group_id', 'user_id');
     }
 }

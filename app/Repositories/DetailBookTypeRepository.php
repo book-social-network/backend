@@ -10,11 +10,11 @@ use App\Repositories\Interfaces\DetailBookTypeInterface;
 class DetailBookTypeRepository implements DetailBookTypeInterface{
     public function getAllTypeOfBook($idBook){
         $book=Book::find($idBook);
-        return $book->type();
+        return $book->type()->get();
     }
     public function getAllBookOfType($idType){
         $type=Type::find($idType);
-        return $type->book();
+        return $type->book()->get();
     }
     public function insertDetailBookType($data){
         DetailBookType::create($data);

@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->integer('from_id');
+            $table->integer('to_id');
             $table->string('information');
-            $table->binary('type');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('from_type')->default('member');
+            $table->string('to_type')->default('member');
             $table->timestamps();
         });
     }

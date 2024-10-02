@@ -14,7 +14,8 @@ class DetailGroupUser extends Model
         'id',
         'group_id',
         'user_id',
-        'state'
+        'state',
+        'role'
     ];
     public function group(){
         return $this->belongsTo(Group::class);

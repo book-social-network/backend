@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DetailGroupUserController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TypeController;
+use App\Models\DetailGroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,8 +37,6 @@ Route::group([
 
 
 // Type
-Route::apiResource('types', TypeController::class);
-
 Route::group([
     'prefix' => 'type'
 ], function ($router) {
@@ -43,4 +44,26 @@ Route::group([
     Route::post('/insert', [TypeController::class, 'insert']);
     Route::post('/update/{id}', [TypeController::class, 'update']);
     Route::delete('/delete/{id}', [TypeController::class, 'delete']);
+});
+
+// Group
+Route::group([
+    'prefix' => 'group'
+], function ($router) {
+    Route::get('/get-all', [GroupController::class,'index']);
+    Route::post('/insert', [GroupController::class, 'insert']);
+    Route::post('/update/{id}', [GroupController::class, 'update']);
+    Route::delete('/delete/{id}', [GroupController::class, 'delete']);
+});
+
+// DEtail Group User
+Route::group([
+    'prefix' => 'detail-group-user'
+], function ($router) {
+    Route::get('/get-all', [DetailGroupUserController::class,'index']);
+    Route::get('/get-all-user/{idGroup}',[DetailGroupUserController::class,'getAllUserInGroup']);
+    Route::post('/insert', [DetailGroupUserController::class, 'insert']);
+    Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
+    Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);
+    Route::delete('/delete/{id}', [DetailGroupUserController::class, 'delete']);
 });
