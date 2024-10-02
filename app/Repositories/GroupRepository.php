@@ -9,6 +9,9 @@ class GroupRepository implements GroupInterface{
     public function getGroup($id){
         return Group::find($id);
     }
+    public function getAllGroup(){
+        return Group::get();
+    }
     public function insertGroup($data){
         Group::create($data);
     }
