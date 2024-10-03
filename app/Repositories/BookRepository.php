@@ -14,7 +14,7 @@ class BookRepository implements BookInterface{
         return Book::find($id);
     }
     public function insertBook($data){
-        Book::create($data);
+        return Book::create($data);
     }
     public function updateBook($data, $id){
         $book=Book::find($id);

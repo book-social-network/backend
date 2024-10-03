@@ -16,6 +16,9 @@ class DetailAuthorBookRepository implements DetailAuthorBookInterface{
         $book=Book::find($idBook);
         return $book->author()->get();
     }
+    public function getDetailAuthorBook($id){
+        return DetailAuthorBook::find($id);
+    }
     public function insertDetailAuthorBook($data){
         DetailAuthorBook::create($data);
     }

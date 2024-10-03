@@ -15,7 +15,9 @@ class AuthorController extends Controller
     private $author;
     private $type;
     private $detailAuthorType;
-    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface,DetailAuthorTypeInterface $detailAuthorTypeInterface){
+    private $detailAuthorBook;
+    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface,DetailAuthorTypeInterface $detailAuthorTypeInterface, DetailAuthorBookInterface $detailAuthorBookInterface){
+        $this->detailAuthorBook=$detailAuthorBookInterface;
         $this->author=$authorInterface;
         $this->type=$typeInterface;
         $this->detailAuthorType=$detailAuthorTypeInterface;
@@ -56,6 +58,7 @@ class AuthorController extends Controller
         $this->author->deleteAuthor($id);
         return response()->json(['message' => 'Delete author successful']);
     }
+    //Type book
     public function insertTypeBookForAuthor(Request $request){
         $request->validate([
             'type_id' => 'required|integer',
@@ -75,7 +78,7 @@ class AuthorController extends Controller
     public function deleteTypeBookForAuthor($id){
         $detail=$this->detailAuthorType->getDetailAuthorType($id);
         if(!$detail){
-            return response()->json(['message' => 'Not found type book of book'], 404);
+            return response()->json(['message' => 'Not found type book of author'], 404);
         }
         $this->detailAuthorType->deleteDetailAuthorType($detail->id);
         return response()->json(['message' => 'Insert type for author successful']);
@@ -86,5 +89,13 @@ class AuthorController extends Controller
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         return response()->json($types);
+    }
+    //Book
+    public function getAllBookOfAuthor($idAuthor){
+        $book=$this->detailAuthorBook->getAllBookOfAuthor($idAuthor);
+        if(!$book){
+            return response()->json(['message' => 'Not found author with id'], 404);
+        }
+        return response()->json($book);
     }
 }

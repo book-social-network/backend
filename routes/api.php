@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\DetailGroupUserController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TypeController;
@@ -45,6 +46,9 @@ Route::group([
     Route::post('/insert', [TypeController::class, 'insert']);
     Route::post('/update/{id}', [TypeController::class, 'update']);
     Route::delete('/delete/{id}', [TypeController::class, 'delete']);
+    Route::get('/get-all-author/{idType}', [TypeController::class,'getAllAuthorOfType']);
+    Route::get('/get-all-book/{idType}', [TypeController::class,'getAllBookOfType']);
+
 });
 
 // Group
@@ -80,4 +84,23 @@ Route::group([
     Route::post('/insert-type', [AuthorController::class, 'insertTypeBookForAuthor']);
     Route::delete('/delete-type/{id}', [AuthorController::class, 'deleteTypeBookForAuthor']);
     Route::get('/get-all-type/{idAuthor}',[AuthorController::class,'getAllTypeOfAuthor']);
+    Route::get('/get-all-book/{idAuthor}',[AuthorController::class,'getAllBookOfAuthor']);
+});
+
+Route::group([
+    'prefix' => 'book'
+], function ($router) {
+    Route::get('/get-all', [BookController::class,'index']);
+    Route::get('/get/{id}', [BookController::class,'getBook']);
+    Route::post('/insert', [BookController::class, 'insert']);
+    Route::post('/update/{id}', [BookController::class, 'update']);
+    Route::delete('/delete/{id}', [BookController::class, 'delete']);
+    //type
+    Route::post('/insert-type', [BookController::class, 'insertTypeBookForBook']);
+    Route::delete('/delete-type/{id}', [BookController::class, 'deleteTypeBookForBook']);
+    Route::get('/get-all-type/{idAuthor}',[BookController::class,'getAllTypeOfAuthor']);
+    //author
+    Route::post('/insert-author', [BookController::class, 'insertAuthorForBook']);
+    Route::delete('/delete-author/{id}', [BookController::class, 'deleteAuthorForBook']);
+    Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
 });
