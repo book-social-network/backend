@@ -12,6 +12,9 @@ class AssessmentRepository implements AssessmentInterface{
     public function getAssessment($id){
         return Assessment::find($id);
     }
+    public function getAssessmentWithIdBookAndUser($idBook, $idUser){
+        return Assessment::where('user_id', $idUser)->where('book_id', $idBook);
+    }
     public function getAllAssessmentByUser($idUser){
         return Assessment::where('user_id', $idUser)->get();
     }

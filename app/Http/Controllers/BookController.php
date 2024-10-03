@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetailAuthorBook;
 use App\Models\DetailBookBook;
+use App\Repositories\Interfaces\AssessmentInterface;
 use App\Repositories\Interfaces\AuthorInterface;
 use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
@@ -14,13 +15,14 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private $book, $type, $author, $detailAuthorBook, $detailBookType;
-    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface){
+    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment;
+    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface){
         $this->book=$bookInterface;
         $this->type=$typeInterface;
         $this->author=$authorInterface;
         $this->detailAuthorBook=$detailAuthorBookInterface;
         $this->detailBookType=$detailBookTypeInterface;
+        $this->assessment=$assessmentInterface;
     }
     public function index(){
         $books=$this->book->getAllBooks();
@@ -31,7 +33,8 @@ class BookController extends Controller
         if(!$book){
             return response()->json(['message'=> 'Not found book with id'],404);
         }
-        return response()->json($book);
+        $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id, auth()->user()->id);
+        return response()->json([$book, $assessment || null]);
     }
     public function insert(Request $request){
         $request->validate([

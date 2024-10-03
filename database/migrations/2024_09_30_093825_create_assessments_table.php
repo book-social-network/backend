@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('assessments', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
-            $table->integer('star');
-            $table->integer('state_read');
+            $table->string('description')->nullable();
+            $table->integer('star')->nullable();
+            $table->integer('state_read')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

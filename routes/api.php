@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\DetailGroupUserController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TypeController;
+use App\Http\Controllers\UserController;
 use App\Models\DetailGroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -98,9 +101,44 @@ Route::group([
     //type
     Route::post('/insert-type', [BookController::class, 'insertTypeBookForBook']);
     Route::delete('/delete-type/{id}', [BookController::class, 'deleteTypeBookForBook']);
-    Route::get('/get-all-type/{idAuthor}',[BookController::class,'getAllTypeOfAuthor']);
+    Route::get('/get-all-type/{idBook}',[BookController::class,'getAllTypeOfAuthor']);
     //author
     Route::post('/insert-author', [BookController::class, 'insertAuthorForBook']);
     Route::delete('/delete-author/{id}', [BookController::class, 'deleteAuthorForBook']);
     Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
 });
+
+Route::group([
+    'prefix' => 'user'
+], function ($router) {
+    Route::get('/get-all', [UserController::class,'index']);
+    Route::get('/get/{id}', [UserController::class,'getUser']);
+    Route::post('/insert', [UserController::class, 'insert']);
+    Route::post('/update/{id}', [UserController::class, 'update']);
+    Route::delete('/delete/{id}', [UserController::class, 'delete']);
+});
+
+
+Route::group([
+    'prefix' => 'follow'
+], function ($router) {
+    Route::get('/get-all', [FollowController::class,'getAllFollow']);
+    Route::get('/follow/{id}', [FollowController::class,'handleFollow']);
+    Route::get('/unfollow/{id}', [FollowController::class,'handleUnfollow']);
+});
+
+Route::group([
+    'prefix' => 'assessment'
+], function ($router) {
+    Route::get('/get-all', [AssessmentController::class,'index']);
+    Route::get('/get/{id}', [AssessmentController::class,'getAssessment']);
+    Route::post('/insert', [AssessmentController::class, 'insert']);
+    Route::post('/update/{id}', [AssessmentController::class, 'update']);
+    Route::post('/update-state-read/{idBook}', [AssessmentController::class, 'updateStateRead']);
+    Route::delete('/delete/{id}', [AssessmentController::class, 'delete']);
+    Route::get('/get-assessment-user/{idUser}', [AssessmentController::class,'getAssessmentOfUser']);
+    Route::get('/get-assessment-book/{idBook}', [AssessmentController::class,'getAssessmentOfBook']);
+
+});
+
+
