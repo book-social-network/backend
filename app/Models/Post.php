@@ -15,7 +15,6 @@ class Post extends Model
         'detail_group_user_id',
         'user_id',
         'description',
-        'photo'
     ];
     public function user(){
         return $this->belongsTo(User::class);

@@ -10,19 +10,22 @@ use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\DetailBookBookInterface;
 use App\Repositories\Interfaces\DetailBookTypeInterface;
+use App\Repositories\Interfaces\DetailPostBookInterface;
+use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\TypeInterface;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment;
-    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface){
+    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook;
+    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface){
         $this->book=$bookInterface;
         $this->type=$typeInterface;
         $this->author=$authorInterface;
         $this->detailAuthorBook=$detailAuthorBookInterface;
         $this->detailBookType=$detailBookTypeInterface;
         $this->assessment=$assessmentInterface;
+        $this->detailPostBook=$detailPostBookInterface;
     }
     public function index(){
         $books=$this->book->getAllBooks();
@@ -129,5 +132,13 @@ class BookController extends Controller
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         return response()->json($authors);
+    }
+    // Post
+    public function getAllPostOfBook($idBook){
+        $posts=$this->detailPostBook->getAllPostOfBook($idBook);
+        if(!$posts){
+            return response()->json(['message' => 'Not found post with id'], 404);
+        }
+        return response()->json($posts);
     }
 }

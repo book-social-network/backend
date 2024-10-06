@@ -13,6 +13,10 @@ class LikeRepository implements LikeInterface{
     public function getAllLikeOfUser($idUser){
         return Like::where('user_id', $idUser)->get();
     }
+    public function getLike($id){
+        $like=Like::find($id);
+        return !empty($like) ? $like : null;
+    }
     public function insertLike($data){
         Like::create($data);
     }

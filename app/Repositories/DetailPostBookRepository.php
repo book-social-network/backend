@@ -16,6 +16,10 @@ class DetailPostBookRepository implements DetailPostBookInterface{
         $post=Post::find($idPost);
         return $post->book()->get();
     }
+    public function getDetailPostBook($id){
+        $DetailPostBook=DetailPostBook::find($id);
+        return empty($DetailPostBook) ? $DetailPostBook : null;
+    }
     public function insertDetailPostBook($data){
         DetailPostBook::create($data);
     }

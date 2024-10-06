@@ -6,8 +6,14 @@ use App\Models\Post;
 use App\Repositories\Interfaces\PostInterface;
 
 class PostRepository implements PostInterface{
+    public function getAllPost(){
+        return Post::get();
+    }
     public function getPost($id){
         return Post::find($id);
+    }
+    public function getAllPostByUser($id){
+        return Post::where('user_id', $id)->get();
     }
     public function insertPost($data){
         Post::create($data);
