@@ -12,6 +12,9 @@ class PostRepository implements PostInterface{
     public function getPost($id){
         return Post::find($id);
     }
+    public function getAllPostInGroup($id){
+        return Post::where('group_id', $id)->get();
+    }
     public function getAllPostByUser($id){
         return Post::where('user_id', $id)->get();
     }

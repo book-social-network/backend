@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
+use App\Repositories\Interfaces\PostInterface;
+use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
     private $group;
-    private $detailGroupUser;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface){
+    private $detailGroupUser, $post, $user;
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface){
         $this->group=$groupInterface;
         $this->detailGroupUser=$detailGroupUserInterface;
+        $this->post=$postInterface;
+        $this->user=$userInterface;
     }
 
     public function index(){
@@ -62,5 +66,13 @@ class GroupController extends Controller
         $this->group->deleteGroup($id);
         return response()->json(['message' => 'Group is deleted']);
     }
-
+    // Post
+    public function getAllPostInGroup($id){
+        $group=$this->group->getGroup($id);
+        if (!$group) {
+            return response()->json(['message' => 'Not found group with id'], 404);
+        }
+        $posts=$this->post->getAllPostInGroup($id);
+        return response()->json($posts);
+    }
 }
