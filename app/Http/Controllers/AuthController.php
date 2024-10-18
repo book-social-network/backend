@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Validator;
+use Cloudinary;
 
 class AuthController extends Controller
 {
@@ -14,7 +16,8 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -23,8 +26,9 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request){
-    	$validator = Validator::make($request->all(), [
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
@@ -45,25 +49,44 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
+        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->getRealPath();
+            $uploadResponse = Cloudinary::upload($imagePath);
+
+            $cloudinaryImage = $uploadResponse->getSecurePath();
+        }
+
         $user = User::create(array_merge(
-                    $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                ));
+            $validator->validated(),
+            [
+                'password' => bcrypt($request->password),
+                'image_url' => $cloudinaryImage,
+            ]
+        ));
 
         return response()->json([
             'message' => 'User successfully registered',
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'image_url' => $cloudinaryImage,
+            ]
         ], 201);
     }
 
@@ -72,7 +95,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout() {
+    public function logout()
+    {
         auth()->logout();
 
         return response()->json(['message' => 'User successfully signed out']);
@@ -83,7 +107,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh() {
+    public function refresh()
+    {
         return $this->createNewToken(auth()->refresh());
     }
 
@@ -92,7 +117,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userProfile() {
+    public function userProfile()
+    {
         return response()->json(auth()->user());
     }
 
@@ -103,7 +129,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token){
+    protected function createNewToken($token)
+    {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -112,20 +139,21 @@ class AuthController extends Controller
         ]);
     }
 
-    public function changePassWord(Request $request) {
+    public function changePassWord(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required|string|min:6',
             'new_password' => 'required|string|confirmed|min:6',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
         $userId = auth()->user()->id;
 
         $user = User::where('id', $userId)->update(
-                    ['password' => bcrypt($request->new_password)]
-                );
+            ['password' => bcrypt($request->new_password)]
+        );
 
         return response()->json([
             'message' => 'User successfully changed password',
