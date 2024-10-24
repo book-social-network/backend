@@ -12,7 +12,7 @@ class Follow extends Model
     protected $table='follows';
     protected $fillable=[
         'id',
-        'from_id',
+        'user_id',
         'follower'
     ];
     public function user(){

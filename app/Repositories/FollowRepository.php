@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\FollowInterface;
 
 class FollowRepository implements FollowInterface{
     public function getAllFollowOfUser($idUser){
-        return Follow::where('book_id', $idUser)->get();
+        return Follow::where('user_id', $idUser)->get();
     }
     public function getFollow($id){
         return Follow::find($id);

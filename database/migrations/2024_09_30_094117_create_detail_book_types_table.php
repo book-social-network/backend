@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detail_book_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('type_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

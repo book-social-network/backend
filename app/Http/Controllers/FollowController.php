@@ -29,6 +29,7 @@ class FollowController extends Controller
         if(!$user || !$follower){
             return response()->json(['message' => 'Please login before following user'], 404);
         }
+        // dd($follower->id);
         $follow=$this->follow->insertFollow([
             'user_id' => $user->id,
             'follower' => $follower->id

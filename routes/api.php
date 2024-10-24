@@ -42,7 +42,7 @@ Route::group([
     Route::get('/get-assessment-book/{idBook}', [AssessmentController::class,'getAssessmentOfBook']);
 });
 
-// Auth
+// Auth finish test
 Route::post('/login', action: [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::group([
@@ -55,7 +55,7 @@ Route::group([
     Route::post('/change-pass', [AuthController::class, 'changePassWord']);
 });
 
-// Author
+// Author finish test
 Route::group([
     'prefix' => 'author'
 ], function ($router) {
@@ -93,7 +93,7 @@ Route::group([
     Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
 });
 
-// Detail Group User
+// Detail Group User finish test
 Route::group([
     'prefix' => 'detail-group-user'
 ], function ($router) {
@@ -115,7 +115,7 @@ Route::group([
 });
 
 
-// Group
+// Group finish test 
 Route::group([
     'prefix' => 'group'
 ], function ($router) {
@@ -150,7 +150,7 @@ Route::group([
     Route::delete('/delete-comment/{id}', [PostController::class, 'deleteComment']);
 });
 
-// Type
+// Type finish test
 Route::group([
     'prefix' => 'type'
 ], function ($router) {
