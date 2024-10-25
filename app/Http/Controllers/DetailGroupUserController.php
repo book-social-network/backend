@@ -48,6 +48,7 @@ class DetailGroupUserController extends Controller
 
 
         //  Handle Realtime Notifications
+
         // send notification for member
         $this->notification->insertNotification([
             'from_id' => $group->id,
