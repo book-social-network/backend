@@ -67,7 +67,6 @@ class AuthController extends Controller
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->getRealPath();
             $uploadResponse = Cloudinary::upload($imagePath);
-
             $cloudinaryImage = $uploadResponse->getSecurePath();
         }
 
