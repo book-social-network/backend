@@ -20,7 +20,7 @@ class DetailAuthorBookRepository implements DetailAuthorBookInterface{
         return DetailAuthorBook::find($id);
     }
     public function insertDetailAuthorBook($data){
-        DetailAuthorBook::create($data);
+        return DetailAuthorBook::create($data);
     }
     public function deleteDetailAuthorBook($id){
         $DetailAuthorBook=DetailAuthorBook::find($id);

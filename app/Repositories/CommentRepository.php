@@ -17,7 +17,7 @@ class CommentRepository implements CommentInterface{
         return Comment::where('post_id', $idPost)->get();
     }
     public function insertComment($data){
-        Comment::create($data);
+        return Comment::create($data);
     }
     public function updateComment($data, $id){
         $Comment=Comment::find($id);

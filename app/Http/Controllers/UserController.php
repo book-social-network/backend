@@ -30,7 +30,7 @@ class UserController extends Controller
     {
         $user = $this->user->getUser($id);
         if (!$user) {
-            return response()->json(['message' => 'Not found user']);
+            return response()->json(['message' => 'Not found user'],404);
         }
         return response()->json($user);
     }

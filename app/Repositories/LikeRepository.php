@@ -18,7 +18,7 @@ class LikeRepository implements LikeInterface{
         return !empty($like) ? $like : null;
     }
     public function insertLike($data){
-        Like::create($data);
+        return Like::create($data);
     }
     public function deleteLike($id){
         $Like=Like::find($id);

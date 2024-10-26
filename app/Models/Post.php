@@ -26,4 +26,8 @@ class Post extends Model
     {
         return $this->belongsToMany(Book::class, 'detail_post_books', 'post_id', 'book_id');
     }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

@@ -105,7 +105,7 @@ Route::group([
     Route::delete('/delete/{id}', [DetailGroupUserController::class, 'delete']);
 });
 
-// Follow
+// Follow finish test
 Route::group([
     'prefix' => 'follow'
 ], function ($router) {
@@ -115,7 +115,7 @@ Route::group([
 });
 
 
-// Group finish test 
+// Group finish test
 Route::group([
     'prefix' => 'group'
 ], function ($router) {
@@ -165,7 +165,7 @@ Route::group([
 
 });
 
-// User
+// User finish test
 Route::group([
     'prefix' => 'user'
 ], function ($router) {

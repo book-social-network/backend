@@ -21,7 +21,7 @@ class DetailPostBookRepository implements DetailPostBookInterface{
         return empty($DetailPostBook) ? $DetailPostBook : null;
     }
     public function insertDetailPostBook($data){
-        DetailPostBook::create($data);
+        return DetailPostBook::create($data);
     }
     public function deleteDetailPostBook($id){
         $DetailPostBook=DetailPostBook::find($id);

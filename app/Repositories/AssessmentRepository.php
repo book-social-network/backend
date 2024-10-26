@@ -22,7 +22,7 @@ class AssessmentRepository implements AssessmentInterface{
         return Assessment::where('book_id', $idBook)->get();
     }
     public function insertAssessment($data){
-        Assessment::create($data);
+        return Assessment::create($data);
     }
     public function updateAssessment($data, $id){
         $assessment=Assessment::find($id);

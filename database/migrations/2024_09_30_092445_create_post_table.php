@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('description');
-            $table->foreignId('detail_group_user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('group_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('detail_group_user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

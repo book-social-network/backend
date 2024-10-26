@@ -20,7 +20,7 @@ class DetailBookTypeRepository implements DetailBookTypeInterface{
         return $type->book()->get();
     }
     public function insertDetailBookType($data){
-        DetailBookType::create($data);
+        return DetailBookType::create($data);
     }
     public function deleteDetailBookType($id){
         $DetailBookType=DetailBookType::find($id);

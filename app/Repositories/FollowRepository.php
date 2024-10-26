@@ -13,7 +13,7 @@ class FollowRepository implements FollowInterface{
         return Follow::find($id);
     }
     public function insertFollow($data){
-        Follow::create($data);
+        return Follow::create($data);
     }
     public function deleteFollow($id){
         $Follow=Follow::find($id);

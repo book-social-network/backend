@@ -2,24 +2,25 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class TestUser extends TestCase
 {
+    use RefreshDatabase;
     /**
-     * A basic test example.
+     * A basic feature test example.
      */
-    /** @test */
     public function it_can_get_all_users()
     {
         User::factory()->count(3)->create();
 
         $response = $this->getJson('/api/user/get-all');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+                 ->assertJsonCount(3);
     }
     /** @test */
     public function it_can_get_a_user()
@@ -37,7 +38,7 @@ class ExampleTest extends TestCase
         $response = $this->getJson('/api/user/get/999');
 
         $response->assertStatus(404)
-                ->assertJson(['message' => 'Not found user']);
+                ->assertJson(['message' => 'Not found user with id']);
     }
     /** @test */
     public function it_can_insert_user()
@@ -97,7 +98,8 @@ class ExampleTest extends TestCase
 
         $response = $this->getJson('/api/user/get-all-post/' . $user->id);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+                ->assertJsonCount(2);
     }
 
     /** @test */
@@ -114,16 +116,17 @@ class ExampleTest extends TestCase
 
         // Tạo nhiều comment cho bài post
         $post->comments()->createMany([
-            ['post_id'=>$post->id, 'user_id' => $user->id,'description' => 'Comment 1'],
-            ['post_id'=>$post->id, 'user_id' => $user->id,'description' => 'Comment 2'],
-            ['post_id'=>$post->id, 'user_id' => $user->id,'description' => 'Comment 3'],
+            ['post_id'=>$post->id,, 'user_id' => $user->id,'description' => 'Comment 1'],
+            ['post_id'=>$post->id,, 'user_id' => $user->id,'description' => 'Comment 2'],
+            ['post_id'=>$post->id,, 'user_id' => $user->id,'description' => 'Comment 3'],
         ]);
 
         // Gửi yêu cầu để lấy tất cả comment của user
         $response = $this->getJson('/api/user/get-all-comment/' . $user->id);
 
         // Kiểm tra phản hồi
-        $response->assertStatus(200); // Kiểm tra có 3 comment
+        $response->assertStatus(200)
+                ->assertJsonCount(3); // Kiểm tra có 3 comment
     }
 
     /** @test */
@@ -140,4 +143,5 @@ class ExampleTest extends TestCase
         $response->assertStatus(200)
                 ->assertJsonCount(2);
     }
+
 }

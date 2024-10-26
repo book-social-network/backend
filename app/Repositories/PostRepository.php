@@ -19,7 +19,7 @@ class PostRepository implements PostInterface{
         return Post::where('user_id', $id)->get();
     }
     public function insertPost($data){
-        Post::create($data);
+        return Post::create($data);
     }
     public function updatePost($data, $id){
         $post=Post::find($id);
