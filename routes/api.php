@@ -8,6 +8,7 @@ use App\Http\Controllers\DetailGroupUserController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use App\Models\DetailGroupUser;
@@ -184,8 +185,16 @@ Route::group([
 });
 
 
-
-
-
-
-
+// share
+Route::group([
+    'prefix' => 'share'
+], function ($router) {
+    Route::get('/get-all', [ShareController::class,'index']);
+    Route::get('/get/{id}', [ShareController::class,'getShare']);
+    Route::post('/insert', [ShareController::class, 'insert']);
+    Route::delete('/delete/{id}', [ShareController::class, 'delete']);
+    // user
+    Route::get('/get-all-user/{id}', [ShareController::class,'getAllShareOfUser']);
+    // book
+    Route::get('/get-all-book/{id}', [ShareController::class,'getAllShareOfBook']);
+});

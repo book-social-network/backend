@@ -63,6 +63,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ShareInterface::class, ShareRepository::class);
         $this->app->bind(TypeInterface::class, TypeRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
+        $this->app->bind(ShareInterface::class, concrete: ShareRepository::class);
+
     }
 
     /**
