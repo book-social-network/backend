@@ -15,6 +15,7 @@ class DetailAuthorType extends Model
         'type_id',
         'author_id',
     ];
+    // one
     public function type(){
         return $this->belongsTo(Type::class);
     }

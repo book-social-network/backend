@@ -17,6 +17,7 @@ class Group extends Model
         'state',
 
     ];
+    // many to many
     public function user() {
         return $this->belongsToMany(User::class, 'detail_group_users', 'group_id', 'user_id');
     }

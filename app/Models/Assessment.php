@@ -18,6 +18,7 @@ class Assessment extends Model
         'book_id',
         'user_id',
     ];
+    // one
     public function user(){
         return $this->belongsTo(User::class);
     }

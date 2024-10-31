@@ -61,10 +61,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    // many to many
     public function group()
     {
-        return $this->belongsToMany(Group::class, 'detail_group_users', 'group_id', 'user_id');
+        return $this->belongsToMany(Group::class, 'detail_group_users', 'user_id', 'group_id');
     }
+    // many
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -76,5 +78,17 @@ class User extends Authenticatable implements JWTSubject
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+    public function follows(){
+        return $this->hasMany(Follow::class);
+    }
+    public function detail_group_users(){
+        return $this->hasMany(DetailGroupUser::class);
+    }
+    public function shares(){
+        return $this->hasMany(Share::class);
+    }
+    public function assessments(){
+        return $this->hasMany(Assessment::class);
     }
 }

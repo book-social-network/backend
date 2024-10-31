@@ -62,7 +62,6 @@ class ExampleTest extends TestCase
 
         $data = [
             'name' => 'Jane Doe',
-            'email' => 'jane@example.com',
             'password' => 'newpassword',
             'password_confirmation' => 'newpassword',
         ];

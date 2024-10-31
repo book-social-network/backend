@@ -15,6 +15,7 @@ class DetailPostBook extends Model
         'post_id',
         'book_id',
     ];
+    // one
     public function post(){
         return $this->belongsTo(Post::class);
     }

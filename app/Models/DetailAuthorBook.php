@@ -15,6 +15,7 @@ class DetailAuthorBook extends Model
         'book_id',
         'author_id',
     ];
+    // one
     public function book(){
         return $this->belongsTo(Book::class);
     }

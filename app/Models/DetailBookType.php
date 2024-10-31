@@ -15,6 +15,7 @@ class DetailBookType extends Model
         'book_id',
         'type_id',
     ];
+    // one
     public function book(){
         return $this->belongsTo(Book::class);
     }

@@ -17,6 +17,11 @@ class DetailGroupUser extends Model
         'state',
         'role'
     ];
+    // many
+    public function posts(){
+        return $this->hasMany(Post::class);
+    }
+    // one
     public function group(){
         return $this->belongsTo(Group::class);
     }

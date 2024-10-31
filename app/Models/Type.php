@@ -14,11 +14,19 @@ class Type extends Model
         'id',
         'name',
     ];
+    // many to many
     public function book()
     {
         return $this->belongsToMany(Book::class, 'detail_book_types', 'type_id', 'book_id');
     }
     public function author(){
         return $this->belongsToMany(Author::class, 'detail_auhtor_types', 'type_id', 'author_id');
+    }
+    // many
+    public function detail_book_types(){
+        return $this->hasMany(DetailBookType::class);
+    }
+    public function detail_author_types(){
+        return $this->hasMany(DetailAuthorType::class);
     }
 }
