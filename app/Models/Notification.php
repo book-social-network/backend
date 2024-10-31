@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
-    public $timestamps = false;
+    public $timestamps = true;
     protected $table='notifications';
     protected $fillable=[
         'id',
@@ -16,6 +16,7 @@ class Notification extends Model
         'to_id',
         'information',
         'from_type',
-        'to_type'
+        'to_type',
+        'state'
     ];
 }

@@ -6,18 +6,20 @@ use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\CommentInterface;
 use App\Repositories\Interfaces\DetailPostBookInterface;
 use App\Repositories\Interfaces\LikeInterface;
+use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private $post, $book, $detailPostBook, $like, $comment;
-    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface){
+    private $post, $book, $detailPostBook, $like, $comment, $notification;
+    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface){
         $this->post=$postInterface;
         $this->book=$bookInterface;
         $this->detailPostBook=$detailPostBookInterface;
         $this->like=$likeInterface;
         $this->comment=$commentInterface;
+        $this->notification=$notificationInterface;
     }
     public function index(){
         $posts=$this->post->getAllPost();
@@ -103,6 +105,22 @@ class PostController extends Controller
         return response()->json(['message'=> 'User is not in a group']);
         }
         $this->like->insertLike($request->all());
+        // notification
+        $notification=$this->notification->getNotificationWithPost($post->id);
+        $countCmt=$this->comment->getAllCommentOnPost($post->id)->count();
+        $countLike=$this->like->getAllLikeOfPost($post->id)->count();
+        if(empty($notification)){
+            $this->notification->insertNotification([
+                'from_id' => $post->id,
+                'to_id' => $request->get('user_id'),
+                'information' => 'Đã có '.$countCmt.' comment và '.$countLike.' like bài viết của bạn',
+                'from_type' => 'post',
+            ]);
+        }else{
+            $this->notification->updateNotification([
+                'information' => 'Đã có '.$countCmt.' comment và '.$countLike.' like bài viết của bạn',
+            ],$post->id);
+        }
         return response()->json(['message'=> 'Like in post successful']);
     }
     public function deleteLike($id){
@@ -133,6 +151,22 @@ class PostController extends Controller
             return response()->json(['message'=> 'User is not in a group']);
         }
         $this->comment->insertComment($request->all());
+         // notification
+         $notification=$this->notification->getNotificationWithPost($post->id);
+         $countCmt=$this->comment->getAllCommentOnPost($post->id)->count();
+         $countLike=$this->like->getAllLikeOfPost($post->id)->count();
+         if(empty($notification)){
+             $this->notification->insertNotification([
+                 'from_id' => $post->id,
+                 'to_id' => $request->get('user_id'),
+                 'information' => 'Đã có '.$countCmt.' comment và '.$countLike.' like bài viết của bạn',
+                 'from_type' => 'post',
+             ]);
+         }else{
+             $this->notification->updateNotification([
+                 'information' => 'Đã có '.$countCmt.' comment và '.$countLike.' like bài viết của bạn',
+             ],$post->id);
+         }
         return response()->json(['message'=> 'Comment in post successful']);
     }
     public function updateComment(Request $request, $id){

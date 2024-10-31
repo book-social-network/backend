@@ -8,4 +8,5 @@ interface FollowInterface
     public function insertFollow($data);
     public function deleteFollow($id);
     public function getFollow($id);
+    public function suggestFriends($userId);
 }

@@ -53,4 +53,13 @@ class FollowController extends Controller
         $this->follow->deleteFollow($id);
         return response()->json(['message' => 'Unfollow successful'], 404);
     }
+    public function suggestFriends(){
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login before following user'], 404);
+        }
+        $friend=$this->follow->suggestFriends($user->id);
+        return response()->json($friend);
+    }
+
 }

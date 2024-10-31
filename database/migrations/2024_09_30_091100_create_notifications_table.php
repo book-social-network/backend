@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('information');
             $table->string('from_type')->default('member');
             $table->string('to_type')->default('member');
+            $table->boolean('state')->default(false);
             $table->timestamps();
         });
     }

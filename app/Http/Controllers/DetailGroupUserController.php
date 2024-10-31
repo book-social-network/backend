@@ -41,11 +41,10 @@ class DetailGroupUserController extends Controller
         $data=[
             'group_id' => $group->id,
             'user_id' => $user->id,
-            'state' => 0,
+            'state' => $group->state==true?1:0,
             'role' => 'member'
         ];
         $detail=$this->detailGroupUser->insertDetailGroupUser($data);
-
 
         //  Handle Realtime Notifications
 
@@ -53,17 +52,18 @@ class DetailGroupUserController extends Controller
         $this->notification->insertNotification([
             'from_id' => $group->id,
             'to_id' => $user->id,
-            'information' => 'Bạn vừa gửi yêu cầu tham gia nhóm '. $group->name,
+            'information' => $group->state==true ? 'Bạn đã tham gia group '.$group->name.' thành công.' : 'Bạn vừa gửi yêu cầu tham gia nhóm '. $group->name,
             'from_type' => 'group',
         ]);
-
-        // send notification for group
-        $this->notification->insertNotification([
-            'from_id' => $user->id,
-            'to_id' => $group->id,
-            'information' => $user->name.' vừa gửi yêu cầu tham gia nhóm ',
-            'to_type' => 'group',
-        ]);
+        if($group->state==false){
+            // send notification for group
+            $this->notification->insertNotification([
+                'from_id' => $user->id,
+                'to_id' => $group->id,
+                'information' => $user->name.' vừa gửi yêu cầu tham gia nhóm ',
+                'to_type' => 'group',
+            ]);
+        }
 
         return response()->json($detail);
     }
@@ -76,12 +76,14 @@ class DetailGroupUserController extends Controller
         if(!$detail){
             return response()->json(['message' => 'Not found user or group'], 404);
         }
-        $data=[
-            'group_id' => $detail->group_id,
-            'user_id' => $detail->user_id,
-            'state' => 1
-        ];
-        $this->detailGroupUser->updateDetailGroupUser($data, $detail->id);
+        // notification
+        $this->notification->insertNotification([
+            'from_id' => $detail->group_id,
+            'to_id' => $detail->user_id,
+            'information' => 'Bạn đã tham gia group '.$detail->group()->name.' thành công.',
+            'from_type' => 'group',
+        ]);
+        $this->detailGroupUser->updateDetailGroupUser([ 'state' => 1], $detail->id);
         return response()->json(['message'=> 'User join group successful']);
     }
     public function updateRole(Request $request){
