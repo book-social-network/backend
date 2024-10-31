@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description')->nullable();
             $table->integer('star')->nullable();
-            $table->integer('state_read')->nullable();
+            $table->tinyInteger('state_read')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

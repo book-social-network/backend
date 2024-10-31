@@ -55,7 +55,6 @@ class AuthController extends Controller
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -63,15 +62,6 @@ class AuthController extends Controller
         }
 
         $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->getRealPath();
-            $uploadResponse = Cloudinary::upload($imagePath, [
-                'folder' => 'avatar'
-            ]);
-            $cloudinaryImage = $uploadResponse->getSecurePath();
-        }
-
         $user = User::create(array_merge(
             $validator->validated(),
             [

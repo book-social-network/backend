@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image_group')->nullable();
-            $table->binary('state')->default(value: 0);
+            $table->boolean('state')->default(false);
             $table->timestamps();
         });
     }
