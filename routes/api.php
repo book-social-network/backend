@@ -7,6 +7,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\DetailGroupUserController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TypeController;
@@ -197,4 +198,12 @@ Route::group([
     Route::get('/get-all-user/{id}', [ShareController::class,'getAllShareOfUser']);
     // book
     Route::get('/get-all-book/{id}', [ShareController::class,'getAllShareOfBook']);
+});
+
+Route::group([
+    'prefix' => 'notification'
+], function ($router) {
+    Route::get('/get-all', [NotificationController::class,'index']);
+    Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
+    Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
 });
