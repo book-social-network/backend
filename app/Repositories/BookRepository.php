@@ -20,6 +20,20 @@ class BookRepository implements BookInterface{
         $book=Book::find($id);
         $book->update($data);
     }
+    public function updateScore($id){
+        $book=Book::find($id);
+        $assessment=$book->assessments();
+        $countAssessment=$assessment->count();
+        $sumStar=$assessment->sum('star');
+        $score=$sumStar/$countAssessment;
+        $review=$book->post()->count();
+        $data=[
+            'ratings' => $countAssessment,
+            'reviews' => $review,
+            'assessment_score' => $score,
+        ];
+        $book->update($data);
+    }
     public function deleteBook($id){
 
         $book=Book::find($id);

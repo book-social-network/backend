@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\DetailGroupUser;
 use App\Models\Post;
 use App\Repositories\Interfaces\PostInterface;
 
@@ -32,5 +33,14 @@ class PostRepository implements PostInterface{
             $Post->delete();
         }
     }
-
+    public function checkUserInGroup($idDetailGroupUser, $idUser){
+        if($idDetailGroupUser!=null){
+            $group=DetailGroupUser::find($idDetailGroupUser)->group();
+            if($group->detail_group_users()->where('user_id',$idUser!=null));
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

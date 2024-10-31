@@ -39,6 +39,7 @@ class AssessmentController extends Controller
             'user_id'=>auth()->user()->id
         ];
         $assessment=$this->assessment->insertAssessment($data);
+        $this->book->updateScore($request->get('book_id'));
         return response()->json($assessment);
     }
     public function updateStateRead(Request $request,$idBook){

@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
+use Cloudinary;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -46,17 +47,25 @@ class UserController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|confirmed',
-        ]);
-
         $user = $this->user->getUser($id);
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
         }
-        $this->user->updateUser($request->all(), $user->id);
+        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->getRealPath();
+            $uploadResponse = Cloudinary::upload($imagePath, [
+                'folder' => 'avatar'
+            ]);
+            $cloudinaryImage = $uploadResponse->getSecurePath();
+        }
+        $this->user->updateUser(array_merge(
+            $request->all(),
+            [
+                'password' => bcrypt($request->password),
+                'image_url' => $cloudinaryImage,
+            ]
+        ), $user->id);
         return response()->json(['message' => 'Update user successful']);
     }
     public function delete($id)

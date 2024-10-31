@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
-
+use Cloudinary;
 class GroupController extends Controller
 {
     private $group;
@@ -44,15 +44,24 @@ class GroupController extends Controller
     }
 
     public function update(Request $request,$id){
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'state' => 'required'
-        ]);
         $group=$this->group->getGroup($id);
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
-        $this->group->updateGroup($request->all(),$id);
+        $cloudinaryImage=null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->getRealPath();
+            $uploadResponse = Cloudinary::upload($imagePath, [
+                'folder' => 'group'
+            ]);
+            $cloudinaryImage = $uploadResponse->getSecurePath();
+        }
+        $this->group->updateGroup(array_merge(
+            $request->all(),
+            [
+                'image_group' => $cloudinaryImage,
+            ]
+        ),$id);
         return response()->json(['message' => 'Information group is updated']);
     }
 

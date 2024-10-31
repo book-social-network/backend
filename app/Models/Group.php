@@ -21,4 +21,7 @@ class Group extends Model
     public function user() {
         return $this->belongsToMany(User::class, 'detail_group_users', 'group_id', 'user_id');
     }
+    public function detail_group_users(){
+        return $this->hasMany(DetailGroupUser::class);
+    }
 }
