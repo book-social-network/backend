@@ -13,6 +13,9 @@ class BookRepository implements BookInterface{
     public function getBook($id){
         return Book::find($id);
     }
+    public function getByName($name){
+        return Book::where('name', 'like', '%' . $name . '%')->get();
+    }
     public function insertBook($data){
         return Book::create($data);
     }
@@ -35,7 +38,6 @@ class BookRepository implements BookInterface{
         $book->update($data);
     }
     public function deleteBook($id){
-
         $book=Book::find($id);
         if(!empty($book)){
             $book->delete();

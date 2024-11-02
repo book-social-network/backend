@@ -25,5 +25,8 @@ class GroupRepository implements GroupInterface{
             $Group->delete();
         }
     }
+    public function getByName($name){
+        return Group::where('name', 'like', '%' . $name . '%')->get();
+    }
 
 }

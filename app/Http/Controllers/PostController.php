@@ -8,18 +8,20 @@ use App\Repositories\Interfaces\DetailPostBookInterface;
 use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
+use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private $post, $book, $detailPostBook, $like, $comment, $notification;
-    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface){
+    private $post, $book, $detailPostBook, $like, $comment, $notification, $user;
+    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface, UserInterface $userInterface){
         $this->post=$postInterface;
         $this->book=$bookInterface;
         $this->detailPostBook=$detailPostBookInterface;
         $this->like=$likeInterface;
         $this->comment=$commentInterface;
         $this->notification=$notificationInterface;
+        $this->user=$userInterface;
     }
     public function index(){
         $posts=$this->post->getAllPost();
@@ -28,10 +30,11 @@ class PostController extends Controller
     public function getPost($id){
         $post=$this->post->getPost($id);
         $books=$this->detailPostBook->getBookOfPost($post->id);
+        $user=$this->user->getUser($post->user_id);
         if(!$post){
             return response()->json(['message' => 'Not found post'], 404);
         }
-        return response()->json([$post, $books]);
+        return response()->json([$post, $books, $user]);
     }
     public function insert(Request $request){
         $request->validate([

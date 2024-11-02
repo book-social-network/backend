@@ -7,4 +7,5 @@ interface UserInterface{
     public function insertUser($data);
     public function updateUser($data,$id);
     public function deleteUser($id);
+    public function getByName($name);
 }

@@ -6,6 +6,7 @@ interface BookInterface
 {
     public function getAllBooks();
     public function getBook($id);
+    public function getByName($name);
     public function insertBook($data);
     public function updateBook($data, $id);
     public function updateScore($id);

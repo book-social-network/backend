@@ -35,4 +35,7 @@ class UserRepository implements UserInterface
             $user->delete();
         }
     }
+    public function getByName($name){
+        return User::where('name', 'like', '%' . $name . '%')->get();
+    }
 }

@@ -182,7 +182,6 @@ Route::group([
     Route::get('/get-all-comment/{id}', [UserController::class,'getAllComment']);
     // like
     Route::get('/get-all-like/{id}', [UserController::class,'getAllLike']);
-
 });
 
 
