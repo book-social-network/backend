@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\AssessmentInterface;
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\CommentInterface;
 use App\Repositories\Interfaces\FollowInterface;
 use App\Repositories\Interfaces\LikeInterface;
@@ -14,13 +15,14 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    private $user, $post, $comment, $like;
-    public function __construct(UserInterface $userInterface, PostInterface $postInterface, CommentInterface $commentInterface, LikeInterface $likeInterface)
+    private $user, $post, $comment, $like, $cloud;
+    public function __construct(UserInterface $userInterface, PostInterface $postInterface, CommentInterface $commentInterface, LikeInterface $likeInterface, CloudInterface $cloudInterface)
     {
         $this->user = $userInterface;
         $this->post = $postInterface;
         $this->comment = $commentInterface;
         $this->like = $likeInterface;
+        $this->cloud = $cloudInterface;
     }
     public function index()
     {
@@ -42,7 +44,19 @@ class UserController extends Controller
             'email' => 'required|email',
             'password' => 'required|confirmed',
         ]);
-        $user = $this->user->insertUser($request->all());
+        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+        // Xử lý hình ảnh nếu có
+        if ($request->hasFile('image')) {
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+        }
+
+        $user = $this->user->insertUser(array_merge(
+            $request->all(),
+            [
+                'password' => bcrypt($request->password),
+                'image_url' => $cloudinaryImage,
+            ]
+        ));
         return response()->json($user);
     }
     public function update(Request $request, $id)
@@ -51,13 +65,12 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
         }
-        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+        $cloudinaryImage = $user->image_url;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->getRealPath();
-            $uploadResponse = Cloudinary::upload($imagePath, [
-                'folder' => 'avatar'
-            ]);
-            $cloudinaryImage = $uploadResponse->getSecurePath();
+            if ($user->image_url) {
+                $this->cloud->deleteCloud($user->image_url);
+            }
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
         }
         $this->user->updateUser(array_merge(
             $request->all(),
@@ -74,6 +87,7 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
         }
+        $this->cloud->deleteCloud($user->image_url);
         $this->user->deleteUser($id);
         return response()->json(['message' => 'Delete user successful']);
     }

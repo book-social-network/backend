@@ -6,18 +6,21 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Repositories\Interfaces\CloudInterface;
 use Validator;
 use Cloudinary;
 
 class AuthController extends Controller
 {
+    private $cloud;
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(CloudInterface $cloudInterface)
     {
+        $this->cloud=$cloudInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -64,11 +67,7 @@ class AuthController extends Controller
         $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->getRealPath();
-            $uploadResponse = Cloudinary::upload($imagePath, [
-                'folder' => 'avatar'
-            ]);
-            $cloudinaryImage = $uploadResponse->getSecurePath();
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
         }
 
         $user = User::create(array_merge(
