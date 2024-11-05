@@ -99,6 +99,21 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $posts = $this->post->getAllPostByUser($id);
+        $data=[];
+        foreach($posts as $post){
+            $commemts=[];
+            foreach($post->comment() as $comment){
+                $commemts[]= [
+                    'comment' => $comment,
+                    'user' => $comment->user()
+                ];
+            }
+            $data[]= [
+                'post' => $post,
+                'comments' => $commemts,
+                'likes' => $post->user_on_likes()
+            ];
+        }
         return response()->json($posts);
     }
     // Comment
@@ -109,7 +124,14 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $comments = $this->comment->getAllCommentByUser($id);
-        return response()->json($comments);
+        $data=[];
+        foreach($comments as $comment){
+            $data[]= [
+                'post' => $comment->post(),
+                'comment' => $comment
+            ];
+        }
+        return response()->json($data);
     }
     // Like
     public function getAllLike($id)
@@ -119,6 +141,13 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $likes = $this->like->getAllLikeOfUser($id);
-        return response()->json($likes);
+        $data=[];
+        foreach($likes as $like){
+            $data[]= [
+                'post' => $like->post(),
+                'like' => $like
+            ];
+        }
+        return response()->json($data);
     }
 }

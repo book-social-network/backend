@@ -18,20 +18,20 @@ class Post extends Model
     ];
     // many to many
     public function user_on_comments(){
-        return $this->belongsToMany(User::class,'comments','post_id','comment_id');
+        return $this->belongsToMany(User::class,'comments','comment_id','post_id');
     }
     public function user_on_likes(){
-        return $this->belongsToMany(User::class, 'likes', 'post_id', 'like_id');
+        return $this->belongsToMany(User::class, 'likes', 'like_id','post_id');
     }
-    public function books(){
-        return $this->belongsToMany(Book::class,'detail_post_books','post_id','book_id');
+    public function book(){
+        return $this->belongsToMany(Book::class,'detail_post_books','book_id','post_id');
     }
     // many
-    public function comments()
+    public function comment()
     {
         return $this->hasMany(Comment::class);
     }
-    public function likes(){
+    public function like(){
         return $this->hasMany(Like::class);
     }
 

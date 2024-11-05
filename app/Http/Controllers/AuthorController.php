@@ -30,7 +30,17 @@ class AuthorController extends Controller
     }
     public function getAuthor($id){
         $author=$this->author->getAuthor($id);
-        return response()->json($author);
+        if (!$author) {
+            return response()->json(['message' => 'Not found author with id'], 404);
+        }
+        $types=$this->detailAuthorType->getAllTypeWithAuthor($id);
+        $books=$this->detailAuthorBook->getAllBookOfAuthor($id);
+
+        return response()->json([
+            'author' => $author,
+            'types' => $types,
+            'books' => $books
+        ]);
     }
     public function insert(Request $request)
     {

@@ -13,5 +13,6 @@ class View extends Model
     protected $fillable=[
         'id',
         'ip_address',
+        'last_visited_at'
     ];
 }

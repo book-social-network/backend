@@ -29,12 +29,23 @@ class PostController extends Controller
     }
     public function getPost($id){
         $post=$this->post->getPost($id);
-        $books=$this->detailPostBook->getBookOfPost($post->id);
-        $user=$this->user->getUser($post->user_id);
         if(!$post){
             return response()->json(['message' => 'Not found post'], 404);
         }
-        return response()->json([$post, $books, $user]);
+        $commemts=[];
+        foreach($post->comment() as $comment){
+            $commemts[]= [
+                'comment' => $comment,
+                'user' => $comment->user()
+            ];
+        }
+        return response()->json([
+            'post' => $post,
+            'books' => $post->book(),
+            'user' => $post->user(),
+            'comments' => $commemts,
+            'likes' => $post->user_on_likes()
+        ]);
     }
     public function insert(Request $request){
         $request->validate([
@@ -65,14 +76,6 @@ class PostController extends Controller
         return response()->json(['message' => 'Delete post successful']);
     }
     // Book
-    public function getBookOfPost($idPost){
-        $post=$this->post->getPost($idPost);
-        if(!$post){
-            return response()->json(['message'=> 'Not found post with id'],404);
-        }
-        $books=$this->detailPostBook->getBookOfPost($idPost);
-        return response()->json($books);
-    }
     public function insertBook(Request $request){
         $request->validate([
             'post_id' => 'required|integer',
@@ -90,14 +93,6 @@ class PostController extends Controller
         return response()->json(['message'=> 'Delete book in post successful']);
     }
     // Like
-    public function getAllLike($idPost){
-        $post=$this->post->getPost($idPost);
-        if(!$post){
-            return response()->json(['message'=> 'Not found post'], 404);
-        }
-        $likes=$this->like->getAllLikeOfPost($idPost);
-        return response()->json($likes);
-    }
     public function insertLike(Request $request){
         $request->validate([
             'post_id' => 'required|integer',
@@ -135,14 +130,6 @@ class PostController extends Controller
         return response()->json(['message'=> 'Delete like in post successful']);
     }
     // Comment
-    public function getAllComment($idPost){
-        $post=$this->post->getPost($idPost);
-        if(!$post){
-            return response()->json(['message'=> 'Not found post'], 404);
-        }
-        $comments=$this->comment->getAllCommentOnPost($idPost);
-        return response()->json($comments);
-    }
     public function insertComment(Request $request){
         $request->validate([
             'post_id' => 'required|integer',

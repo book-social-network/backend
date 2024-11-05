@@ -19,7 +19,15 @@ class DetailGroupUserController extends Controller
     }
     public function index(){
         $details=$this->detailGroupUser->getAllDetailGroupUser();
-        return response()->json($details);
+        $data=[];
+        foreach($details as $detail){
+            $data[] = [
+                'detail' => $detail,
+                'group' => $detail->group(),
+                'user' => $detail->user()
+            ];
+        }
+        return response()->json($data);
     }
     public function getAllUserInGroup($idGroup){
         $group=$this->group->getGroup($idGroup);
@@ -27,7 +35,10 @@ class DetailGroupUserController extends Controller
         return response()->json(['message'=> 'Not found group'],404);
         }
         $users=$this->detailGroupUser->getAllUserInGroup($group->id);
-        return response()->json($users);
+        return response()->json([
+            'group' => $group,
+            'users' => $users
+        ]);
     }
     public function insert(Request $request){
         $request->validate([
@@ -67,7 +78,6 @@ class DetailGroupUserController extends Controller
 
         return response()->json($detail);
     }
-
     public function updateState(Request $request){
         $request->validate([
             'id'=> 'required'

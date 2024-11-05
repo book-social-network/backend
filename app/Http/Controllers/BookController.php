@@ -42,8 +42,15 @@ class BookController extends Controller
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
         }
+        $types = $this->detailBookType->getAllTypeOfBook($id);
+        $authors = $this->detailAuthorBook->getAllAuthorOfBook($id);
         $assessment = $this->assessment->getAssessmentWithIdBookAndUser($book->id, auth()->user()->id);
-        return response()->json([$book, $assessment || null]);
+        return response()->json([
+            'book' => $book,
+            'types' => $types,
+            'authors' => $authors,
+            'assessment' => $assessment
+        ]);
     }
     public function insert(Request $request)
     {
@@ -136,14 +143,6 @@ class BookController extends Controller
         $this->detailBookType->deleteDetailBookType($detail->id);
         return response()->json(['message' => 'Insert type for Book successful']);
     }
-    public function getAllTypeOfAuthor($idBook)
-    {
-        $types = $this->detailBookType->getAllTypeOfBook($idBook);
-        if (!$types) {
-            return response()->json(['message' => 'Not found author with id'], 404);
-        }
-        return response()->json($types);
-    }
     //Author
     public function insertAuthorForBook(Request $request)
     {
@@ -170,14 +169,6 @@ class BookController extends Controller
         }
         $this->detailBookType->deleteDetailBookType($detail->id);
         return response()->json(['message' => 'Delete author for Book successful']);
-    }
-    public function getAllAuthorForBook($idBook)
-    {
-        $authors = $this->detailAuthorBook->getAllAuthorOfBook($idBook);
-        if (!$authors) {
-            return response()->json(['message' => 'Not found author with id'], 404);
-        }
-        return response()->json($authors);
     }
     // Post
     public function getAllPostOfBook($idBook)

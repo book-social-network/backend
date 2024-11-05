@@ -17,14 +17,26 @@ class AssessmentController extends Controller
     }
     public function index(){
         $assessments=$this->assessment->getAllAssessments();
-        return response()->json($assessments);
+        $data=[];
+        foreach($assessments as $assessment){
+            $data[]= [
+                'assessment'=> $assessment,
+                'book' => $assessment->book(),
+                'user'=> $assessment->user()
+            ];
+        }
+        return response()->json($data);
     }
     public function getAssessment($id){
         $assessment=$this->assessment->getAssessment($id);
         if(!$assessment){
             return response()->json(['message'=> 'Not found assessment']);
         }
-        return response()->json($assessment);
+        return response()->json([
+            'assessment'=> $assessment,
+            'book' => $assessment->book(),
+            'user'=> $assessment->user()
+        ]);
     }
     public function insert(Request $request){
         $request->validate([
@@ -92,15 +104,31 @@ class AssessmentController extends Controller
         if(!$user){
             return response()->json(['message' => 'Not found any assessment of user'], 404);
         }
-        $assessment=$this->assessment->getAllAssessmentByUser($user->id);
-        return response()->json($assessment);
+        $assessments=$this->assessment->getAllAssessmentByUser($user->id);
+        $data=[];
+        foreach($assessments as $assessment){
+            $data[]= [
+                'assessment'=> $assessment,
+                'book' => $assessment->book(),
+                'user'=> $assessment->user()
+            ];
+        }
+        return response()->json($data);
     }
     public function getAssessmentOfBook($idBook){
         $book=$this->book->getbook($idBook);
         if(!$book){
             return response()->json(['message' => 'Not found any assessment of book'], 404);
         }
-        $assessment=$this->assessment->getAllAssessmentByBook($book->id);
-        return response()->json($assessment);
+        $assessments=$this->assessment->getAllAssessmentByBook($book->id);
+        $data=[];
+        foreach($assessments as $assessment){
+            $data[]= [
+                'assessment'=> $assessment,
+                'book' => $assessment->book(),
+                'user'=> $assessment->user()
+            ];
+        }
+        return response()->json($data);
     }
 }

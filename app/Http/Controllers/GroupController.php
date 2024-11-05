@@ -22,7 +22,14 @@ class GroupController extends Controller
 
     public function index(){
         $groups=$this->group->getAllGroup();
-        return response()->json($groups);
+        $data=[];
+        foreach($groups as $group){
+            $data[] = [
+                'group' => $group,
+                'users' => $group->user()
+            ];
+        }
+        return response()->json($data);
     }
 
     public function insert(Request $request){

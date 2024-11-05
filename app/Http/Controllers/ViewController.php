@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\View;
+use App\Repositories\Interfaces\GroupInterface;
+use App\Repositories\Interfaces\PostInterface;
+use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class ViewController extends Controller
 {
+    private $post, $user, $group;
+    public function __construct(PostInterface $postInterface, UserInterface $userInterface, GroupInterface $groupInterface){
+        $this->post=$postInterface;
+        $this->user=$userInterface;
+        $this->group=$groupInterface;
+    }
     public function getTotalViews()
     {
         $todayStart = now()->startOfDay();
@@ -55,5 +64,11 @@ class ViewController extends Controller
                      ->get();
 
         return response()->json($views);
+    }
+    public function statistical(){
+        $countPost=$this->post->getAllPost()->count();
+        $countUser=$this->user->getAllUsers()->count();
+        $countGroup=$this->group->getAllGroup()->count();
+        return response()->json([$countGroup, $countUser, $countPost]);
     }
 }

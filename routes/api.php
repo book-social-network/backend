@@ -88,11 +88,9 @@ Route::group([
     //type
     Route::post('/insert-type', [BookController::class, 'insertTypeBookForBook']);
     Route::delete('/delete-type/{id}', [BookController::class, 'deleteTypeBookForBook']);
-    Route::get('/get-all-type/{idBook}',[BookController::class,'getAllTypeOfAuthor']);
     //author
     Route::post('/insert-author', [BookController::class, 'insertAuthorForBook']);
     Route::delete('/delete-author/{id}', [BookController::class, 'deleteAuthorForBook']);
-    Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
     // post
     Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
 });
@@ -249,4 +247,5 @@ Route::group([
     Route::get('/views-by-week', [ViewController::class, 'getViewsByWeek']);
     Route::get('/views-by-month', [ViewController::class, 'getViewsByMonth']);
     Route::get('/views-by-year', [ViewController::class, 'getViewsByYear']);
+    Route::get('/statistical', [ViewController::class, 'statistical']);
 });
