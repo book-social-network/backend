@@ -9,9 +9,11 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfessionController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ViewController;
 use App\Models\DetailGroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -114,6 +116,7 @@ Route::group([
     Route::get('/get-all', [FollowController::class,'getAllFollow']);
     Route::get('/follow/{id}', [FollowController::class,'handleFollow']);
     Route::get('/unfollow/{id}', [FollowController::class,'handleUnfollow']);
+    Route::get('/suggest-friends',[FollowController::class,'suggestFriends']);
 });
 
 
@@ -126,6 +129,15 @@ Route::group([
     Route::post('/update/{id}', [GroupController::class, 'update']);
     Route::delete('/delete/{id}', [GroupController::class, 'delete']);
     Route::get('/get-all-post-group/{id}', [GroupController::class, 'getAllPostInGroup']);
+});
+
+//Notification
+Route::group([
+    'prefix' => 'notification'
+], function ($router) {
+    Route::get('/get-all', [NotificationController::class,'index']);
+    Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
+    Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
 });
 
 // Post
@@ -152,6 +164,26 @@ Route::group([
     Route::delete('/delete-comment/{id}', [PostController::class, 'deleteComment']);
 });
 
+// Profession
+Route::group([
+    'prefix' => 'profession'
+], function ($router) {
+    Route::post('/searh', [ProfessionController::class, 'searh']);
+});
+// Share
+Route::group([
+    'prefix' => 'share'
+], function ($router) {
+    Route::get('/get-all', [ShareController::class,'index']);
+    Route::post('/insert', [ShareController::class, 'insert']);
+    Route::post('/update/{id}', [ShareController::class, 'update']);
+    Route::delete('/delete/{id}', [ShareController::class, 'delete']);
+    // author
+    Route::get('/get-all-author/{idType}', [ShareController::class,'getAllAuthorOfType']);
+    // book
+    Route::get('/get-all-book/{idType}', [ShareController::class,'getAllBookOfType']);
+
+});
 // Type finish test
 Route::group([
     'prefix' => 'type'
@@ -199,10 +231,22 @@ Route::group([
     Route::get('/get-all-book/{id}', [ShareController::class,'getAllShareOfBook']);
 });
 
+// notification
 Route::group([
     'prefix' => 'notification'
 ], function ($router) {
     Route::get('/get-all', [NotificationController::class,'index']);
     Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
     Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
+});
+
+// view
+Route::group([
+    'prefix' => 'view'
+], function ($router){
+    Route::get('/total-views', [ViewController::class, 'getTotalViews']);
+    Route::get('/views-by-day', [ViewController::class, 'getViewsByDay']);
+    Route::get('/views-by-week', [ViewController::class, 'getViewsByWeek']);
+    Route::get('/views-by-month', [ViewController::class, 'getViewsByMonth']);
+    Route::get('/views-by-year', [ViewController::class, 'getViewsByYear']);
 });

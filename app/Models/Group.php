@@ -13,9 +13,9 @@ class Group extends Model
     protected $fillable=[
         'id',
         'name',
+        'title',
         'image_group',
         'state',
-
     ];
     // many to many
     public function user() {
