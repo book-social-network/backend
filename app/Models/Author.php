@@ -22,11 +22,11 @@ class Author extends Model
     // many to many
     public function book()
     {
-        return $this->belongsToMany(Book::class, 'detail_author_books', 'author_id', 'book_id');
+        return $this->belongsToMany(Book::class, 'detail_author_books', 'book_id', 'author_id');
     }
     public function type()
     {
-        return $this->belongsToMany(Type::class, 'detail_author_types', 'author_id', 'type_id');
+        return $this->belongsToMany(Type::class, 'detail_author_types', 'type_id', 'author_id');
     }
     // many
     public function detail_author_books(){

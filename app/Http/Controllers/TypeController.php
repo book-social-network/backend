@@ -55,19 +55,26 @@ class TypeController extends Controller
     // author
     public function getAllAuthorOfType($idType)
     {
-        $authors = $this->detailAuthorType->getAllAuthorWithType($idType);
-        if (!$authors) {
+        $type = $this->type->getType($idType);
+        if (!$type) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
-        return response()->json($authors);
+        return response()->json([
+            'type' => $type,
+            'authors' => $type->author()
+        ]);
     }
     //book
     public function getAllBookOfType($idType)
     {
-        $book = $this->detailBookType->getAllBookOfType($idType);
-        if (!$book) {
+        $type = $this->type->getType($idType);
+
+        if (!$type) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
-        return response()->json($book);
+        return response()->json([
+            'type' => $type,
+            'books' => $type->book()
+        ]);
     }
 }

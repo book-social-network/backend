@@ -7,6 +7,7 @@ use App\Models\DetailBookBook;
 use App\Repositories\Interfaces\AssessmentInterface;
 use App\Repositories\Interfaces\AuthorInterface;
 use App\Repositories\Interfaces\BookInterface;
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\DetailBookBookInterface;
 use App\Repositories\Interfaces\DetailBookTypeInterface;
@@ -18,8 +19,8 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook;
-    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface)
+    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook, $cloud;
+    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface, CloudInterface $cloudInterface)
     {
         $this->book = $bookInterface;
         $this->type = $typeInterface;
@@ -28,6 +29,7 @@ class BookController extends Controller
         $this->detailBookType = $detailBookTypeInterface;
         $this->assessment = $assessmentInterface;
         $this->detailPostBook = $detailPostBookInterface;
+        $this->cloud=$cloudInterface;
     }
     public function index()
     {
@@ -40,26 +42,28 @@ class BookController extends Controller
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
         }
+        $types = $this->detailBookType->getAllTypeOfBook($id);
+        $authors = $this->detailAuthorBook->getAllAuthorOfBook($id);
         $assessment = $this->assessment->getAssessmentWithIdBookAndUser($book->id, auth()->user()->id);
-        return response()->json([$book, $assessment || null]);
+        return response()->json([
+            'book' => $book,
+            'types' => $types,
+            'authors' => $authors,
+            'assessment' => $assessment
+        ]);
     }
     public function insert(Request $request)
     {
         $request->validate([
             'name' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'link_book' => 'required' // Kiểm tra rằng link_book là một URL hợp lệ
         ]);
 
         $cloudinaryImage = null;
 
         // Xử lý hình ảnh nếu có
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->getRealPath();
-            $uploadResponse = Cloudinary::upload($imagePath, [
-                'folder' => 'book'
-            ]);
-            $cloudinaryImage = $uploadResponse->getSecurePath();
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'book');
         }
 
         // Tạo dữ liệu sách
@@ -76,14 +80,29 @@ class BookController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'image' => 'required',
-            'link_book' => 'required'
         ]);
+
         $book = $this->book->getBook($id);
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
         }
-        $this->book->updateBook($request->all(), $book->id);
+
+        $cloudinaryImage = $book->image;
+
+        if ($request->hasFile('image')) {
+            if ($book->image) {
+                $this->cloud->deleteCloud($book->image);
+            }
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'book');
+        }
+
+        $this->book->updateBook(array_merge(
+            $request->all(),
+            [
+                'image' => $cloudinaryImage,
+            ]
+        ), $book->id);
+
         return response()->json(['message' => 'Update book successful']);
     }
     public function delete($id)
@@ -92,6 +111,7 @@ class BookController extends Controller
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
         }
+        $this->cloud->deleteCloud($book->image);
         $this->book->deleteBook($id);
         return response()->json(['message' => 'Delete book successful']);
     }
@@ -122,14 +142,6 @@ class BookController extends Controller
         $this->detailBookType->deleteDetailBookType($detail->id);
         return response()->json(['message' => 'Insert type for Book successful']);
     }
-    public function getAllTypeOfAuthor($idBook)
-    {
-        $types = $this->detailBookType->getAllTypeOfBook($idBook);
-        if (!$types) {
-            return response()->json(['message' => 'Not found author with id'], 404);
-        }
-        return response()->json($types);
-    }
     //Author
     public function insertAuthorForBook(Request $request)
     {
@@ -156,14 +168,6 @@ class BookController extends Controller
         }
         $this->detailBookType->deleteDetailBookType($detail->id);
         return response()->json(['message' => 'Delete author for Book successful']);
-    }
-    public function getAllAuthorForBook($idBook)
-    {
-        $authors = $this->detailAuthorBook->getAllAuthorOfBook($idBook);
-        if (!$authors) {
-            return response()->json(['message' => 'Not found author with id'], 404);
-        }
-        return response()->json($authors);
     }
     // Post
     public function getAllPostOfBook($idBook)

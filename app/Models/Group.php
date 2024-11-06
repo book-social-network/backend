@@ -13,13 +13,13 @@ class Group extends Model
     protected $fillable=[
         'id',
         'name',
+        'title',
         'image_group',
         'state',
-
     ];
     // many to many
     public function user() {
-        return $this->belongsToMany(User::class, 'detail_group_users', 'group_id', 'user_id');
+        return $this->belongsToMany(User::class, 'detail_group_users', 'user_id', 'group_id');
     }
     public function detail_group_users(){
         return $this->hasMany(DetailGroupUser::class);

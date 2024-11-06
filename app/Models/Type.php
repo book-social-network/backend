@@ -17,10 +17,10 @@ class Type extends Model
     // many to many
     public function book()
     {
-        return $this->belongsToMany(Book::class, 'detail_book_types', 'type_id', 'book_id');
+        return $this->belongsToMany(Book::class, 'detail_book_types', 'book_id', 'type_id');
     }
     public function author(){
-        return $this->belongsToMany(Author::class, 'detail_auhtor_types', 'type_id', 'author_id');
+        return $this->belongsToMany(Author::class, 'detail_auhtor_types', 'author_id', 'type_id');
     }
     // many
     public function detail_book_types(){

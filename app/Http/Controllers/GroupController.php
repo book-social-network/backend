@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\PostInterface;
@@ -11,8 +12,8 @@ use Cloudinary;
 class GroupController extends Controller
 {
     private $group;
-    private $detailGroupUser, $post, $user;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface){
+    private $detailGroupUser, $post, $user, $cloud;
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface){
         $this->group=$groupInterface;
         $this->detailGroupUser=$detailGroupUserInterface;
         $this->post=$postInterface;
@@ -21,7 +22,14 @@ class GroupController extends Controller
 
     public function index(){
         $groups=$this->group->getAllGroup();
-        return response()->json($groups);
+        $data=[];
+        foreach($groups as $group){
+            $data[] = [
+                'group' => $group,
+                'users' => $group->user()
+            ];
+        }
+        return response()->json($data);
     }
 
     public function insert(Request $request){
@@ -32,7 +40,17 @@ class GroupController extends Controller
         if(!$user){
             return response()->json(['message' => 'Not found user with id'], 404);
         }
-        $group=$this->group->insertGroup($request->all());
+        $cloudinaryImage=null;
+        if ($request->hasFile('image')) {
+
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'group');
+        }
+        $group=$this->group->insertGroup(array_merge(
+            $request->all(),
+            [
+                'image_group' => $cloudinaryImage,
+            ]
+        ));
         $data=[
             'group_id' => $group->id,
             'user_id' => $user->id,
@@ -48,13 +66,12 @@ class GroupController extends Controller
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
-        $cloudinaryImage=null;
+        $cloudinaryImage=$group->image_group;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->getRealPath();
-            $uploadResponse = Cloudinary::upload($imagePath, [
-                'folder' => 'group'
-            ]);
-            $cloudinaryImage = $uploadResponse->getSecurePath();
+            if ($group->image_group) {
+                $this->cloud->deleteCloud($group->image_group);
+            }
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'group');
         }
         $this->group->updateGroup(array_merge(
             $request->all(),
@@ -71,7 +88,7 @@ class GroupController extends Controller
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
-
+        $this->cloud->deleteCloud($group->image_group);
         $this->group->deleteGroup($id);
         return response()->json(['message' => 'Group is deleted']);
     }

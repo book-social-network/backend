@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\DetailAuthorType;
 use App\Repositories\Interfaces\AuthorInterface;
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\DetailAuthorTypeInterface;
 use App\Repositories\Interfaces\TypeInterface;
@@ -15,12 +16,13 @@ class AuthorController extends Controller
     private $author;
     private $type;
     private $detailAuthorType;
-    private $detailAuthorBook;
-    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface,DetailAuthorTypeInterface $detailAuthorTypeInterface, DetailAuthorBookInterface $detailAuthorBookInterface){
+    private $detailAuthorBook, $cloud;
+    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface,DetailAuthorTypeInterface $detailAuthorTypeInterface, DetailAuthorBookInterface $detailAuthorBookInterface, CloudInterface $cloudInterface){
         $this->detailAuthorBook=$detailAuthorBookInterface;
         $this->author=$authorInterface;
         $this->type=$typeInterface;
         $this->detailAuthorType=$detailAuthorTypeInterface;
+        $this->cloud=$cloudInterface;
     }
     public function index(){
         $authors=$this->author->getAllAuthors();
@@ -28,16 +30,42 @@ class AuthorController extends Controller
     }
     public function getAuthor($id){
         $author=$this->author->getAuthor($id);
-        return response()->json($author);
+        if (!$author) {
+            return response()->json(['message' => 'Not found author with id'], 404);
+        }
+        $types=$this->detailAuthorType->getAllTypeWithAuthor($id);
+        $books=$this->detailAuthorBook->getAllBookOfAuthor($id);
+
+        return response()->json([
+            'author' => $author,
+            'types' => $types,
+            'books' => $books
+        ]);
     }
-    public function insert(Request $request){
+    public function insert(Request $request)
+    {
         $request->validate([
             'name' => 'required|string',
-            'image' => 'required'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $author=$this->author->insertAuthor($request->all());
-        return response()->json($author);
+        $cloudinaryImage = null;
+
+        // Xử lý hình ảnh nếu có
+        if ($request->hasFile('image')) {
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'author');
+        }
+
+        // Tạo dữ liệu sách
+        $authorData = array_merge($request->all(), ['image' => $cloudinaryImage]);
+
+        try {
+            // Chèn vào cơ sở dữ liệu
+            $authorData = $this->author->insertAuthor($authorData);
+            return response()->json($authorData, 201); // Trả về mã trạng thái 201 để chỉ ra rằng tài nguyên đã được tạo
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Unable to insert book.'], 500);
+        }
     }
     public function update(Request $request,$id){
         $request->validate([
@@ -47,7 +75,20 @@ class AuthorController extends Controller
         if(!$author){
             return response()->json(['message' => 'Not found author with id'], 404);
         }
-        $this->author->updateAuthor($request->all(),$id);
+        $cloudinaryImage = $author->image;
+        if ($request->hasFile('image')) {
+            if ($author->image) {
+                $this->cloud->deleteCloud($author->image);
+            }
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+        }
+        $this->author->updateAuthor(array_merge(
+            $request->all(),
+            [
+                'password' => bcrypt($request->password),
+                'image' => $cloudinaryImage,
+            ]
+        ), $author->id);
         return response()->json(['message' => 'Update author successful']);
     }
     public function delete($id){
@@ -55,6 +96,7 @@ class AuthorController extends Controller
         if(!$author){
             return response()->json(['message' => 'Not found author with id'], 404);
         }
+        $this->cloud->deleteCloud($author->image);
         $this->author->deleteAuthor($id);
         return response()->json(['message' => 'Delete author successful']);
     }

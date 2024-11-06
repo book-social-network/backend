@@ -21,7 +21,10 @@ class FollowController extends Controller
             return response()->json(['message' => 'Please login'], 404);
         }
         $followers=$this->follow->getAllFollowOfUser($user->id);
-        return response()->json($followers);
+        return response()->json([
+            'user' => $user,
+            'followers' => $followers
+        ]);
     }
     public function handleFollow($id){
         $user=auth()->user();
