@@ -31,12 +31,14 @@ use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\ShareInterface;
 use App\Repositories\Interfaces\TypeInterface;
 use App\Repositories\Interfaces\UserInterface;
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\LikeRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\ShareRepository;
 use App\Repositories\TypeRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\CloudRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -64,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TypeInterface::class, TypeRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(ShareInterface::class, concrete: ShareRepository::class);
-
+        $this->app->bind(CloudInterface::class, concrete: CloudRepository::class);
     }
 
     /**
