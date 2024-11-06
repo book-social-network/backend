@@ -64,7 +64,6 @@ class BookController extends Controller
 
         // Tạo dữ liệu sách
         $bookData = array_merge($request->all(), ['image' => $cloudinaryImage]);
-
         try {
             // Chèn vào cơ sở dữ liệu
             $book = $this->book->insertBook($bookData);
