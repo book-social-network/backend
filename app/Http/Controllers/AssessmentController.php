@@ -21,8 +21,8 @@ class AssessmentController extends Controller
         foreach($assessments as $assessment){
             $data[]= [
                 'assessment'=> $assessment,
-                'book' => $assessment->book(),
-                'user'=> $assessment->user()
+                'book' => $assessment->book()->get(),
+                'user'=> $assessment->user()->get()
             ];
         }
         return response()->json($data);
@@ -34,8 +34,8 @@ class AssessmentController extends Controller
         }
         return response()->json([
             'assessment'=> $assessment,
-            'book' => $assessment->book(),
-            'user'=> $assessment->user()
+            'book' => $assessment->book()->get(),
+            'user'=> $assessment->user()->get()
         ]);
     }
     public function insert(Request $request){
@@ -99,20 +99,33 @@ class AssessmentController extends Controller
         $this->assessment->deleteAssessment($id);
         return response()->json(['message' => 'Delete assessment successful']);
     }
-    public function getAssessmentOfUser($idUser){
+    public function getAssessmentOfUser($idUser, $state=null){
         $user=$this->user->getUser($idUser);
         if(!$user){
             return response()->json(['message' => 'Not found any assessment of user'], 404);
         }
         $assessments=$this->assessment->getAllAssessmentByUser($user->id);
         $data=[];
-        foreach($assessments as $assessment){
-            $data[]= [
-                'assessment'=> $assessment,
-                'book' => $assessment->book(),
-                'user'=> $assessment->user()
-            ];
+        if($state==null){
+            foreach($assessments as $assessment){
+                $data[]= [
+                    'assessment'=> $assessment,
+                    'book' => $assessment->book()->get(),
+                    'user'=> $assessment->user()->get()
+                ];
+            }
+        }else{
+            foreach($assessments as $assessment){
+                if($assessment->state_read==$state){
+                    $data[]= [
+                        'assessment'=> $assessment,
+                        'book' => $assessment->book()->get(),
+                        'user'=> $assessment->user()->get()
+                    ];
+                }
+            }
         }
+
         return response()->json($data);
     }
     public function getAssessmentOfBook($idBook){
@@ -125,8 +138,8 @@ class AssessmentController extends Controller
         foreach($assessments as $assessment){
             $data[]= [
                 'assessment'=> $assessment,
-                'book' => $assessment->book(),
-                'user'=> $assessment->user()
+                'book' => $assessment->book()->get(),
+                'user'=> $assessment->user()->get()
             ];
         }
         return response()->json($data);

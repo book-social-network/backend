@@ -61,7 +61,7 @@ class TypeController extends Controller
         }
         return response()->json([
             'type' => $type,
-            'authors' => $type->author()
+            'authors' => $type->author()->get()
         ]);
     }
     //book
@@ -74,7 +74,7 @@ class TypeController extends Controller
         }
         return response()->json([
             'type' => $type,
-            'books' => $type->book()
+            'books' => $type->book()->get()
         ]);
     }
 }

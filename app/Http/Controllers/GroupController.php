@@ -26,7 +26,7 @@ class GroupController extends Controller
         foreach($groups as $group){
             $data[] = [
                 'group' => $group,
-                'users' => $group->user()
+                'users' => $group->user()->get()
             ];
         }
         return response()->json($data);
@@ -98,7 +98,7 @@ class GroupController extends Controller
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
-        $posts=$this->post->getAllPostInGroup($id);
+        $posts=$this->post->getAllPostInGroup($id,1,10);
         return response()->json($posts);
     }
 }

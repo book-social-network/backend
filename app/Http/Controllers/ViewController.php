@@ -66,7 +66,7 @@ class ViewController extends Controller
         return response()->json($views);
     }
     public function statistical(){
-        $countPost=$this->post->getAllPost()->count();
+        $countPost=$this->post->getAllPost(1,10)->count();
         $countUser=$this->user->getAllUsers()->count();
         $countGroup=$this->group->getAllGroup()->count();
         return response()->json([$countGroup, $countUser, $countPost]);

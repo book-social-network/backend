@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table = 'books';
     protected $fillable = [
         'id',
@@ -18,19 +17,20 @@ class Book extends Model
         'reviews',
         'assessment_score',
         'link_book',
+        'description'
     ];
     // many to many
     public function author()
     {
-        return $this->belongsToMany(Author::class, 'detail_author_books', 'author_id', 'book_id');
+        return $this->belongsToMany(Author::class, 'detail_author_books', 'book_id', 'author_id');
     }
     public function post()
     {
-        return $this->belongsToMany(Post::class, 'detail_post_books', 'post_id', 'book_id');
+        return $this->belongsToMany(Post::class, 'detail_post_books', 'book_id', 'post_id');
     }
     public function type()
     {
-        return $this->belongsToMany(Type::class, 'detail_book_types', 'type_id', 'book_id');
+        return $this->belongsToMany(Type::class, 'detail_book_types', 'book_id', 'type_id');
     }
     // many
     public function assessments(){

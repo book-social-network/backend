@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\UserInterface;
@@ -34,5 +35,17 @@ class ProfessionController extends Controller
         }
         return response()->json($results);
     }
-
+    public function sort(Request $request){
+        $sort=$request->input('sort', 'ratings');
+        if($sort==null){
+            return response()->json(['message'=> 'Not found value in search'],404);
+        }
+        if($sort=='ratings'){
+            return Book::orderBy('ratings', 'desc')
+            ->get();
+        }else if($sort=='posts'){
+            return Book::withCount('posts')->orderBy('posts_count', 'desc')->get();
+        }
+        return response()->json(['message'=> 'Not found value in search'],404);
+    }
 }

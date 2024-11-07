@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('reviews')->default(0);
             $table->double('assessment_score')->default(0);
             $table->string('link_book');
+            $table->string('description');
             $table->timestamps();
         });
     }

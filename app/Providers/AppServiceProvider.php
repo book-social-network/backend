@@ -6,6 +6,7 @@ use App\Models\DetailBookType;
 use App\Repositories\AssessmentRepository;
 use App\Repositories\AuthorRepository;
 use App\Repositories\BookRepository;
+use App\Repositories\CloudRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\DetailAuthorBookRepository;
 use App\Repositories\DetailAuthorTypeRepository;
@@ -17,6 +18,7 @@ use App\Repositories\GroupRepository;
 use App\Repositories\Interfaces\AssessmentInterface;
 use App\Repositories\Interfaces\AuthorInterface;
 use App\Repositories\Interfaces\BookInterface;
+use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\CommentInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\DetailAuthorTypeInterface;
@@ -64,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TypeInterface::class, TypeRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(ShareInterface::class, concrete: ShareRepository::class);
+        $this->app->bind(CloudInterface::class, concrete: CloudRepository::class);
 
     }
 

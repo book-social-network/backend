@@ -24,8 +24,23 @@ class PostController extends Controller
         $this->user=$userInterface;
     }
     public function index(){
-        $posts=$this->post->getAllPost();
-        return response()->json($posts);
+        $posts=$this->post->getAllPost(1,10);
+        $data=[];
+        foreach($posts as $post){
+            $commemts=[];
+            foreach($post->comment()->get() as $comment){
+                $commemts[]= [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $data[]= [
+                'post' => $post,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get()
+            ];
+        }
+        return response()->json($data);
     }
     public function getPost($id){
         $post=$this->post->getPost($id);
@@ -33,18 +48,18 @@ class PostController extends Controller
             return response()->json(['message' => 'Not found post'], 404);
         }
         $commemts=[];
-        foreach($post->comment() as $comment){
+        foreach($post->comment()->get() as $comment){
             $commemts[]= [
                 'comment' => $comment,
-                'user' => $comment->user()
+                'user' => $comment->user()->get()
             ];
         }
         return response()->json([
             'post' => $post,
-            'books' => $post->book(),
-            'user' => $post->user(),
+            'books' => $post->book()->get(),
+            'user' => $post->user()->get(),
             'comments' => $commemts,
-            'likes' => $post->user_on_likes()
+            'likes' => $post->user_on_likes()->get()
         ]);
     }
     public function insert(Request $request){

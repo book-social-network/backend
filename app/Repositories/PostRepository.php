@@ -8,16 +8,19 @@ use App\Repositories\Interfaces\PostInterface;
 
 class PostRepository implements PostInterface{
     public function getAllPost(){
-        return Post::get();
+        return Post::orderBy('created_at', 'desc')->get();
+    }
+    public function getAllPostOnPage($page , $num){
+        return Post::orderBy('created_at', 'desc')->skip(($page - 1) * $num)->take($num)->get();
     }
     public function getPost($id){
         return Post::find($id);
     }
-    public function getAllPostInGroup($id){
-        return Post::where('group_id', $id)->get();
+    public function getAllPostInGroup($id, $page, $num){
+        return Post::where('group_id', $id)->skip(($page - 1) * $num)->take($num)->orderBy('created_at', 'desc')->get();
     }
     public function getAllPostByUser($id){
-        return Post::where('user_id', $id)->get();
+        return Post::where('user_id', $id)->orderBy('created_at', 'desc')->get();
     }
     public function insertPost($data){
         return Post::create($data);

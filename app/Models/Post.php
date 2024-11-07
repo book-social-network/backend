@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='posts';
     protected $fillable=[
         'id',
@@ -18,13 +17,13 @@ class Post extends Model
     ];
     // many to many
     public function user_on_comments(){
-        return $this->belongsToMany(User::class,'comments','comment_id','post_id');
+        return $this->belongsToMany(User::class,'comments','post_id','user_id');
     }
     public function user_on_likes(){
-        return $this->belongsToMany(User::class, 'likes', 'like_id','post_id');
+        return $this->belongsToMany(User::class, 'likes','post_id', 'user_id');
     }
     public function book(){
-        return $this->belongsToMany(Book::class,'detail_post_books','book_id','post_id');
+        return $this->belongsToMany(Book::class,'detail_post_books','post_id','book_id');
     }
     // many
     public function comment()

@@ -105,13 +105,13 @@ class UserController extends Controller
             foreach($post->comment() as $comment){
                 $commemts[]= [
                     'comment' => $comment,
-                    'user' => $comment->user()
+                    'user' => $comment->user()->get()
                 ];
             }
             $data[]= [
                 'post' => $post,
                 'comments' => $commemts,
-                'likes' => $post->user_on_likes()
+                'likes' => $post->user_on_likes()->get()
             ];
         }
         return response()->json($posts);
@@ -127,7 +127,7 @@ class UserController extends Controller
         $data=[];
         foreach($comments as $comment){
             $data[]= [
-                'post' => $comment->post(),
+                'post' => $comment->post()->get(),
                 'comment' => $comment
             ];
         }
@@ -144,7 +144,7 @@ class UserController extends Controller
         $data=[];
         foreach($likes as $like){
             $data[]= [
-                'post' => $like->post(),
+                'post' => $like->post()->get(),
                 'like' => $like
             ];
         }

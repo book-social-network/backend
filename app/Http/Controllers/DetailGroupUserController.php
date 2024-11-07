@@ -23,8 +23,8 @@ class DetailGroupUserController extends Controller
         foreach($details as $detail){
             $data[] = [
                 'detail' => $detail,
-                'group' => $detail->group(),
-                'user' => $detail->user()
+                'group' => $detail->group()->get(),
+                'user' => $detail->user()->get()
             ];
         }
         return response()->json($data);
