@@ -36,14 +36,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group([
     'prefix' => 'assessment'
 ], function ($router) {
-    Route::get('/get-all', [AssessmentController::class,'index']);
-    Route::get('/get/{id}', [AssessmentController::class,'getAssessment']);
+    Route::get('/get-all', [AssessmentController::class, 'index']);
+    Route::get('/get/{id}', [AssessmentController::class, 'getAssessment']);
     Route::post('/insert', [AssessmentController::class, 'insert']);
     Route::post('/update/{id}', [AssessmentController::class, 'update']);
     Route::post('/update-state-read/{idBook}', [AssessmentController::class, 'updateStateRead']);
     Route::delete('/delete/{id}', [AssessmentController::class, 'delete']);
-    Route::get('/get-assessment-user/{idUser}', [AssessmentController::class,'getAssessmentOfUser']);
-    Route::get('/get-assessment-book/{idBook}', [AssessmentController::class,'getAssessmentOfBook']);
+    Route::get('/get-assessment-user/{idUser}', [AssessmentController::class, 'getAssessmentOfUser']);
+    Route::get('/get-assessment-book/{idBook}', [AssessmentController::class, 'getAssessmentOfBook']);
 });
 
 // Auth finish test
@@ -63,27 +63,27 @@ Route::group([
 Route::group([
     'prefix' => 'author'
 ], function ($router) {
-    Route::get('/get-all', [AuthorController::class,'index']);
-    Route::get('/get/{id}', [AuthorController::class,'getAuthor']);
+    Route::get('/get-all', [AuthorController::class, 'index']);
+    Route::get('/get/{id}', [AuthorController::class, 'getAuthor']);
     Route::post('/insert', [AuthorController::class, 'insert']);
-    Route::post('/update/{id}', [AuthorController::class, 'update']);
+    Route::put('/update/{id}', [AuthorController::class, 'update']);
     Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
     // type
     Route::post('/insert-type', [AuthorController::class, 'insertTypeBookForAuthor']);
     Route::delete('/delete-type/{id}', [AuthorController::class, 'deleteTypeBookForAuthor']);
-    Route::get('/get-all-type/{idAuthor}',[AuthorController::class,'getAllTypeOfAuthor']);
+    Route::get('/get-all-type/{idAuthor}', [AuthorController::class, 'getAllTypeOfAuthor']);
     // book
-    Route::get('/get-all-book/{idAuthor}',[AuthorController::class,'getAllBookOfAuthor']);
+    Route::get('/get-all-book/{idAuthor}', [AuthorController::class, 'getAllBookOfAuthor']);
 });
 
 // Book
 Route::group([
     'prefix' => 'book'
 ], function ($router) {
-    Route::get('/get-all', [BookController::class,'index']);
-    Route::get('/get/{id}', [BookController::class,'getBook']);
+    Route::get('/get-all', [BookController::class, 'index']);
+    Route::get('/get/{id}', [BookController::class, 'getBook']);
     Route::post('/insert', [BookController::class, 'insert']);
-    Route::post('/update/{id}', [BookController::class, 'update']);
+    Route::put('/update/{id}', [BookController::class, 'update']);
     Route::delete('/delete/{id}', [BookController::class, 'delete']);
     //type
     Route::post('/insert-type', [BookController::class, 'insertTypeBookForBook']);
@@ -92,15 +92,15 @@ Route::group([
     Route::post('/insert-author', [BookController::class, 'insertAuthorForBook']);
     Route::delete('/delete-author/{id}', [BookController::class, 'deleteAuthorForBook']);
     // post
-    Route::get('/get-all-author/{idAuthor}',[BookController::class,'getAllAuthorForBook']);
+    Route::get('/get-all-author/{idAuthor}', [BookController::class, 'getAllAuthorForBook']);
 });
 
 // Detail Group User finish test
 Route::group([
     'prefix' => 'detail-group-user'
 ], function ($router) {
-    Route::get('/get-all', [DetailGroupUserController::class,'index']);
-    Route::get('/get-all-user/{idGroup}',[DetailGroupUserController::class,'getAllUserInGroup']);
+    Route::get('/get-all', [DetailGroupUserController::class, 'index']);
+    Route::get('/get-all-user/{idGroup}', [DetailGroupUserController::class, 'getAllUserInGroup']);
     Route::post('/insert', [DetailGroupUserController::class, 'insert']);
     Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
     Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);
@@ -111,10 +111,10 @@ Route::group([
 Route::group([
     'prefix' => 'follow'
 ], function ($router) {
-    Route::get('/get-all', [FollowController::class,'getAllFollow']);
-    Route::get('/follow/{id}', [FollowController::class,'handleFollow']);
-    Route::get('/unfollow/{id}', [FollowController::class,'handleUnfollow']);
-    Route::get('/suggest-friends',[FollowController::class,'suggestFriends']);
+    Route::get('/get-all', [FollowController::class, 'getAllFollow']);
+    Route::get('/follow/{id}', [FollowController::class, 'handleFollow']);
+    Route::get('/unfollow/{id}', [FollowController::class, 'handleUnfollow']);
+    Route::get('/suggest-friends', [FollowController::class, 'suggestFriends']);
 });
 
 
@@ -122,7 +122,7 @@ Route::group([
 Route::group([
     'prefix' => 'group'
 ], function ($router) {
-    Route::get('/get-all', [GroupController::class,'index']);
+    Route::get('/get-all', [GroupController::class, 'index']);
     Route::post('/insert', [GroupController::class, 'insert']);
     Route::post('/update/{id}', [GroupController::class, 'update']);
     Route::delete('/delete/{id}', [GroupController::class, 'delete']);
@@ -133,7 +133,7 @@ Route::group([
 Route::group([
     'prefix' => 'notification'
 ], function ($router) {
-    Route::get('/get-all', [NotificationController::class,'index']);
+    Route::get('/get-all', [NotificationController::class, 'index']);
     Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
     Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
 });
@@ -142,21 +142,21 @@ Route::group([
 Route::group([
     'prefix' => 'post'
 ], function ($router) {
-    Route::get('/get-all', [PostController::class,'index']);
-    Route::get('/get/{id}', [PostController::class,'getPost']);
+    Route::get('/get-all', [PostController::class, 'index']);
+    Route::get('/get/{id}', [PostController::class, 'getPost']);
     Route::post('/insert', [PostController::class, 'insert']);
     Route::post('/update/{id}', [PostController::class, 'update']);
     Route::delete('/delete/{id}', [PostController::class, 'delete']);
     // Book
-    Route::get('/get-all-book/{idPost}',[PostController::class, 'getBookOfPost']);
+    Route::get('/get-all-book/{idPost}', [PostController::class, 'getBookOfPost']);
     Route::post('/insert-book', [PostController::class, 'insertBook']);
     Route::delete('/delete-book/{id}', [PostController::class, 'deleteBook']);
     // Like
-    Route::get('/get-all-like/{idPost}',[PostController::class, 'getBookOfPost']);
+    Route::get('/get-all-like/{idPost}', [PostController::class, 'getBookOfPost']);
     Route::post('/insert-like', [PostController::class, 'insertBook']);
     Route::delete('/delete-like/{id}', [PostController::class, 'deleteBook']);
     // Comment
-    Route::get('/get-all-comment/{idPost}',[PostController::class, 'getAllComment']);
+    Route::get('/get-all-comment/{idPost}', [PostController::class, 'getAllComment']);
     Route::post('/insert-comment', [PostController::class, 'insertComment']);
     Route::post('/upate-comment/{id}', [PostController::class, 'updateComment']);
     Route::delete('/delete-comment/{id}', [PostController::class, 'deleteComment']);
@@ -172,46 +172,44 @@ Route::group([
 Route::group([
     'prefix' => 'share'
 ], function ($router) {
-    Route::get('/get-all', [ShareController::class,'index']);
+    Route::get('/get-all', [ShareController::class, 'index']);
     Route::post('/insert', [ShareController::class, 'insert']);
     Route::post('/update/{id}', [ShareController::class, 'update']);
     Route::delete('/delete/{id}', [ShareController::class, 'delete']);
     // author
-    Route::get('/get-all-author/{idType}', [ShareController::class,'getAllAuthorOfType']);
+    Route::get('/get-all-author/{idType}', [ShareController::class, 'getAllAuthorOfType']);
     // book
-    Route::get('/get-all-book/{idType}', [ShareController::class,'getAllBookOfType']);
-
+    Route::get('/get-all-book/{idType}', [ShareController::class, 'getAllBookOfType']);
 });
 // Type finish test
 Route::group([
     'prefix' => 'type'
 ], function ($router) {
-    Route::get('/get-all', [TypeController::class,'index']);
+    Route::get('/get-all', [TypeController::class, 'index']);
     Route::post('/insert', [TypeController::class, 'insert']);
     Route::post('/update/{id}', [TypeController::class, 'update']);
     Route::delete('/delete/{id}', [TypeController::class, 'delete']);
     // author
-    Route::get('/get-all-author/{idType}', [TypeController::class,'getAllAuthorOfType']);
+    Route::get('/get-all-author/{idType}', [TypeController::class, 'getAllAuthorOfType']);
     // book
-    Route::get('/get-all-book/{idType}', [TypeController::class,'getAllBookOfType']);
-
+    Route::get('/get-all-book/{idType}', [TypeController::class, 'getAllBookOfType']);
 });
 
 // User finish test
 Route::group([
     'prefix' => 'user'
 ], function ($router) {
-    Route::get('/get-all', [UserController::class,'index']);
-    Route::get('/get/{id}', [UserController::class,'getUser']);
+    Route::get('/get-all', [UserController::class, 'index']);
+    Route::get('/get/{id}', [UserController::class, 'getUser']);
     Route::post('/insert', [UserController::class, 'insert']);
     Route::post('/update/{id}', [UserController::class, 'update']);
     Route::delete('/delete/{id}', [UserController::class, 'delete']);
     // post
-    Route::get('/get-all-post/{id}', [UserController::class,'getAllPostOfUser']);
+    Route::get('/get-all-post/{id}', [UserController::class, 'getAllPostOfUser']);
     // comment
-    Route::get('/get-all-comment/{id}', [UserController::class,'getAllComment']);
+    Route::get('/get-all-comment/{id}', [UserController::class, 'getAllComment']);
     // like
-    Route::get('/get-all-like/{id}', [UserController::class,'getAllLike']);
+    Route::get('/get-all-like/{id}', [UserController::class, 'getAllLike']);
 });
 
 
@@ -219,21 +217,21 @@ Route::group([
 Route::group([
     'prefix' => 'share'
 ], function ($router) {
-    Route::get('/get-all', [ShareController::class,'index']);
-    Route::get('/get/{id}', [ShareController::class,'getShare']);
+    Route::get('/get-all', [ShareController::class, 'index']);
+    Route::get('/get/{id}', [ShareController::class, 'getShare']);
     Route::post('/insert', [ShareController::class, 'insert']);
     Route::delete('/delete/{id}', [ShareController::class, 'delete']);
     // user
-    Route::get('/get-all-user/{id}', [ShareController::class,'getAllShareOfUser']);
+    Route::get('/get-all-user/{id}', [ShareController::class, 'getAllShareOfUser']);
     // book
-    Route::get('/get-all-book/{id}', [ShareController::class,'getAllShareOfBook']);
+    Route::get('/get-all-book/{id}', [ShareController::class, 'getAllShareOfBook']);
 });
 
 // notification
 Route::group([
     'prefix' => 'notification'
 ], function ($router) {
-    Route::get('/get-all', [NotificationController::class,'index']);
+    Route::get('/get-all', [NotificationController::class, 'index']);
     Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
     Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
 });
@@ -241,7 +239,7 @@ Route::group([
 // view
 Route::group([
     'prefix' => 'view'
-], function ($router){
+], function ($router) {
     Route::get('/total-views', [ViewController::class, 'getTotalViews']);
     Route::get('/views-by-day', [ViewController::class, 'getViewsByDay']);
     Route::get('/views-by-week', [ViewController::class, 'getViewsByWeek']);
