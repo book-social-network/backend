@@ -33,7 +33,7 @@ class UserController extends Controller
     {
         $user = $this->user->getUser($id);
         if (!$user) {
-            return response()->json(['message' => 'Not found user'],404);
+            return response()->json(['message' => 'Not found user'], 404);
         }
         return response()->json($user);
     }
@@ -44,10 +44,10 @@ class UserController extends Controller
             'email' => 'required|email',
             'password' => 'required|confirmed',
         ]);
-        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1731144261/avatar/avatar-gender-neutral-silhouette-vector-600nw-2526512481_o4lren.webp';
         // Xử lý hình ảnh nếu có
         if ($request->hasFile('image')) {
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
 
         $user = $this->user->insertUser(array_merge(
@@ -70,7 +70,7 @@ class UserController extends Controller
             if ($user->image_url) {
                 $this->cloud->deleteCloud($user->image_url);
             }
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
         $this->user->updateUser(array_merge(
             $request->all(),
@@ -99,16 +99,16 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $posts = $this->post->getAllPostByUser($id);
-        $data=[];
-        foreach($posts as $post){
-            $commemts=[];
-            foreach($post->comment() as $comment){
-                $commemts[]= [
+        $data = [];
+        foreach ($posts as $post) {
+            $commemts = [];
+            foreach ($post->comment() as $comment) {
+                $commemts[] = [
                     'comment' => $comment,
                     'user' => $comment->user()->get()
                 ];
             }
-            $data[]= [
+            $data[] = [
                 'post' => $post,
                 'comments' => $commemts,
                 'likes' => $post->user_on_likes()->get()
@@ -124,9 +124,9 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $comments = $this->comment->getAllCommentByUser($id);
-        $data=[];
-        foreach($comments as $comment){
-            $data[]= [
+        $data = [];
+        foreach ($comments as $comment) {
+            $data[] = [
                 'post' => $comment->post()->get(),
                 'comment' => $comment
             ];
@@ -141,9 +141,9 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $likes = $this->like->getAllLikeOfUser($id);
-        $data=[];
-        foreach($likes as $like){
-            $data[]= [
+        $data = [];
+        foreach ($likes as $like) {
+            $data[] = [
                 'post' => $like->post()->get(),
                 'like' => $like
             ];
