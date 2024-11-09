@@ -19,7 +19,7 @@ class AuthorControllerTest extends TestCase
      *
      * @return void
      */
-    public function testCreateAuthor()
+    public function testInsertAuthor()
     {
         // Arrange: Chuẩn bị dữ liệu
         $authorData = [

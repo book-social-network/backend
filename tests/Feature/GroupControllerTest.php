@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Models\Group;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class GroupControllerTest extends TestCase
 {
@@ -37,13 +40,21 @@ class GroupControllerTest extends TestCase
      */
     public function testInsertGroup()
     {
-        // Dữ liệu nhóm mới
+        // Tạo một người dùng giả và đăng nhập
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Dữ liệu cho nhóm mới và ảnh giả
         $data = [
             'name' => 'New Group',
             'description' => 'Description of the new group',
+            'image' => UploadedFile::fake()->image('group.jpg')
         ];
 
-        // Gửi yêu cầu POST đến route /group/insert
+        // Giả lập lưu trữ cho dịch vụ cloudinary
+        Storage::fake('cloudinary');
+
+        // Gửi yêu cầu POST đến route /api/group/insert
         $response = $this->post('/api/group/insert', $data);
 
         // Kiểm tra mã trạng thái HTTP trả về là 201 (Created)
@@ -52,9 +63,20 @@ class GroupControllerTest extends TestCase
         // Kiểm tra rằng nhóm mới đã được thêm vào cơ sở dữ liệu
         $this->assertDatabaseHas('groups', [
             'name' => 'New Group',
+            'description' => 'Description of the new group',
+            'image_group' => 'group/fake_image.jpg'
         ]);
-    }
 
+        // Kiểm tra rằng chi tiết người dùng trong nhóm đã được thêm vào
+        $this->assertDatabaseHas('detail_group_user', [
+            'user_id' => $user->id,
+            'state' => 1,
+            'role' => 'admin'
+        ]);
+
+        // Kiểm tra rằng hình ảnh đã được lưu trữ thành công
+        $this->assertTrue(Storage::disk('cloudinary')->exists('group/fake_image.jpg'));
+    }
     /**
      * Test cập nhật nhóm.
      *
@@ -130,4 +152,3 @@ class GroupControllerTest extends TestCase
         $response->assertJsonCount(2);
     }
 }
-
