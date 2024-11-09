@@ -116,8 +116,6 @@ Route::group([
     Route::get('/unfollow/{id}', [FollowController::class, 'handleUnfollow']);
     Route::get('/suggest-friends', [FollowController::class, 'suggestFriends']);
 });
-
-
 // Group finish test
 Route::group([
     'prefix' => 'group'
