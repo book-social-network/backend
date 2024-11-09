@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct(CloudInterface $cloudInterface)
     {
-        $this->cloud=$cloudInterface;
+        $this->cloud = $cloudInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -64,10 +64,10 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1729268122/149071_hh2iuh.png';
+        $cloudinaryImage = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1731144261/avatar/avatar-gender-neutral-silhouette-vector-600nw-2526512481_o4lren.webp';
 
         if ($request->hasFile('image')) {
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
 
         $user = User::create(array_merge(
