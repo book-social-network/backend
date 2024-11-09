@@ -24,7 +24,7 @@ class PostController extends Controller
         $this->user=$userInterface;
     }
     public function index(){
-        $posts=$this->post->getAllPost(1,10);
+        $posts=$this->post->getAllPost();
         $data=[];
         foreach($posts as $post){
             $commemts=[];

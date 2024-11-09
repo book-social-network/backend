@@ -66,8 +66,10 @@ class UserController extends Controller
             return response()->json(['message' => 'Not found user with id'], 404);
         }
         $cloudinaryImage = $user->image_url;
+        $avatar = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1731144261/avatar/avatar-gender-neutral-silhouette-vector-600nw-2526512481_o4lren.webp';
+
         if ($request->hasFile('image')) {
-            if ($user->image_url) {
+            if ($user->image_url && $cloudinaryImage!=$avatar) {
                 $this->cloud->deleteCloud($user->image_url);
             }
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
