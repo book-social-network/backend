@@ -37,7 +37,8 @@ class PostController extends Controller
             $data[]= [
                 'post' => $post,
                 'commemts' => $commemts,
-                'likes' => $post->user_on_likes()->get()
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
             ];
         }
         return response()->json($data);
@@ -59,7 +60,8 @@ class PostController extends Controller
             'books' => $post->book()->get(),
             'user' => $post->user()->get(),
             'comments' => $commemts,
-            'likes' => $post->user_on_likes()->get()
+            'likes' => $post->user_on_likes()->get(),
+            'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
         ]);
     }
     public function insert(Request $request){
