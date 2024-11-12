@@ -114,7 +114,7 @@ class PostController extends Controller
             'user_id' => 'required|integer'
         ]);
         $post=$this->post->getPost($request->get('post_id'));
-        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $$request->get('user_id'))){
+        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))&& $post->detail_group_user_id!=null){
         return response()->json(['message'=> 'User is not in a group']);
         }
         $this->like->insertLike($request->all());

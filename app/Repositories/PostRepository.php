@@ -39,7 +39,7 @@ class PostRepository implements PostInterface{
     public function checkUserInGroup($idDetailGroupUser, $idUser){
         if($idDetailGroupUser!=null){
             $group=DetailGroupUser::find($idDetailGroupUser)->group();
-            if($group->detail_group_users()->where('user_id',$idUser!=null));
+            if($group->state==true && $group->detail_group_users()->where('user_id',$idUser!=null));
             {
                 return true;
             }
