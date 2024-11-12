@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Http\Testing\File;
+use App\Models\User;
 
 class BookControllerTest extends TestCase
 {
@@ -28,27 +30,38 @@ class BookControllerTest extends TestCase
         // Tạo một bản ghi Book giả
         $book = Book::factory()->create();
 
+        // Đảm bảo rằng $book không phải là null trước khi truy xuất thuộc tính
+        $this->assertNotNull($book, 'Book should be created successfully.');
+
+        // Tạo một người dùng và đăng nhập
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
         // Gửi yêu cầu GET để lấy thông tin sách theo ID
-        $response = $this->getJson('/api/book/get/' . $book->id);
+        $response = $this->getJson("/api/book/get/{$book->id}");
 
         // Kiểm tra status code và dữ liệu trả về có chứa các thông tin mong muốn
         $response->assertStatus(200);
         $response->assertJson([
-            'id' => $book->id,
-            'name' => $book->name,
+            'book' => [
+                'id' => $book->id,
+                'name' => $book->name,
+            ]
         ]);
     }
 
+
+
     public function testInsertBook()
     {
-        // Dữ liệu sách để thêm mới
+        $image = File::image('book_image.jpg', 200, 300);
         $data = [
             'name' => 'New Book',
             'author' => 'Author Name',
             'ratings' => 10,
             'reviews' => 5,
             'assessment_score' => 4.5,
-            'image' => 'https://i.pinimg.com/736x/5d/9a/69/5d9a69ed36d92006cf4a02dfded9952f.jpg',
+            'image' => $image,  // URL mẫu .jpg,
             'link_book' => 'https://example.com',
             'description' => 'Description of the new book.',
         ];
@@ -72,7 +85,7 @@ class BookControllerTest extends TestCase
         ];
 
         // Gửi yêu cầu POST để cập nhật sách
-        $response = $this->postJson('/api/book/update/' . $book->id, $data);
+        $response = $this->putJson("/api/book/update/{$book->id}", $data);
 
         // Kiểm tra status code và xác nhận dữ liệu đã được cập nhật trong database
         $response->assertStatus(200);
@@ -83,9 +96,7 @@ class BookControllerTest extends TestCase
     {
         // Tạo một bản ghi Book giả
         $book = Book::factory()->create();
-
-        // Gửi yêu cầu DELETE để xóa sách
-        $response = $this->deleteJson('/api/book/delete/' . $book->id);
+        $response = $this->deleteJson("/api/book/delete/{$book->id}");
 
         // Kiểm tra status code và xác nhận sách đã bị xóa khỏi database
         $response->assertStatus(200);

@@ -19,23 +19,35 @@ class AuthorControllerTest extends TestCase
      *
      * @return void
      */
-    public function testCreateAuthor()
+    public function testInsertAuthor()
     {
+        // Arrange: Chuẩn bị dữ liệu
         $authorData = [
             'name' => 'John Doe',
             'born' => '1980-01-01',
             'dob' => '1980-01-01',
-            'died' => null,
             'description' => 'Author description',
-            'image' => \Illuminate\Http\Testing\File::image('john_doe.jpg', 200, 300),
+            'image' => \Illuminate\Http\Testing\File::image('john_doe.jpg', 200, 300), // Tạo tệp ảnh giả để kiểm tra
         ];
 
+        // Act: Gọi API để tạo tác giả
         $response = $this->postJson('/api/author/insert', $authorData);
 
-        $response->assertStatus(201); // Kiểm tra mã trạng thái HTTP 201 (Created)
-        $this->assertDatabaseHas('authors', $authorData); // Kiểm tra xem dữ liệu có được lưu vào DB
-    }
+        // Assert: Kiểm tra mã trạng thái HTTP là 201 (Created)
+        $response->assertStatus(201);
 
+        // Lấy dữ liệu từ response để kiểm tra URL ảnh trả về
+        $responseData = $response->json();
+
+        // Assert: Kiểm tra dữ liệu có tồn tại trong cơ sở dữ liệu
+        $this->assertDatabaseHas('authors', [
+            'name' => 'John Doe',
+            'born' => '1980-01-01',
+            'dob' => '1980-01-01',
+            'description' => 'Author description',
+            'image' => $responseData['image'],  // Kiểm tra URL ảnh trả về từ Cloudinary
+        ]);
+    }
     /**
      * Test lấy tất cả tác giả.
      *
