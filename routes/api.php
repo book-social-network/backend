@@ -148,15 +148,12 @@ Route::group([
     Route::post('/update/{id}', [PostController::class, 'update']);
     Route::delete('/delete/{id}', [PostController::class, 'delete']);
     // Book
-    Route::get('/get-all-book/{idPost}', [PostController::class, 'getBookOfPost']);
     Route::post('/insert-book', [PostController::class, 'insertBook']);
     Route::delete('/delete-book/{id}', [PostController::class, 'deleteBook']);
     // Like
-    Route::get('/get-all-like/{idPost}', [PostController::class, 'getBookOfPost']);
-    Route::post('/insert-like', [PostController::class, 'insertBook']);
-    Route::delete('/delete-like/{id}', [PostController::class, 'deleteBook']);
+    Route::post('/insert-like', [PostController::class, 'insertLike']);
+    Route::delete('/delete-like/{id}', [PostController::class, 'deleteLike']);
     // Comment
-    Route::get('/get-all-comment/{idPost}', [PostController::class, 'getAllComment']);
     Route::post('/insert-comment', [PostController::class, 'insertComment']);
     Route::post('/upate-comment/{id}', [PostController::class, 'updateComment']);
     Route::delete('/delete-comment/{id}', [PostController::class, 'deleteComment']);

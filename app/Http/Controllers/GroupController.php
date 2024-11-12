@@ -34,7 +34,8 @@ class GroupController extends Controller
 
     public function insert(Request $request){
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'title' => 'required'
         ]);
         $user = auth()->user();
         if(!$user){

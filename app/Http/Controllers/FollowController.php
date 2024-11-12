@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
 use App\Repositories\Interfaces\FollowInterface;
 use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\UserInterface;
@@ -38,13 +39,15 @@ class FollowController extends Controller
             'follower' => $follower->id
         ]);
         // handle Realtime notification
+
         // follower
-        $this->notification->insertNotification([
+        $notification=$this->notification->insertNotification([
             'from_id' => $user->id,
             'to_id' => $follower->id,
             'information' => $follower->name.' vừa gửi theo dõi bạn',
             'from_type' => 'user',
         ]);
+        broadcast(new NotificationSent($user,$notification->information));
         return response()->json(['message' => 'Follow successful'], 404);
     }
     public function handleUnfollow($id){
