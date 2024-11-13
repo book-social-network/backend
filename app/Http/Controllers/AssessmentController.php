@@ -112,19 +112,23 @@ class AssessmentController extends Controller
         $data=[];
         if($state==null){
             foreach($assessments as $assessment){
+                $authors=$this->detailAuthorBook->getAllAuthorOfBook($assessment->book()->first()->id);
                 $data[]= [
                     'assessment'=> $assessment,
                     'book' => $assessment->book()->get(),
-                    'user'=> $assessment->user()->get()
+                    'user'=> $assessment->user()->get(),
+                    'authors'=> $authors
                 ];
             }
         }else{
             foreach($assessments as $assessment){
+                $authors=$this->detailAuthorBook->getAllAuthorOfBook($assessment->book()->first()->id);
                 if($assessment->state_read==$state){
                     $data[]= [
                         'assessment'=> $assessment,
                         'book' => $assessment->book()->get(),
-                        'user'=> $assessment->user()->get()
+                        'user'=> $assessment->user()->get(),
+                        'authors'=> $authors
                     ];
                 }
             }
@@ -140,10 +144,12 @@ class AssessmentController extends Controller
         $assessments=$this->assessment->getAllAssessmentByBook($book->id);
         $data=[];
         foreach($assessments as $assessment){
+            $authors=$this->detailAuthorBook->getAllAuthorOfBook($assessment->book()->first()->id);
             $data[]= [
                 'assessment'=> $assessment,
                 'book' => $assessment->book()->get(),
-                'user'=> $assessment->user()->get()
+                'user'=> $assessment->user()->get(),
+                'authors'=> $authors
             ];
         }
         return response()->json($data);
