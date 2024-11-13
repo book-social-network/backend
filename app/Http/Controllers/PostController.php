@@ -27,19 +27,22 @@ class PostController extends Controller
         $posts=$this->post->getAllPost();
         $data=[];
         foreach($posts as $post){
-            $commemts=[];
-            foreach($post->comment()->get() as $comment){
-                $commemts[]= [
-                    'comment' => $comment,
-                    'user' => $comment->user()->get()
+            if(!$this->post->checkUserInGroup($post->detail_group_user_id, auth()->user()->id)&& $post->detail_group_user_id!=null){
+            }else{
+                $commemts=[];
+                foreach($post->comment()->get() as $comment){
+                    $commemts[]= [
+                        'comment' => $comment,
+                        'user' => $comment->user()->get()
+                    ];
+                }
+                $data[]= [
+                    'post' => $post,
+                    'commemts' => $commemts,
+                    'likes' => $post->user_on_likes()->get(),
+                    'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
                 ];
             }
-            $data[]= [
-                'post' => $post,
-                'commemts' => $commemts,
-                'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
-            ];
         }
         return response()->json($data);
     }
@@ -155,12 +158,12 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $post=$this->post->getPost($request->get('post_id'));
-        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $$request->get('user_id'))){
+        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))){
             return response()->json(['message'=> 'User is not in a group']);
         }
         $this->comment->insertComment($request->all());
          // notification
-         $notification=$this->notification->getNotificationWithPost($post->id);
+         $notification=$this->notification->getNotificationWithPost($post->id,$request->get('user_id'));
          $countCmt=$this->comment->getAllCommentOnPost($post->id)->count();
          $countLike=$this->like->getAllLikeOfPost($post->id)->count();
          if(empty($notification)){
