@@ -121,7 +121,8 @@ class PostController extends Controller
         }
         $this->like->insertLike($request->all());
         // notification
-        $notification=$this->notification->getNotificationWithPost($post->id);
+        $notification=$this->notification->getNotificationWithPost($post->id,$request->get('user_id'));
+
         $countCmt=$this->comment->getAllCommentOnPost($post->id)->count();
         $countLike=$this->like->getAllLikeOfPost($post->id)->count();
         if(empty($notification)){

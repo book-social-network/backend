@@ -13,8 +13,11 @@ class NotificationRepository implements NotificationInterface{
     public function getNotification($id){
         return Notification::find($id);
     }
-    public function getNotificationWithPost($idPost){
-        return Notification::where('from_id', $idPost)->where('from_type', 'post')->get();
+    public function getNotificationWithPost($idPost, $idUser){
+        return Notification::where('from_id', $idPost)
+        ->where('from_type', 'post')
+        ->where('to_id', $idUser)
+        ->first();
     }
     public function insertNotification($data){
         return Notification::create($data);
