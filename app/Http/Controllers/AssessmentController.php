@@ -85,7 +85,6 @@ class AssessmentController extends Controller
     public function update(Request $request,$id){
         $request->validate([
             'star'=> 'required',
-            'book_id' =>'required',
         ]);
         $assessment=$this->assessment->getAssessment($id);
         if(!$assessment){
