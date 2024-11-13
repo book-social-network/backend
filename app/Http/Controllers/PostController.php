@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\CommentInterface;
+use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\DetailPostBookInterface;
 use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\NotificationInterface;
@@ -13,8 +14,8 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private $post, $book, $detailPostBook, $like, $comment, $notification, $user;
-    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface, UserInterface $userInterface){
+    private $post, $book, $detailPostBook, $like, $comment, $notification, $user, $detailGroupUser;
+    public function __construct(PostInterface $postInterface,BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface, UserInterface $userInterface, DetailGroupUserInterface $detailGroupUserInterface){
         $this->post=$postInterface;
         $this->book=$bookInterface;
         $this->detailPostBook=$detailPostBookInterface;
@@ -22,13 +23,23 @@ class PostController extends Controller
         $this->comment=$commentInterface;
         $this->notification=$notificationInterface;
         $this->user=$userInterface;
+        $this->detailGroupUser=$detailGroupUserInterface;
     }
     public function index(){
+        $user=auth()->user();
         $posts=$this->post->getAllPost();
         $data=[];
         foreach($posts as $post){
-            if(!$this->post->checkUserInGroup($post->detail_group_user_id, auth()->user()->id)&& $post->detail_group_user_id!=null){
-            }else{
+            $check=true;
+            if($user->role!='admin'){
+                if($post->detail_group_user_id!=null){
+                    $state=$post->detail_group_user()->first()->group()->first()->state;
+                    if(!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $state==1){
+                        $check=false;
+                    }
+                }
+            }
+            if($check){
                 $commemts=[];
                 foreach($post->comment()->get() as $comment){
                     $commemts[]= [
@@ -47,9 +58,16 @@ class PostController extends Controller
         return response()->json($data);
     }
     public function getPost($id){
+        $user=auth()->user();
         $post=$this->post->getPost($id);
         if(!$post){
             return response()->json(['message' => 'Not found post'], 404);
+        }
+        if($post->detail_group_user_id!=null){
+            $state=$post->detail_group_user()->first()->group()->first()->state;
+            if(!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $state==1){
+                return response()->json(['message' => 'Group is private! Please join in group before find this post.'], 404);
+            }
         }
         $commemts=[];
         foreach($post->comment()->get() as $comment){
@@ -64,7 +82,7 @@ class PostController extends Controller
             'user' => $post->user()->get(),
             'comments' => $commemts,
             'likes' => $post->user_on_likes()->get(),
-            'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
+            'state-like' => $this->like->getStateOfPost($post->id,$user->id)
         ]);
     }
     public function insert(Request $request){
@@ -119,7 +137,8 @@ class PostController extends Controller
             'user_id' => 'required|integer'
         ]);
         $post=$this->post->getPost($request->get('post_id'));
-        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))&& $post->detail_group_user_id!=null){
+        $this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'));
+        if(!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))&& $post->detail_group_user_id!=null){
         return response()->json(['message'=> 'User is not in a group']);
         }
         $this->like->insertLike($request->all());
@@ -138,7 +157,7 @@ class PostController extends Controller
         }else{
             $this->notification->updateNotification([
                 'information' => 'Đã có '.$countCmt.' comment và '.$countLike.' like bài viết của bạn',
-            ],$post->id);
+            ],$notification->id);
         }
         return response()->json(['message'=> 'Like in post successful']);
     }
@@ -158,7 +177,7 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $post=$this->post->getPost($request->get('post_id'));
-        if(!$this->post->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))){
+        if(!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $request->get('user_id'))){
             return response()->json(['message'=> 'User is not in a group']);
         }
         $this->comment->insertComment($request->all());

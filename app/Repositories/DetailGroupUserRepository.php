@@ -39,4 +39,16 @@ class DetailGroupUserRepository implements DetailGroupUserInterface{
             $DetailGroupUser->delete();
         }
     }
+    public function checkUserInGroup($id, $idUser){
+        if($id!=null){
+            $group= DetailGroupUser::find($id)->group()->first();
+            if($group!=null){
+                if($group->state==true && $group->detail_group_users()->where('user_id',$idUser!=null));
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\AssessmentInterface;
 use App\Repositories\Interfaces\BookInterface;
+use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class AssessmentController extends Controller
 {
-    private $assessment, $book, $user;
-    public function __construct(AssessmentInterface $assessmentInterface, BookInterface $bookInterface, UserInterface $userInterface){
+    private $assessment, $book, $user, $detailAuthorBook;
+    public function __construct(AssessmentInterface $assessmentInterface, BookInterface $bookInterface, UserInterface $userInterface, DetailAuthorBookInterface $detailAuthorBookInterface){
         $this->assessment=$assessmentInterface;
         $this->book=$bookInterface;
         $this->user=$userInterface;
+        $this->detailAuthorBook=$detailAuthorBookInterface;
     }
     public function index(){
         $assessments=$this->assessment->getAllAssessments();
@@ -32,10 +34,12 @@ class AssessmentController extends Controller
         if(!$assessment){
             return response()->json(['message'=> 'Not found assessment']);
         }
+        $authors=$this->detailAuthorBook->getAllAuthorOfBook($assessment->book()->first()->id);
         return response()->json([
             'assessment'=> $assessment,
             'book' => $assessment->book()->get(),
-            'user'=> $assessment->user()->get()
+            'user'=> $assessment->user()->get(),
+            'author'=> $authors
         ]);
     }
     public function insert(Request $request){
@@ -80,7 +84,6 @@ class AssessmentController extends Controller
     }
     public function update(Request $request,$id){
         $request->validate([
-            'description' => 'required|string',
             'star'=> 'required',
             'book_id' =>'required',
         ]);

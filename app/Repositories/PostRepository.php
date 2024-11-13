@@ -36,14 +36,5 @@ class PostRepository implements PostInterface{
             $Post->delete();
         }
     }
-    public function checkUserInGroup($idDetailGroupUser, $idUser){
-        if($idDetailGroupUser!=null){
-            $group=DetailGroupUser::find($idDetailGroupUser)->group();
-            if($group->state==true && $group->detail_group_users()->where('user_id',$idUser!=null));
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

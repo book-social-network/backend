@@ -12,4 +12,5 @@ interface DetailGroupUserInterface
     public function deleteDetailGroupUser($id);
     public function updateDetailGroupUser($data,$id);
     public function getAllUserWantToJoin($idGroup);
+    public function checkUserInGroup($id, $idUser);
 }

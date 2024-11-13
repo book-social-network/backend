@@ -12,5 +12,4 @@ interface PostInterface
     public function insertPost($data);
     public function updatePost($data, $id);
     public function deletePost($id);
-    public function checkUserInGroup($idDetailGroupUser, $idUser);
 }
