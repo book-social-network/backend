@@ -21,10 +21,12 @@ class AssessmentController extends Controller
         $assessments=$this->assessment->getAllAssessments();
         $data=[];
         foreach($assessments as $assessment){
+            $authors=$this->detailAuthorBook->getAllAuthorOfBook($assessment->book()->first()->id);
             $data[]= [
                 'assessment'=> $assessment,
                 'book' => $assessment->book()->get(),
-                'user'=> $assessment->user()->get()
+                'user'=> $assessment->user()->get(),
+                'authors'=> $authors
             ];
         }
         return response()->json($data);
@@ -39,7 +41,7 @@ class AssessmentController extends Controller
             'assessment'=> $assessment,
             'book' => $assessment->book()->get(),
             'user'=> $assessment->user()->get(),
-            'author'=> $authors
+            'authors'=> $authors
         ]);
     }
     public function insert(Request $request){
