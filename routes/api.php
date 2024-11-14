@@ -83,7 +83,7 @@ Route::group([
     Route::get('/get-all', [BookController::class, 'index']);
     Route::get('/get/{id}', [BookController::class, 'getBook']);
     Route::post('/insert', [BookController::class, 'insert']);
-    Route::put('/update/{id}', [BookController::class, 'update']);
+    Route::post('/update/{id}', [BookController::class, 'update']);
     Route::delete('/delete/{id}', [BookController::class, 'delete']);
     //type
     Route::post('/insert-type', [BookController::class, 'insertTypeBookForBook']);
@@ -92,7 +92,7 @@ Route::group([
     Route::post('/insert-author', [BookController::class, 'insertAuthorForBook']);
     Route::delete('/delete-author/{id}', [BookController::class, 'deleteAuthorForBook']);
     // post
-    Route::get('/get-all-author/{idAuthor}', [BookController::class, 'getAllAuthorForBook']);
+    Route::get('/get-all-post/{idBook}', [BookController::class, 'getAllPostOfBook']);
 });
 
 // Detail Group User finish test

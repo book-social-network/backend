@@ -66,15 +66,9 @@ class BookController extends Controller
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'book');
         }
 
-        // Tạo dữ liệu sách
-        $bookData = array_merge($request->all(), ['image' => $cloudinaryImage]);
-        try {
-            // Chèn vào cơ sở dữ liệu
-            $book = $this->book->insertBook($bookData);
-            return response()->json($book, 201); // Trả về mã trạng thái 201 để chỉ ra rằng tài nguyên đã được tạo
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Unable to insert book.'], 500);
-        }
+        // Chèn vào cơ sở dữ liệu
+        $book = $this->book->insertBook(array_merge($request->all(), ['image' => $cloudinaryImage]));
+        return response()->json($book, 201); // Trả về mã trạng thái 201 để chỉ ra rằng tài nguyên đã được tạo
     }
     public function update(Request $request, $id)
     {
@@ -140,7 +134,7 @@ class BookController extends Controller
             return response()->json(['message' => 'Not found type book of book'], 404);
         }
         $this->detailBookType->deleteDetailBookType($detail->id);
-        return response()->json(['message' => 'Insert type for Book successful']);
+        return response()->json(['message' => 'Delete type for Book successful']);
     }
     //Author
     public function insertAuthorForBook(Request $request)
@@ -172,10 +166,14 @@ class BookController extends Controller
     // Post
     public function getAllPostOfBook($idBook)
     {
-        $posts = $this->detailPostBook->getAllPostOfBook($idBook);
+        $book = $this->book->getBook($idBook);
+        $posts=$book->post()->get();
         if (!$posts) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
-        return response()->json($posts);
+        return response()->json([
+            'book' => $book,
+            'posts' => $posts
+        ]);
     }
 }
