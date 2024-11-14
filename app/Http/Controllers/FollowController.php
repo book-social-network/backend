@@ -33,7 +33,6 @@ class FollowController extends Controller
         if(!$user || !$follower){
             return response()->json(['message' => 'Please login before following user'], 404);
         }
-        // dd($follower->id);
         $follow=$this->follow->insertFollow([
             'user_id' => $user->id,
             'follower' => $follower->id
@@ -52,7 +51,7 @@ class FollowController extends Controller
     }
     public function handleUnfollow($id){
         $user=auth()->user();
-        $follow=$this->follow->getFollow($id);
+        $follow=$this->follow->getFollow($id, $user->id);
         if(!$user || !$follow){
             return response()->json(['message' => 'Please login before following user'], 404);
         }

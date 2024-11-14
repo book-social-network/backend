@@ -10,8 +10,8 @@ class FollowRepository implements FollowInterface{
     public function getAllFollowOfUser($idUser){
         return Follow::where('user_id', $idUser)->get();
     }
-    public function getFollow($id){
-        return Follow::find($id);
+    public function getFollow($idFollower, $idUser){
+        return Follow::where('follower', $idFollower)->where('user_id', $idUser)->first();
     }
     public function insertFollow($data){
         return Follow::create($data);
