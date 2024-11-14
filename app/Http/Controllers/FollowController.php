@@ -47,8 +47,8 @@ class FollowController extends Controller
             'information' => $follower->name.' vừa gửi theo dõi bạn',
             'from_type' => 'user',
         ]);
-        broadcast(new NotificationSent($user,$notification->information));
-        return response()->json(['message' => 'Follow successful'], 404);
+        // broadcast(new NotificationSent($user,$notification->information));
+        return response()->json(['message' => 'Follow successful']);
     }
     public function handleUnfollow($id){
         $user=auth()->user();

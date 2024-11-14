@@ -40,7 +40,7 @@ class AssessmentController extends Controller
         return response()->json([
             'assessment'=> $assessment,
             'book' => $assessment->book()->get(),
-            'user'=> $assessment->user()->get(),
+            'user'=> $assessment->user()->get()['id'],
             'authors'=> $authors
         ]);
     }
@@ -68,12 +68,12 @@ class AssessmentController extends Controller
         if(!$book){
             return response()->json(['message' => 'Not found book '], 404);
         }
-        $user=auth()->user();
+        $user=$this->user->getUser(auth()->user()->id);
         if(!$user){
             return response()->json(['message' => 'Not found user '], 404);
         }
         $assessment=$this->assessment->getAssessmentWithIdBookAndUser($idBook,$user->id);
-        if($assessment){
+        if(!empty($assessment)){
             $this->assessment->updateAssessment(['state_read' => $request->get('state_read')],$assessment->id);
         }else{
             $this->assessment->insertAssessment([

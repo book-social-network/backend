@@ -162,6 +162,7 @@ Route::group([
     'prefix' => 'profession'
 ], function ($router) {
     Route::post('/searh', [ProfessionController::class, 'searh']);
+    Route::post('/sort', [ProfessionController::class,'sort']);
 });
 // Share
 Route::group([
