@@ -85,7 +85,6 @@ class AuthorController extends Controller
         $this->author->updateAuthor(array_merge(
             $request->all(),
             [
-                'password' => bcrypt($request->password),
                 'image' => $cloudinaryImage,
             ]
         ), $author->id);

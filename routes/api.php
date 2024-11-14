@@ -66,7 +66,7 @@ Route::group([
     Route::get('/get-all', [AuthorController::class, 'index']);
     Route::get('/get/{id}', [AuthorController::class, 'getAuthor']);
     Route::post('/insert', [AuthorController::class, 'insert']);
-    Route::put('/update/{id}', [AuthorController::class, 'update']);
+    Route::post('/update/{id}', [AuthorController::class, 'update']);
     Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
     // type
     Route::post('/insert-type', [AuthorController::class, 'insertTypeBookForAuthor']);
