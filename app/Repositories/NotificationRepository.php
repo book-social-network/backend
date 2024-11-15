@@ -7,8 +7,7 @@ use App\Repositories\Interfaces\NotificationInterface;
 
 class NotificationRepository implements NotificationInterface{
     public function getAllNotificationOfUser($idUser){
-        return Notification::where('user_id', $idUser)->get();
-
+        return Notification::where('to_id', $idUser)->where('to_type','member')->get();
     }
     public function getNotification($id){
         return Notification::find($id);
@@ -33,13 +32,13 @@ class NotificationRepository implements NotificationInterface{
         }
     }
     public function getNotificationsByUser($idUser){
-        $Notifications=Notification::where('to_id', $idUser);
+        $Notifications=Notification::where('to_id', $idUser)->get();
         if(!empty($Notification)){
             return $Notifications;
         }
     }
     public function getNotificationsByGroup($idGroup){
-        $Notifications=Notification::where('to_id', $idGroup);
+        $Notifications=Notification::where('to_id', $idGroup)->get();
         if(!empty($Notification)){
             return $Notifications;
         }
