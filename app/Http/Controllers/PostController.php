@@ -57,6 +57,19 @@ class PostController extends Controller
         }
         return response()->json($data);
     }
+    public function getPostOnAllGroup(){
+        $user=auth()->user();
+        $posts=$this->post->getAllPostGroupWithUser($user->id);
+        $data=[];
+        foreach($posts as $post){
+            $detail=$post->detail_group_user()->first();
+            $data[]= [
+                'post' => $post,
+                'group' => $detail->group()->first()
+            ];
+        }
+        return response()->json($data);
+    }
     public function getPost($id){
         $user=auth()->user();
         $post=$this->post->getPost($id);

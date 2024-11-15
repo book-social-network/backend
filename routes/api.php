@@ -142,6 +142,7 @@ Route::group([
 ], function ($router) {
     Route::get('/get-all', [PostController::class, 'index']);
     Route::get('/get/{id}', [PostController::class, 'getPost']);
+    Route::get('/get-post-in-group', [PostController::class, 'getPostOnAllGroup']);
     Route::post('/insert', [PostController::class, 'insert']);
     Route::post('/update/{id}', [PostController::class, 'update']);
     Route::delete('/delete/{id}', [PostController::class, 'delete']);

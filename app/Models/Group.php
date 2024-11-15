@@ -14,6 +14,7 @@ class Group extends Model
         'id',
         'name',
         'title',
+        'description',
         'image_group',
         'state',
     ];

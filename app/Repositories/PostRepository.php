@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\DetailGroupUser;
+use App\Models\Group;
 use App\Models\Post;
+use App\Models\User;
 use App\Repositories\Interfaces\PostInterface;
 
 class PostRepository implements PostInterface{
@@ -21,6 +23,25 @@ class PostRepository implements PostInterface{
     }
     public function getAllPostByUser($id){
         return Post::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+    }
+    public function getAllPostGroupWithUser($idUser) {
+        $user = User::find($idUser);
+
+        if (!$user) {
+            return null;
+        }
+
+        $groups = $user->group()->get();
+        $posts = collect();
+        foreach ($groups as $group) {
+            $details = $group->detail_group_users()->get();
+
+            foreach ($details as $item) {
+                $posts = $posts->merge($item->posts()->get());
+            }
+        }
+        $posts = $posts->sortByDesc('created_at');
+        return $posts;
     }
     public function insertPost($data){
         return Post::create($data);

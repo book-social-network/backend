@@ -100,6 +100,9 @@ class GroupController extends Controller
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $posts=$this->post->getAllPostInGroup($id,1,10);
-        return response()->json($posts);
+        return response()->json([
+            'group' => $group,
+            'posts' => $posts
+        ]);
     }
 }
