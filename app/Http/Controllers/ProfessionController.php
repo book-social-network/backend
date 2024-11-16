@@ -16,7 +16,7 @@ class ProfessionController extends Controller
         $this->group=$groupInterface;
         $this->book=$bookInterface;
     }
-    public function searh(Request $request){
+    public function search(Request $request){
         $search=$request->input('search',null);
         $type=$request->input('type','book');
         $results=null;

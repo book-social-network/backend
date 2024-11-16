@@ -162,7 +162,7 @@ Route::group([
 Route::group([
     'prefix' => 'profession'
 ], function ($router) {
-    Route::post('/searh', [ProfessionController::class, 'searh']);
+    Route::post('/search', [ProfessionController::class, 'search']);
     Route::post('/sort', [ProfessionController::class,'sort']);
 });
 // Share
