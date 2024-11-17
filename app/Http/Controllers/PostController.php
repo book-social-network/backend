@@ -33,7 +33,9 @@ class PostController extends Controller
             $check=true;
             if($user->role!='admin'){
                 if($post->detail_group_user_id!=null){
-                    $state=$post->detail_group_user()->first()->group()->first()->state;
+                    $group=$post->detail_group_user()->first()->group()->first();
+
+                    $state=$group->state;
                     if(!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $state==1){
                         $check=false;
                     }
@@ -47,8 +49,11 @@ class PostController extends Controller
                         'user' => $comment->user()->get()
                     ];
                 }
+                $group = $post->detail_group_user_id!=null ? $post->detail_group_user()->first()->group()->first() : null;
                 $data[]= [
                     'post' => $post,
+                    'user' => $post->user()->first(),
+                    'group' => $group,
                     'commemts' => $commemts,
                     'likes' => $post->user_on_likes()->get(),
                     'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
