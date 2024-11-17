@@ -68,8 +68,10 @@ class PostController extends Controller
         $data=[];
         foreach($posts as $post){
             $detail=$post->detail_group_user()->first();
+            $books=$post->book()->get();
             $data[]= [
                 'post' => $post,
+                'books' => $books,
                 'group' => $detail->group()->first()
             ];
         }
