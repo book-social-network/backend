@@ -99,7 +99,7 @@ class GroupController extends Controller
     public function getAllPostInGroup($id){
         $user=auth()->user();
         $group=$this->group->getGroup($id);
-        if (!$group) {
+        if (!$group || !$user) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $posts=$this->post->getAllPostInGroup($id,1,10);
@@ -122,6 +122,9 @@ class GroupController extends Controller
                 'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
             ];
         }
-        return response()->json($data);
+        return response()->json([
+            'group' => $group,
+            'posts' => $data
+        ]);
     }
 }
