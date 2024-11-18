@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
+use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
@@ -12,12 +13,13 @@ use Cloudinary;
 class GroupController extends Controller
 {
     private $group;
-    private $detailGroupUser, $post, $user, $cloud;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface){
+    private $detailGroupUser, $post, $user, $cloud, $like;
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface){
         $this->group=$groupInterface;
         $this->detailGroupUser=$detailGroupUserInterface;
         $this->post=$postInterface;
         $this->user=$userInterface;
+        $this->like=$likeInterface;
     }
 
     public function index(){
@@ -95,14 +97,31 @@ class GroupController extends Controller
     }
     // Post
     public function getAllPostInGroup($id){
+        $user=auth()->user();
         $group=$this->group->getGroup($id);
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $posts=$this->post->getAllPostInGroup($id,1,10);
-        return response()->json([
-            'group' => $group,
-            'posts' => $posts
-        ]);
+        foreach($posts as $post){
+            $commemts=[];
+            foreach($post->comment()->get() as $comment){
+                $commemts[]= [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $books=$post->book()->get();
+            $data[]= [
+                'post' => $post,
+                'user' => $post->user()->first(),
+                'books'=> $books,
+                'group' => $group,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
+            ];
+        }
+        return response()->json($data);
     }
 }

@@ -24,6 +24,9 @@ class PostRepository implements PostInterface{
     public function getAllPostByUser($id){
         return Post::where('user_id', $id)->orderBy('created_at', 'desc')->get();
     }
+    public function getAllPostByUserNotInGroup($id){
+        return Post::where('user_id', $id)->where('detail_group_user_id', null)->orderBy('created_at', 'desc')->get();
+    }
     public function getAllPostGroupWithUser($idUser) {
         $user = User::find($idUser);
 

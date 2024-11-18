@@ -49,10 +49,12 @@ class PostController extends Controller
                         'user' => $comment->user()->get()
                     ];
                 }
+                $books=$post->book()->get();
                 $group = $post->detail_group_user_id!=null ? $post->detail_group_user()->first()->group()->first() : null;
                 $data[]= [
                     'post' => $post,
                     'user' => $post->user()->first(),
+                    'books'=> $books,
                     'group' => $group,
                     'commemts' => $commemts,
                     'likes' => $post->user_on_likes()->get(),
@@ -67,12 +69,24 @@ class PostController extends Controller
         $posts=$this->post->getAllPostGroupWithUser($user->id);
         $data=[];
         foreach($posts as $post){
-            $detail=$post->detail_group_user()->first();
+            $commemts=[];
+                foreach($post->comment()->get() as $comment){
+                    $commemts[]= [
+                        'comment' => $comment,
+                        'user' => $comment->user()->get()
+                    ];
+                }
             $books=$post->book()->get();
+            $group = $post->detail_group_user_id!=null ? $post->detail_group_user()->first()->group()->first() : null;
+
             $data[]= [
                 'post' => $post,
+                'user' => $post->user()->first(),
                 'books' => $books,
-                'group' => $detail->group()->first()
+                'group' => $group,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id,auth()->user()->id)
             ];
         }
         return response()->json($data);
@@ -96,10 +110,12 @@ class PostController extends Controller
                 'user' => $comment->user()->get()
             ];
         }
+        $group = $post->detail_group_user_id!=null ? $post->detail_group_user()->first()->group()->first() : null;
         return response()->json([
             'post' => $post,
             'books' => $post->book()->get(),
             'user' => $post->user()->get(),
+            'group' => $group,
             'comments' => $commemts,
             'likes' => $post->user_on_likes()->get(),
             'state-like' => $this->like->getStateOfPost($post->id,$user->id)

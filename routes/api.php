@@ -203,6 +203,7 @@ Route::group([
     Route::delete('/delete/{id}', [UserController::class, 'delete']);
     // post
     Route::get('/get-all-post/{id}', [UserController::class, 'getAllPostOfUser']);
+    Route::get('/get-all-post-user-follow', [UserController::class, 'getAllPostUserFollow']);
     // comment
     Route::get('/get-all-comment/{id}', [UserController::class, 'getAllComment']);
     // like

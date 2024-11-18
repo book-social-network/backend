@@ -15,14 +15,15 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    private $user, $post, $comment, $like, $cloud;
-    public function __construct(UserInterface $userInterface, PostInterface $postInterface, CommentInterface $commentInterface, LikeInterface $likeInterface, CloudInterface $cloudInterface)
+    private $user, $post, $comment, $like, $cloud, $follow;
+    public function __construct(UserInterface $userInterface, PostInterface $postInterface, CommentInterface $commentInterface, LikeInterface $likeInterface, CloudInterface $cloudInterface, FollowInterface $followInterface)
     {
         $this->user = $userInterface;
         $this->post = $postInterface;
         $this->comment = $commentInterface;
         $this->like = $likeInterface;
         $this->cloud = $cloudInterface;
+        $this->follow=$followInterface;
     }
     public function index()
     {
@@ -96,6 +97,7 @@ class UserController extends Controller
     // Post
     public function getAllPostOfUser($id)
     {
+        $auth=auth()->user();
         $user = $this->user->getUser($id);
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
@@ -112,11 +114,29 @@ class UserController extends Controller
             }
             $data[] = [
                 'post' => $post,
+                'books' => $post->book()->get(),
+                'user' => $post->user()->get(),
                 'comments' => $commemts,
-                'likes' => $post->user_on_likes()->get()
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id,$auth->id)
             ];
         }
-        return response()->json($posts);
+        return response()->json($data);
+    }
+    public function getAllPostUserFollow(){
+        $user=auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        $followers=$this->follow->getAllFollowOfUser($user->id);
+        $data=[];
+        foreach($followers as $follower){
+            $data[]=[
+                'follower' => $follower,
+                'posts' => $this->getAllPostOfUser($follower->follower)->original
+            ];
+        }
+        return response()->json($data);
     }
     // Comment
     public function getAllComment($id)
