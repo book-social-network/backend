@@ -124,6 +124,7 @@ class GroupController extends Controller
         }
         return response()->json([
             'group' => $group,
+            'users' => $group->user()->get(),
             'posts' => $data
         ]);
     }
