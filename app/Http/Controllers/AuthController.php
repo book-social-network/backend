@@ -7,22 +7,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Repositories\Interfaces\CloudInterface;
+use App\Repositories\Interfaces\FollowInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Validator;
 use Cloudinary;
 
 class AuthController extends Controller
 {
-    private $cloud, $user;
+    private $cloud, $user, $follow;
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface)
+    public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface, FollowInterface $followInterface)
     {
         $this->cloud = $cloudInterface;
         $this->user=$userInterface;
+        $this->follow=$followInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -122,9 +124,19 @@ class AuthController extends Controller
     {
         $user=auth()->user();
         $groups=$user->group;
+        $userFollows=$this->follow->getAllUserFollow($user->id);
+        $followers=$this->follow->getAllFollowOfUser($user->id);
         return response()->json([
             'user' => $user,
-            'groups' => $groups
+            'groups' => $groups,
+            'follows'=>[
+                'user' => $followers,
+                'quantity' => $followers->count()
+            ],
+            'followers'=>[
+                'user' => $userFollows,
+                'quantity' => $userFollows->count()
+            ],
         ]);
     }
 
