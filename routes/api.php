@@ -199,7 +199,7 @@ Route::group([
     Route::get('/get-all', [UserController::class, 'index']);
     Route::get('/get/{id}', [UserController::class, 'getUser']);
     Route::post('/insert', [UserController::class, 'insert']);
-    Route::post('/update/{id}', [UserController::class, 'update']);
+    Route::post('/update', [UserController::class, 'update']);
     Route::delete('/delete/{id}', [UserController::class, 'delete']);
     // post
     Route::get('/get-all-post/{id}', [UserController::class, 'getAllPostOfUser']);

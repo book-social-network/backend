@@ -103,6 +103,7 @@ class GroupController extends Controller
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $posts=$this->post->getAllPostInGroup($id,1,10);
+        $data=[];
         foreach($posts as $post){
             $commemts=[];
             foreach($post->comment()->get() as $comment){

@@ -60,9 +60,9 @@ class UserController extends Controller
         ));
         return response()->json($user);
     }
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $user = $this->user->getUser($id);
+        $user = auth()->user();
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
         }
@@ -75,13 +75,23 @@ class UserController extends Controller
             }
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
-        $this->user->updateUser(array_merge(
-            $request->all(),
-            [
-                'password' => bcrypt($request->password),
-                'image_url' => $cloudinaryImage,
-            ]
-        ), $user->id);
+        if($request->get('password')!=null){
+            $this->user->updateUser(array_merge(
+                $request->all(),
+                [
+                    'password' => bcrypt($request->password),
+                    'image_url' => $cloudinaryImage,
+                ]
+            ), $user->id);
+        }else{
+            $this->user->updateUser(array_merge(
+                $request->all(),
+                [
+                    'image_url' => $cloudinaryImage,
+                ]
+            ), $user->id);
+        }
+
         return response()->json(['message' => 'Update user successful']);
     }
     public function delete($id)
