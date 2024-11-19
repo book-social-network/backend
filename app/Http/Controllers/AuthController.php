@@ -7,20 +7,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Repositories\Interfaces\CloudInterface;
+use App\Repositories\Interfaces\UserInterface;
 use Validator;
 use Cloudinary;
 
 class AuthController extends Controller
 {
-    private $cloud;
+    private $cloud, $user;
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct(CloudInterface $cloudInterface)
+    public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface)
     {
         $this->cloud = $cloudInterface;
+        $this->user=$userInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -118,7 +120,12 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        return response()->json(auth()->user());
+        $user=auth()->user();
+        $groups=$user->group;
+        return response()->json([
+            'user' => $user,
+            'groups' => $groups
+        ]);
     }
 
     /**
