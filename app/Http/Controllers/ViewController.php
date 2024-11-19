@@ -3,18 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\View;
+use App\Repositories\Interfaces\AuthorInterface;
+use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\PostInterface;
+use App\Repositories\Interfaces\TypeInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class ViewController extends Controller
 {
-    private $post, $user, $group;
-    public function __construct(PostInterface $postInterface, UserInterface $userInterface, GroupInterface $groupInterface){
+    private $post, $user, $group, $book, $author, $type;
+    public function __construct(PostInterface $postInterface, UserInterface $userInterface, GroupInterface $groupInterface, BookInterface $bookInterface, AuthorInterface $authorInterface, TypeInterface $typeInterface){
         $this->post=$postInterface;
         $this->user=$userInterface;
         $this->group=$groupInterface;
+        $this->book=$bookInterface;
+        $this->author=$authorInterface;
+        $this->type=$typeInterface;
     }
     public function getTotalViews()
     {
@@ -69,6 +75,16 @@ class ViewController extends Controller
         $countPost=$this->post->getAllPost()->count();
         $countUser=$this->user->getAllUsers()->count();
         $countGroup=$this->group->getAllGroup()->count();
-        return response()->json([$countGroup, $countUser, $countPost]);
+        $countBook=$this->book->getAllBooks()->count();
+        $countAuthor=$this->author->getAllAuthors()->count();
+        $countType=$this->type->getAllType()->count();
+        return response()->json([
+            'posts' => $countPost,
+            'users' => $countUser,
+            'groups' => $countGroup,
+            'books' => $countBook,
+            'authors' => $countAuthor,
+            'types' => $countType,
+        ]);
     }
 }
