@@ -23,7 +23,7 @@ class UserController extends Controller
         $this->comment = $commentInterface;
         $this->like = $likeInterface;
         $this->cloud = $cloudInterface;
-        $this->follow=$followInterface;
+        $this->follow = $followInterface;
     }
     public function index()
     {
@@ -70,12 +70,12 @@ class UserController extends Controller
         $avatar = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1731144261/avatar/avatar-gender-neutral-silhouette-vector-600nw-2526512481_o4lren.webp';
 
         if ($request->hasFile('image')) {
-            if ($user->image_url && $cloudinaryImage!=$avatar) {
+            if ($user->image_url && $cloudinaryImage != $avatar) {
                 $this->cloud->deleteCloud($user->image_url);
             }
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
-        if($request->get('password')!=null){
+        if ($request->get('password') != null) {
             $this->user->updateUser(array_merge(
                 $request->all(),
                 [
@@ -83,7 +83,7 @@ class UserController extends Controller
                     'image_url' => $cloudinaryImage,
                 ]
             ), $user->id);
-        }else{
+        } else {
             $this->user->updateUser(array_merge(
                 $request->all(),
                 [
@@ -107,7 +107,7 @@ class UserController extends Controller
     // Post
     public function getAllPostOfUser($id)
     {
-        $auth=auth()->user();
+        $auth = auth()->user();
         $user = $this->user->getUser($id);
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
@@ -128,20 +128,21 @@ class UserController extends Controller
                 'user' => $post->user()->get(),
                 'comments' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id,$auth->id)
+                'state-like' => $this->like->getStateOfPost($post->id, $auth->id)
             ];
         }
         return response()->json($data);
     }
-    public function getAllPostUserFollow(){
-        $user=auth()->user();
+    public function getAllPostUserFollow()
+    {
+        $user = auth()->user();
         if (!$user) {
             return response()->json(['message' => 'Please login'], 404);
         }
-        $followers=$this->follow->getAllFollowOfUser($user->id);
-        $data=[];
-        foreach($followers as $follower){
-            $data[]=[
+        $followers = $this->follow->getAllFollowOfUser($user->id);
+        $data = [];
+        foreach ($followers as $follower) {
+            $data[] = [
                 'follower' => $follower,
                 'posts' => $this->getAllPostOfUser($follower->follower)->original
             ];
