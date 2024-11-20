@@ -135,7 +135,7 @@ class PostController extends Controller
         }
         $post=$this->post->insertPost( [
             'description' => $request->get('description'),
-            'detail_group_user_id' => $detail,
+            'detail_group_user_id' => $detail->id,
             'user_id'=> $user->id
         ]);
         return response()->json($post);
