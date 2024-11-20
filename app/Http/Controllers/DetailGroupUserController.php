@@ -35,9 +35,16 @@ class DetailGroupUserController extends Controller
         return response()->json(['message'=> 'Not found group'],404);
         }
         $users=$this->detailGroupUser->getAllUserInGroup($group->id);
+        $data=[];
+        foreach($users as $user){
+            $data[]=[
+                'user' => $user,
+                'role' => $user->detail_group_users()->first()->role
+            ];
+        }
         return response()->json([
             'group' => $group,
-            'users' => $users
+            'users' => $data
         ]);
     }
     public function insert(Request $request){
