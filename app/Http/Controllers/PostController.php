@@ -122,11 +122,22 @@ class PostController extends Controller
         ]);
     }
     public function insert(Request $request){
+        $user=auth()->user();
+        if(empty($user)){
+            return response()->json(['message'=> 'Please login'],404);
+        }
         $request->validate([
             'description' => 'required|string',
-            'user_id' =>'required'
         ]);
-        $post=$this->post->insertPost($request->all());
+        $detail=null;
+        if($request->get('group_id')){
+            $detail=$this->detailGroupUser->getDetail($request->get('group_id'),$user->id);
+        }
+        $post=$this->post->insertPost( [
+            'description' => $request->get('description'),
+            'detail_group_user_id' => $detail,
+            'user_id'=> $user->id
+        ]);
         return response()->json($post);
     }
     public function update(Request $request,$id){
