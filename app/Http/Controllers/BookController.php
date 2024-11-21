@@ -29,7 +29,7 @@ class BookController extends Controller
         $this->detailBookType = $detailBookTypeInterface;
         $this->assessment = $assessmentInterface;
         $this->detailPostBook = $detailPostBookInterface;
-        $this->cloud=$cloudInterface;
+        $this->cloud = $cloudInterface;
     }
     public function index()
     {
@@ -63,7 +63,7 @@ class BookController extends Controller
 
         // Xử lý hình ảnh nếu có
         if ($request->hasFile('image')) {
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'book');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'book');
         }
 
         // Chèn vào cơ sở dữ liệu
@@ -87,7 +87,7 @@ class BookController extends Controller
             if ($book->image) {
                 $this->cloud->deleteCloud($book->image);
             }
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'book');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'book');
         }
 
         $this->book->updateBook(array_merge(
@@ -167,7 +167,7 @@ class BookController extends Controller
     public function getAllPostOfBook($idBook)
     {
         $book = $this->book->getBook($idBook);
-        $posts=$book->post()->get();
+        $posts = $book->post()->get();
         if (!$posts) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
