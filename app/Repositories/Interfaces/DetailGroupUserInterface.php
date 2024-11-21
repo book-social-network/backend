@@ -8,6 +8,7 @@ interface DetailGroupUserInterface
     public function getAllGroupOfUser($idUser);
     public function insertDetailGroupUser($data);
     public function getAllDetailGroupUser();
+    public function getAdminGroup($group);
     public function getDetail($group, $user);
     public function getDetailGroupUser($id);
     public function deleteDetailGroupUser($id);

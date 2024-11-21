@@ -101,6 +101,7 @@ Route::group([
 ], function ($router) {
     Route::get('/get-all', [DetailGroupUserController::class, 'index']);
     Route::get('/get-all-user/{idGroup}', [DetailGroupUserController::class, 'getAllUserInGroup']);
+    Route::get('/get-all-user-want-join/{idGroup}', [DetailGroupUserController::class, 'getAllUserWantJoinGroup']);
     Route::post('/insert', [DetailGroupUserController::class, 'insert']);
     Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
     Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);

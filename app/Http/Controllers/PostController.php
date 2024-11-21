@@ -140,7 +140,7 @@ class PostController extends Controller
         }
         $post = $this->post->insertPost([
             'description' => $request->get('description'),
-            'detail_group_user_id' => $detail->id,
+            'detail_group_user_id' => $detail?$detail->id:$detail,
             'user_id' => $user->id
         ]);
         return response()->json($post);
@@ -160,9 +160,27 @@ class PostController extends Controller
     }
     public function delete($id)
     {
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login'], 404);
+        }
         $post = $this->post->getPost($id);
         if (!$post) {
             return response()->json(['message' => 'Not found post with id'], 404);
+        }
+        if($post->detail_group_user_id!=null){
+            $group=$post->detail_group_user()->first()->group()->first();
+            $admins=$this->detailGroupUser->getAdminGroup($group->id);
+            foreach($admins as $admin){
+                if($admin->user_id==$user->id){
+                    $this->notification->insertNotification([
+                        'from_id' => $group->id,
+                        'to_id' => $user->id,
+                        'information' =>'Bài viết của bạn đã bị xoá trong group '. $group->name,
+                        'from_type' => 'group',
+                    ]);
+                }
+            }
         }
         $this->post->deletePost($id);
         return response()->json(['message' => 'Delete post successful']);

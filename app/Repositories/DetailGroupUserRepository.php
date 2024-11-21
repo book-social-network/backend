@@ -19,6 +19,9 @@ class DetailGroupUserRepository implements DetailGroupUserInterface{
     public function getDetail($group, $user){
         return DetailGroupUser::where('group_id',$group)->where('user_id',$user)->first();
     }
+    public function getAdminGroup($group){
+        return DetailGroupUser::where('group_id', $group)->where('role','admin')->get();
+    }
     public function getAllUserWantToJoin($idGroup){
         $users=DetailGroupUser::where('group_id',$idGroup)->where('state', 0);
         return $users;

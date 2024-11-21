@@ -31,6 +31,33 @@ class DetailGroupUserController extends Controller
         }
         return response()->json($data);
     }
+    public function getAllUserWantJoinGroup($idGroup){
+        $group = $this->group->getGroup($idGroup);
+        if (!$group) {
+            return response()->json(['message' => 'Not found group'], 404);
+        }
+        $user=auth()->user();
+        $admins=$this->detailGroupUser->getAdminGroup($idGroup);
+        $check=false;
+        foreach($admins as $admin){
+            if($admin->user_id==$user->id){
+                $check=true;
+                break;
+            }
+        }
+        if(!$check){
+            return response()->json(['message' => 'You are not admin in group'], 404);
+        }
+        $details=$this->detailGroupUser->getAllUserWantToJoin($idGroup);
+        $data=[];
+        foreach($details as $detail){
+            $data[]=[
+                'user' => $detail->user()->first(),
+                'detail' => $detail
+            ];
+        }
+        return response()->json($data);
+    }
     public function getAllUserInGroup($idGroup)
     {
         $group = $this->group->getGroup($idGroup);
@@ -126,6 +153,13 @@ class DetailGroupUserController extends Controller
             'user_id' => $detail->user_id,
             'role' => $request->get('role')
         ];
+        $group=$detail->group()->first();
+        $this->notification->insertNotification([
+            'from_id' => $detail->group_id,
+            'to_id' => $detail->user_id,
+            'information' =>$request->get('role')=='admin'?'Bạn đã được cập nhật quyền quản trị viên trong group '.$group->name:'Bạn đang là thành viên của group '.$group->name,
+            'from_type' => 'group',
+        ]);
         $this->detailGroupUser->updateDetailGroupUser($data, $detail->id);
         return response()->json(['message' => 'Update role for user successful']);
     }

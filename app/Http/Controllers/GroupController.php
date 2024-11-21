@@ -6,6 +6,7 @@ use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\LikeInterface;
+use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
@@ -13,13 +14,14 @@ use Cloudinary;
 class GroupController extends Controller
 {
     private $group;
-    private $detailGroupUser, $post, $user, $cloud, $like;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface){
+    private $detailGroupUser, $post, $user, $cloud, $like, $notification;
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface, NotificationInterface $notificationInterface){
         $this->group=$groupInterface;
         $this->detailGroupUser=$detailGroupUserInterface;
         $this->post=$postInterface;
         $this->user=$userInterface;
         $this->like=$likeInterface;
+        $this->notification=$notificationInterface;
     }
 
     public function index(){
@@ -60,6 +62,16 @@ class GroupController extends Controller
             'state' => 1,
             'role' => 'admin'
         ];
+        $admins=$this->detailGroupUser->getAdminGroup($group->id);
+        foreach($admins as $admin){
+            $this->notification->insertNotification([
+                'from_id' => $group->id,
+                'to_id' => $admin->id,
+                'information' => $user->name. ' đã yêu cầu tham gia group '.$group->name,
+                'from_type' => 'group',
+                'to_type'=>'user'
+            ]);
+        }
         $this->detailGroupUser->insertDetailGroupUser($data);
         return response()->json($group);
     }
