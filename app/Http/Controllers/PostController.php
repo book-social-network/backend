@@ -283,8 +283,10 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $post = $this->post->getPost($request->get('post_id'));
-        if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
-            return response()->json(['message' => 'User is not in a group']);
+        if($post->detail_group_user_id!=null){
+            if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
+                return response()->json(['message' => 'User is not in a group']);
+            }
         }
         $this->comment->insertComment($request->all());
         // notification
