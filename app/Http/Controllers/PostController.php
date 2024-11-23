@@ -268,7 +268,7 @@ class PostController extends Controller
         if (!$like) {
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
-        $this->like->deleteLike($idPost);
+        $this->like->deleteLike($idPost,$user->id);
         return response()->json(['message' => 'Delete like in post successful']);
     }
     // Comment

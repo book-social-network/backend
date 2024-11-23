@@ -24,8 +24,8 @@ class LikeRepository implements LikeInterface{
     public function insertLike($data){
         return Like::create($data);
     }
-    public function deleteLike($id){
-        $Like=Like::find($id);
+    public function deleteLike($idPost, $isUser){
+        $Like=Like::where('post_id', $idPost)->where('user_id', $isUser)->first();
         if(!empty($Like)){
             $Like->delete();
         }

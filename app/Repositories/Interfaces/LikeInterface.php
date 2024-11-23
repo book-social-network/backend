@@ -9,5 +9,5 @@ interface LikeInterface
     public function getLike($idPost,$idUser);
     public function getStateOfPost($idPost, $isUser);
     public function insertLike($data);
-    public function deleteLike($id);
+    public function deleteLike($idPost, $isUser);
 }
