@@ -288,7 +288,11 @@ class PostController extends Controller
                 return response()->json(['message' => 'User is not in a group']);
             }
         }
-        $this->comment->insertComment($request->all());
+        $this->comment->insertComment([
+            'description'=>$request->get('description'),
+            'post_id'=>$request->get('post_id'),
+            'user_id' => $user->id
+        ]);
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
