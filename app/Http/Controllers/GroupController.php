@@ -117,6 +117,7 @@ class GroupController extends Controller
         if (!$group || !$user) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
+        $countPost=$this->post->getAllPostInGroup($id)->count();
         $posts=$this->post->getAllPostInGroup($id,1,10);
         $data=[];
         foreach($posts as $post){
@@ -141,7 +142,8 @@ class GroupController extends Controller
         return response()->json([
             'group' => $group,
             'users' => $group->user()->get(),
-            'posts' => $data
+            'posts' => $data,
+            'count-post' =>$countPost
         ]);
     }
 }

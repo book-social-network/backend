@@ -9,7 +9,7 @@ interface PostInterface
     public function getPost($id);
     public function getAllPostByUser($id);
     public function getAllPostByUserNotInGroup($id);
-    public function getAllPostInGroup($id, $page, $num);
+    public function getAllPostInGroup($id, $page=null, $num=null);
     public function getAllPostGroupWithUser($idUser);
     public function insertPost($data);
     public function updatePost($data, $id);
