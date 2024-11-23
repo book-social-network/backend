@@ -41,7 +41,7 @@ class FollowController extends Controller
             'follower' => $follower->id
         ]);
         // handle Realtime notification
-
+        broadcast(new NotificationSent($follower->name . ' vừa gửi theo dõi bạn',$id));
         // follower
         $notification = $this->notification->insertNotification([
             'from_id' => $user->id,
@@ -49,7 +49,6 @@ class FollowController extends Controller
             'information' => $follower->name . ' vừa gửi theo dõi bạn',
             'from_type' => 'user',
         ]);
-        // broadcast(new NotificationSent($user,$notification->information));
         return response()->json(['message' => 'Follow successful']);
     }
     public function handleUnfollow($id)

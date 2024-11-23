@@ -17,8 +17,8 @@ class LikeRepository implements LikeInterface{
         $like=Like::where('post_id', $idPost)->where('user_id', $isUser)->first();
         return !empty($like);
     }
-    public function getLike($id){
-        $like=Like::find($id);
+    public function getLike($idPost,$idUser){
+        $like=Like::where('user_id',$idUser)->where('post_id',$idPost)->first();
         return !empty($like) ? $like : null;
     }
     public function insertLike($data){

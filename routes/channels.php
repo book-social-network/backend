@@ -16,6 +16,6 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
-Broadcast::channel('notification.{receiver_id}', callback: function ($user, $receiver_id) {
-    return (int) $user->id === (int) $receiver_id;
-});
+// Broadcast::channel('notifications.{userId}', callback: function ($user, $userId) {
+//     return auth()->check() && $userId == auth()->id();
+// });

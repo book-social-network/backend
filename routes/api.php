@@ -152,11 +152,11 @@ Route::group([
     Route::delete('/delete-book/{id}', [PostController::class, 'deleteBook']);
     // Like
     Route::post('/insert-like', [PostController::class, 'insertLike']);
-    Route::delete('/delete-like/{id}', [PostController::class, 'deleteLike']);
+    Route::delete('/delete-like/{idPost}', [PostController::class, 'deleteLike']);
     // Comment
     Route::post('/insert-comment', [PostController::class, 'insertComment']);
-    Route::post('/upate-comment/{id}', [PostController::class, 'updateComment']);
-    Route::delete('/delete-comment/{id}', [PostController::class, 'deleteComment']);
+    Route::post('/upate-comment/{idPost}', [PostController::class, 'updateComment']);
+    Route::delete('/delete-comment/{idPost}', [PostController::class, 'deleteComment']);
 });
 
 // Profession

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\NotificationInterface;
@@ -97,24 +98,27 @@ class DetailGroupUserController extends Controller
             'role' => 'member'
         ];
         $detail = $this->detailGroupUser->insertDetailGroupUser($data);
-
         //  Handle Realtime Notifications
-
+        $information=$group->state == true ? 'Bạn đã tham gia group ' . $group->name . ' thành công.' : 'Bạn vừa gửi yêu cầu tham gia nhóm ' . $group->name;
         // send notification for member
         $this->notification->insertNotification([
             'from_id' => $group->id,
             'to_id' => $user->id,
-            'information' => $group->state == true ? 'Bạn đã tham gia group ' . $group->name . ' thành công.' : 'Bạn vừa gửi yêu cầu tham gia nhóm ' . $group->name,
+            'information' => $information,
             'from_type' => 'group',
         ]);
+        broadcast(new NotificationSent($information,$user->id));
+
         if ($group->state == false) {
             // send notification for group
             $this->notification->insertNotification([
                 'from_id' => $user->id,
                 'to_id' => $group->id,
-                'information' => $user->name . ' vừa gửi yêu cầu tham gia nhóm ',
+                'information' => $user->name . ' vừa gửi yêu cầu tham gia nhóm '.$group->name,
                 'to_type' => 'group',
             ]);
+            // handle Realtime notification
+            broadcast(new NotificationSent($user->name . ' vừa gửi yêu cầu tham gia nhóm '.$group->name,$user->id));
         }
 
         return response()->json($detail);
@@ -135,6 +139,9 @@ class DetailGroupUserController extends Controller
             'information' => 'Bạn đã tham gia group ' . $detail->group()->name . ' thành công.',
             'from_type' => 'group',
         ]);
+        // handle Realtime notification
+        broadcast(new NotificationSent('Bạn đã tham gia group ' . $detail->group()->name . ' thành công.',$detail->user_id));
+
         $this->detailGroupUser->updateDetailGroupUser(['state' => 1], $detail->id);
         return response()->json(['message' => 'User join group successful']);
     }
@@ -154,12 +161,15 @@ class DetailGroupUserController extends Controller
             'role' => $request->get('role')
         ];
         $group=$detail->group()->first();
+        $information=$request->get('role')=='admin'?'Bạn đã được cập nhật quyền quản trị viên trong group '.$group->name:'Bạn đang là thành viên của group '.$group->name;
         $this->notification->insertNotification([
             'from_id' => $detail->group_id,
             'to_id' => $detail->user_id,
-            'information' =>$request->get('role')=='admin'?'Bạn đã được cập nhật quyền quản trị viên trong group '.$group->name:'Bạn đang là thành viên của group '.$group->name,
+            'information' =>$information,
             'from_type' => 'group',
         ]);
+        // handle Realtime notification
+        broadcast(new NotificationSent($information,$detail->user_id));
         $this->detailGroupUser->updateDetailGroupUser($data, $detail->id);
         return response()->json(['message' => 'Update role for user successful']);
     }

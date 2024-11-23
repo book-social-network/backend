@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
 use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
@@ -71,6 +72,8 @@ class GroupController extends Controller
                 'from_type' => 'group',
                 'to_type'=>'user'
             ]);
+            // notification realtime
+            broadcast(new NotificationSent($user->name. ' đã yêu cầu tham gia group '.$group->name,$admin->id));
         }
         $this->detailGroupUser->insertDetailGroupUser($data);
         return response()->json($group);
