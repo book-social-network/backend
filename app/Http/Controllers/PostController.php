@@ -236,7 +236,10 @@ class PostController extends Controller
         if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $post->detail_group_user_id != null) {
             return response()->json(['message' => 'User is not in a group'],404);
         }
-        $this->like->insertLike($request->all());
+        $this->like->insertLike([
+            'post_id' => $request->get('post_id'),
+            'user_id' => $user->id
+        ]);
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
 
@@ -294,13 +297,13 @@ class PostController extends Controller
             'user_id' => $user->id
         ]);
         // notification
-        $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
+        $notification = $this->notification->getNotificationWithPost($post->id, $post->user_id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         if (empty($notification)) {
             $this->notification->insertNotification([
                 'from_id' => $post->id,
-                'to_id' => $user->id,
+                'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
                 'from_type' => 'post',
             ]);
@@ -308,8 +311,11 @@ class PostController extends Controller
             broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',$post->user_id));
         } else {
             $this->notification->updateNotification([
+                'from_id' => $post->id,
+                'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
-            ], $post->id);
+                'from_type' => 'post',
+            ], $notification->id);
         }
         return response()->json(['message' => 'Comment in post successful']);
     }
