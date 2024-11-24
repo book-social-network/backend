@@ -149,7 +149,7 @@ Route::group([
     Route::delete('/delete/{id}', [PostController::class, 'delete']);
     // Book
     Route::post('/insert-book', [PostController::class, 'insertBook']);
-    Route::delete('/delete-book/{id}', [PostController::class, 'deleteBook']);
+    Route::post('/delete-book', [PostController::class, 'deleteBook']);
     // Like
     Route::post('/insert-like', [PostController::class, 'insertLike']);
     Route::delete('/delete-like/{idPost}', [PostController::class, 'deleteLike']);

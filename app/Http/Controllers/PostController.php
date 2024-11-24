@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentEvent;
+use App\Events\LikeEvent;
 use App\Events\NotificationSent;
 use App\Repositories\Interfaces\BookInterface;
 use App\Repositories\Interfaces\CommentInterface;
@@ -195,7 +197,7 @@ class PostController extends Controller
                         'information' =>'Bài viết của bạn đã bị xoá trong group '. $group->name,
                         'from_type' => 'group',
                     ]);
-                    broadcast(new NotificationSent('Bài viết của bạn đã bị xoá trong group '. $group->name,$user->id));
+                    broadcast(new NotificationSent('Bài viết của bạn đã bị xoá trong group '. $group->name,$post->user_id));
                 }
             }
         }
@@ -212,13 +214,17 @@ class PostController extends Controller
         $this->detailPostBook->insertDetailPostBook($request->all());
         return response()->json(['message' => 'Insert book in post successful']);
     }
-    public function deleteBook($id)
+    public function deleteBook(Request $request)
     {
-        $detail = $this->detailPostBook->getDetailPostBook($id);
+        $request->validate([
+            'post_id' => 'required|integer',
+            'book_id' => 'required|integer'
+        ]);
+        $detail = $this->detailPostBook->getDetailPostBook($request->get('post_id'),$request->get('book_id'));
         if (!$detail) {
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
-        $this->detailPostBook->deleteDetailPostBook($id);
+        $this->detailPostBook->deleteDetailPostBook($detail->id);
         return response()->json(['message' => 'Delete book in post successful']);
     }
     // Like
@@ -232,7 +238,7 @@ class PostController extends Controller
             'post_id' => 'required|integer',
         ]);
         $post = $this->post->getPost($request->get('post_id'));
-        $this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id);
+
         if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $post->detail_group_user_id != null) {
             return response()->json(['message' => 'User is not in a group'],404);
         }
@@ -240,11 +246,12 @@ class PostController extends Controller
             'post_id' => $request->get('post_id'),
             'user_id' => $user->id
         ]);
+
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
-
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
+        broadcast(new LikeEvent($post->id,$countLike));
         if (empty($notification)) {
             $this->notification->insertNotification([
                 'from_id' => $post->id,
@@ -253,12 +260,12 @@ class PostController extends Controller
                 'from_type' => 'post',
             ]);
             // handle Realtime notification
-            broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',$post->user_id));
         } else {
             $this->notification->updateNotification([
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
             ], $notification->id);
         }
+        broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',$post->user_id));
         return response()->json(['message' => 'Like in post successful']);
     }
     public function deleteLike($idPost)
@@ -272,6 +279,9 @@ class PostController extends Controller
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
         $this->like->deleteLike($idPost,$user->id);
+        $countLike = $this->like->getAllLikeOfPost($idPost)->count();
+        // handle Realtime like
+        broadcast(new LikeEvent($idPost,$countLike));
         return response()->json(['message' => 'Delete like in post successful']);
     }
     // Comment
@@ -291,11 +301,13 @@ class PostController extends Controller
                 return response()->json(['message' => 'User is not in a group']);
             }
         }
-        $this->comment->insertComment([
+        $cmt=$this->comment->insertComment([
             'description'=>$request->get('description'),
             'post_id'=>$request->get('post_id'),
             'user_id' => $user->id
         ]);
+        // handle realtime comment
+        broadcast(new CommentEvent($request->get('post_id'),$cmt));
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $post->user_id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
@@ -326,7 +338,9 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $comments = $this->comment->getComment($id);
-        $this->comment->updateComment($request->all(), $id);
+        $cmt=$this->comment->updateComment($request->all(), $id);
+        // handle realtime comment
+        broadcast(new CommentEvent($request->get('post_id'),$cmt));
         return response()->json($comments);
     }
     public function deleteComment($id)
@@ -335,6 +349,8 @@ class PostController extends Controller
         if (!$comment) {
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
+        // handle realtime comment
+        broadcast(new CommentEvent($comment->post_id,$comment));
         $this->comment->deleteComment($id);
         return response()->json(['message' => 'Delete comment in post successful']);
     }

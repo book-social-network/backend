@@ -11,10 +11,10 @@ class CommentRepository implements CommentInterface{
     }
 
     public function getAllCommentByUser($idUser){
-        return Comment::where('user_id', $idUser)->get();
+        return Comment::where('user_id', $idUser)->orderBy('created_at', 'desc')->get();
     }
     public function getAllCommentOnPost($idPost){
-        return Comment::where('post_id', $idPost)->get();
+        return Comment::where('post_id', $idPost)->orderBy('created_at', 'desc')->get();
     }
     public function insertComment($data){
         return Comment::create($data);
@@ -22,6 +22,7 @@ class CommentRepository implements CommentInterface{
     public function updateComment($data, $id){
         $Comment=Comment::find($id);
         $Comment->update($data);
+        return $Comment;
     }
     public function deleteComment($id){
         $Comment=Comment::find($id);

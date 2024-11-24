@@ -126,21 +126,31 @@ class AuthController extends Controller
     {
         $user=auth()->user();
         $groups=$user->group;
-        $userFollows=$this->follow->getAllUserFollow($user->id);
+        $following=$this->follow->getAllUserFollow($user->id);
         $followers=$this->follow->getAllFollowOfUser($user->id);
+        $dataFollowing=[];
+        $dataFollower=[];
+        foreach($following as $follow){
+            $dataFollowing[]=$follow->user()->first();
+        }
+        foreach($followers as $follow){
+            $dataFollower[]=$follow->user()->first();
+        }
+
         $posts=$this->post->getAllPostByUser($user->id);
         return response()->json([
             'user' => $user,
             'groups' => $groups,
-            'follows'=>[
-                'user' => $followers,
+            'followers'=>[
+                'user' => $dataFollowing,
                 'quantity' => $followers->count()
             ],
-            'followers'=>[
-                'user' => $userFollows,
-                'quantity' => $userFollows->count()
+            'following'=>[
+                'user' => $dataFollower,
+                'quantity' => $following->count()
             ],
-            'posts'=> $posts
+            'posts'=> $posts,
+
         ]);
     }
 
