@@ -155,6 +155,7 @@ class PostController extends Controller
             'detail_group_user_id' => $detail?$detail->id:$detail,
             'user_id' => $user->id
         ]);
+
         return response()->json($post);
     }
     public function update(Request $request, $id)
@@ -185,6 +186,9 @@ class PostController extends Controller
         $post = $this->post->getPost($id);
         if (!$post) {
             return response()->json(['message' => 'Not found post with id'], 404);
+        }
+        if($post->user_id!=$user->id){
+            return response()->json(['message' => 'Thlis post is not your post'], 404);
         }
         if($post->detail_group_user_id!=null){
             $group=$post->detail_group_user()->first()->group()->first();
@@ -239,8 +243,10 @@ class PostController extends Controller
         ]);
         $post = $this->post->getPost($request->get('post_id'));
 
-        if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $post->detail_group_user_id != null) {
-            return response()->json(['message' => 'User is not in a group'],404);
+        if($post->detail_group_user_id != null){
+            if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
+                return response()->json(['message' => 'User is not in a group'],404);
+            }
         }
         $this->like->insertLike([
             'post_id' => $request->get('post_id'),

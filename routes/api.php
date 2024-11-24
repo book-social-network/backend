@@ -201,6 +201,7 @@ Route::group([
     Route::get('/get/{id}', [UserController::class, 'getUser']);
     Route::post('/insert', [UserController::class, 'insert']);
     Route::post('/update', [UserController::class, 'update']);
+    Route::post('/update-point', [UserController::class, 'updatePoint']);
     Route::delete('/delete/{id}', [UserController::class, 'delete']);
     // post
     Route::get('/get-all-post/{id}', [UserController::class, 'getAllPostOfUser']);

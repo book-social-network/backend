@@ -36,7 +36,53 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Not found user'], 404);
         }
-        return response()->json($user);
+        $groups=$user->group;
+        $following=$this->follow->getAllUserFollow($user->id);
+        $followers=$this->follow->getAllFollowOfUser($user->id);
+        $posts=$this->post->getAllPostByUser($user->id);
+
+        $dataFollowing=[];
+        $dataFollower=[];
+        foreach($following as $follow){
+            $dataFollowing[]=$follow->user()->first();
+        }
+        foreach($followers as $follow){
+            $dataFollower[]=$follow->user()->first();
+        }
+        $data=[];
+        foreach ($posts as $post) {
+            $commemts = [];
+            foreach ($post->comment()->get() as $comment) {
+                $commemts[] = [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $books = $post->book()->get();
+
+            $data[] = [
+                'post' => $post,
+                'user' => $post->user()->first(),
+                'books' => $books,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+            ];
+        }
+        return response()->json([
+            'user' => $user,
+            'groups' => $groups,
+            'followers'=>[
+                'user' => $dataFollowing,
+                'quantity' => $followers->count()
+            ],
+            'following'=>[
+                'user' => $dataFollower,
+                'quantity' => $following->count()
+            ],
+            'posts'=> $data,
+
+        ]);
     }
     public function insert(Request $request)
     {
@@ -93,6 +139,19 @@ class UserController extends Controller
         }
 
         return response()->json(['message' => 'Update user successful']);
+    }
+    public function updatePoint(Request $request){
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Not found user with id'], 404);
+        }
+        $request->validate([
+            'point' => 'required|integer',
+        ]);
+        $user=$this->user->updateUser([
+            'point'=> $request->get('point')
+        ],$user->id);
+        return response()->json($user);
     }
     public function delete($id)
     {

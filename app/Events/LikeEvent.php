@@ -31,7 +31,7 @@ class LikeEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('post.' . $this->postId);
+        return new Channel('post.' . $this->postId);
     }
     public function broadcastAs()
     {
