@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\FollowInterface;
+use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Validator;
@@ -15,18 +16,19 @@ use Cloudinary;
 
 class AuthController extends Controller
 {
-    private $cloud, $user, $follow, $post;
+    private $cloud, $user, $follow, $post, $like;
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface, FollowInterface $followInterface, PostInterface $postInterface)
+    public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface, FollowInterface $followInterface, PostInterface $postInterface, LikeInterface $likeInterface)
     {
         $this->cloud = $cloudInterface;
         $this->user = $userInterface;
         $this->follow = $followInterface;
         $this->post = $postInterface;
+        $this->like=$likeInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -128,6 +130,8 @@ class AuthController extends Controller
         $groups=$user->group;
         $following=$this->follow->getAllUserFollow($user->id);
         $followers=$this->follow->getAllFollowOfUser($user->id);
+        $posts=$this->post->getAllPostByUser($user->id);
+
         $dataFollowing=[];
         $dataFollower=[];
         foreach($following as $follow){
@@ -136,8 +140,26 @@ class AuthController extends Controller
         foreach($followers as $follow){
             $dataFollower[]=$follow->user()->first();
         }
+        $data=[];
+        foreach ($posts as $post) {
+            $commemts = [];
+            foreach ($post->comment()->get() as $comment) {
+                $commemts[] = [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $books = $post->book()->get();
 
-        $posts=$this->post->getAllPostByUser($user->id);
+            $data[] = [
+                'post' => $post,
+                'user' => $post->user()->first(),
+                'books' => $books,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+            ];
+        }
         return response()->json([
             'user' => $user,
             'groups' => $groups,
@@ -149,7 +171,7 @@ class AuthController extends Controller
                 'user' => $dataFollower,
                 'quantity' => $following->count()
             ],
-            'posts'=> $posts,
+            'posts'=> $data,
 
         ]);
     }
