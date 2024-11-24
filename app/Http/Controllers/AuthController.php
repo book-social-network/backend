@@ -24,9 +24,9 @@ class AuthController extends Controller
     public function __construct(CloudInterface $cloudInterface, UserInterface $userInterface, FollowInterface $followInterface, PostInterface $postInterface)
     {
         $this->cloud = $cloudInterface;
-        $this->user=$userInterface;
-        $this->follow=$followInterface;
-        $this->post=$postInterface;
+        $this->user = $userInterface;
+        $this->follow = $followInterface;
+        $this->post = $postInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -124,23 +124,23 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        $user=auth()->user();
-        $groups=$user->group;
-        $userFollows=$this->follow->getAllUserFollow($user->id);
-        $followers=$this->follow->getAllFollowOfUser($user->id);
-        $posts=$this->post->getAllPostByUser($user->id);
+        $user = auth()->user();
+        $groups = $user->group;
+        $userFollows = $this->follow->getAllUserFollow($user->id);
+        $followers = $this->follow->getAllFollowOfUser($user->id);
+        $posts = $this->post->getAllPostByUser($user->id);
         return response()->json([
             'user' => $user,
             'groups' => $groups,
-            'follows'=>[
+            'follows' => [
                 'user' => $followers,
                 'quantity' => $followers->count()
             ],
-            'followers'=>[
+            'followers' => [
                 'user' => $userFollows,
                 'quantity' => $userFollows->count()
             ],
-            'posts'=> $posts
+            'posts' => $posts
         ]);
     }
 

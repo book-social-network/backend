@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Author;
+use Database\Factories\TypeFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Type;
+use App\Models\DetailAuthorType;
 
 class AuthorControllerTest extends TestCase
 {
@@ -91,11 +94,87 @@ class AuthorControllerTest extends TestCase
      */
     public function testDeleteAuthor()
     {
+        // Tạo một tác giả mới
         $author = Author::factory()->create();
 
+        // Gửi yêu cầu DELETE đến API xóa tác giả
         $response = $this->deleteJson("/api/author/delete/{$author->id}");
 
-        $response->assertStatus(204); // Kiểm tra mã trạng thái HTTP 204 (No Content)
-        $this->assertDatabaseMissing('authors', ['id' => $author->id]); // Kiểm tra xem tác giả đã bị xóa khỏi DB
+        // Kiểm tra phản hồi trả về mã trạng thái HTTP 204 (No Content)
+        $response->assertStatus(200);
+
+        // Kiểm tra tác giả đã bị xóa khỏi cơ sở dữ liệu
+        $this->assertDatabaseMissing('authors', ['id' => $author->id]);
+    }
+    //Type
+    /** @test */
+    public function it_can_insert_type_for_author()
+    {
+        // Tạo dữ liệu giả cho Author và Type
+        $author = Author::factory()->create();
+        $type = Type::factory()->create();
+
+        $data = [
+            'type_id' => $type->id,
+            'author_id' => $author->id,
+        ];
+
+        // Gửi yêu cầu POST đến API insert-type
+        $response = $this->postJson('/api/insert-type', $data);
+
+        // Kiểm tra kết quả trả về
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Insert type for author successful']);
+
+        // Kiểm tra trong cơ sở dữ liệu
+        $this->assertDatabaseHas('detail_author_types', [
+            'author_id' => $author->id,
+            'type_id' => $type->id
+        ]);
+    }
+
+    /** @test */
+    public function it_can_delete_type_for_author()
+    {
+        // Tạo dữ liệu giả cho Author, Type và DetailAuthorType
+        $author = Author::factory()->create();
+        $type = Type::factory()->create();
+        $detail = DetailAuthorType::create([
+            'author_id' => $author->id,
+            'type_id' => $type->id
+        ]);
+
+        // Gửi yêu cầu DELETE đến API delete-type
+        $response = $this->deleteJson("/api/delete-type/{$detail->id}");
+
+        // Kiểm tra kết quả trả về
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Delete type for author successful']);
+
+        // Kiểm tra cơ sở dữ liệu không còn dữ liệu này
+        $this->assertDatabaseMissing('detail_author_types', [
+            'id' => $detail->id
+        ]);
+    }
+
+    /** @test */
+    public function it_can_get_all_types_of_author()
+    {
+        // Tạo dữ liệu giả cho Author và Type
+        $author = Author::factory()->create();
+        $type = Type::factory()->create();
+        DetailAuthorType::create([
+            'author_id' => $author->id,
+            'type_id' => $type->id
+        ]);
+
+        // Gửi yêu cầu GET đến API get-all-type
+        $response = $this->getJson("/api/get-all-type/{$author->id}");
+
+        // Kiểm tra kết quả trả về
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => ['author_id', 'type_id']
+            ]);
     }
 }
