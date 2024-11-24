@@ -239,10 +239,12 @@ class PostController extends Controller
             return response()->json(['message' => 'Please login'],404);
         }
         $request->validate([
-            'post_id' => 'required|integer',
+            'post_id' => 'required',
         ]);
         $post = $this->post->getPost($request->get('post_id'));
-
+        if($post==null){
+            return response()->json(['message' => 'Not found post'],404);
+        }
         if($post->detail_group_user_id != null){
             if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
                 return response()->json(['message' => 'User is not in a group'],404);
