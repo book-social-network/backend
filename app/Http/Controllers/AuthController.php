@@ -124,7 +124,6 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-<<<<<<< HEAD
         $user=auth()->user();
         $groups=$user->group;
         $following=$this->follow->getAllUserFollow($user->id);
@@ -152,25 +151,6 @@ class AuthController extends Controller
             ],
             'posts'=> $posts,
 
-=======
-        $user = auth()->user();
-        $groups = $user->group;
-        $userFollows = $this->follow->getAllUserFollow($user->id);
-        $followers = $this->follow->getAllFollowOfUser($user->id);
-        $posts = $this->post->getAllPostByUser($user->id);
-        return response()->json([
-            'user' => $user,
-            'groups' => $groups,
-            'follows' => [
-                'user' => $followers,
-                'quantity' => $followers->count()
-            ],
-            'followers' => [
-                'user' => $userFollows,
-                'quantity' => $userFollows->count()
-            ],
-            'posts' => $posts
->>>>>>> 0fdaffe39eff948828f3e1d8efb641ea60abc94a
         ]);
     }
 
