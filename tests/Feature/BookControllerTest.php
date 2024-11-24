@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Http\Testing\File;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 
 class BookControllerTest extends TestCase
 {
@@ -51,13 +52,11 @@ class BookControllerTest extends TestCase
     }
 
 
-
     public function testInsertBook()
     {
         $image = File::image('book_image.jpg', 200, 300);
         $data = [
             'name' => 'New Book',
-            'author' => 'Author Name',
             'ratings' => 10,
             'reviews' => 5,
             'assessment_score' => 4.5,

@@ -29,19 +29,16 @@ class TypeControllerTest extends TestCase
 
     public function test_insert_type()
     {
-        // Arrange: Chuẩn bị dữ liệu
+        // Arrange: Prepare data
         $data = ['name' => 'New Type'];
 
-        // Act: Gọi API để thêm mới một loại
+        // Act: Call the API to insert a new type
         $response = $this->post('/api/type/insert', $data);
 
-        // Kiểm tra mã trạng thái trả về là 200
-        $response->assertStatus(200);  // Thay từ assertStatus(201) thành assertStatus(200)
-
-        // Kiểm tra dữ liệu có tồn tại trong cơ sở dữ liệu
-        $this->assertDatabaseHas('types', $data);
+        // Assert: Check the type was created
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('types', $data);  // Ensure the data is in the DB
     }
-
 
     public function test_update_type()
     {
@@ -62,7 +59,10 @@ class TypeControllerTest extends TestCase
         // Arrange: Create a type
         $type = Type::factory()->create();
 
+        // Act: Call the API to delete the type
         $response = $this->delete("/api/type/delete/{$type->id}");
+
+        // Assert: Check the type was deleted
         $response->assertStatus(200);
         $this->assertDatabaseMissing('types', ['id' => $type->id]);  // Ensure it's removed
     }
