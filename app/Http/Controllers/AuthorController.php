@@ -17,24 +17,27 @@ class AuthorController extends Controller
     private $type;
     private $detailAuthorType;
     private $detailAuthorBook, $cloud;
-    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface,DetailAuthorTypeInterface $detailAuthorTypeInterface, DetailAuthorBookInterface $detailAuthorBookInterface, CloudInterface $cloudInterface){
-        $this->detailAuthorBook=$detailAuthorBookInterface;
-        $this->author=$authorInterface;
-        $this->type=$typeInterface;
-        $this->detailAuthorType=$detailAuthorTypeInterface;
-        $this->cloud=$cloudInterface;
+    public function __construct(AuthorInterface $authorInterface, TypeInterface $typeInterface, DetailAuthorTypeInterface $detailAuthorTypeInterface, DetailAuthorBookInterface $detailAuthorBookInterface, CloudInterface $cloudInterface)
+    {
+        $this->detailAuthorBook = $detailAuthorBookInterface;
+        $this->author = $authorInterface;
+        $this->type = $typeInterface;
+        $this->detailAuthorType = $detailAuthorTypeInterface;
+        $this->cloud = $cloudInterface;
     }
-    public function index(){
-        $authors=$this->author->getAllAuthors();
+    public function index()
+    {
+        $authors = $this->author->getAllAuthors();
         return response()->json($authors);
     }
-    public function getAuthor($id){
-        $author=$this->author->getAuthor($id);
+    public function getAuthor($id)
+    {
+        $author = $this->author->getAuthor($id);
         if (!$author) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
-        $types=$this->detailAuthorType->getAllTypeWithAuthor($id);
-        $books=$this->detailAuthorBook->getAllBookOfAuthor($id);
+        $types = $this->detailAuthorType->getAllTypeWithAuthor($id);
+        $books = $this->detailAuthorBook->getAllBookOfAuthor($id);
 
         return response()->json([
             'author' => $author,
@@ -53,7 +56,7 @@ class AuthorController extends Controller
 
         // Xử lý hình ảnh nếu có
         if ($request->hasFile('image')) {
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'author');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'author');
         }
 
         // Tạo dữ liệu sách
@@ -67,12 +70,13 @@ class AuthorController extends Controller
             return response()->json(['error' => 'Unable to insert book.'], 500);
         }
     }
-    public function update(Request $request,$id){
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'name' => 'required|string',
         ]);
-        $author=$this->author->getAuthor($id);
-        if(!$author){
+        $author = $this->author->getAuthor($id);
+        if (!$author) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         $cloudinaryImage = $author->image;
@@ -80,7 +84,7 @@ class AuthorController extends Controller
             if ($author->image) {
                 $this->cloud->deleteCloud($author->image);
             }
-            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'),'avatar');
+            $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'avatar');
         }
         $this->author->updateAuthor(array_merge(
             $request->all(),
@@ -90,9 +94,10 @@ class AuthorController extends Controller
         ), $author->id);
         return response()->json(['message' => 'Update author successful']);
     }
-    public function delete($id){
-        $author=$this->author->getAuthor($id);
-        if(!$author){
+    public function delete($id)
+    {
+        $author = $this->author->getAuthor($id);
+        if (!$author) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         $this->cloud->deleteCloud($author->image);
@@ -100,14 +105,15 @@ class AuthorController extends Controller
         return response()->json(['message' => 'Delete author successful']);
     }
     //Type book
-    public function insertTypeBookForAuthor(Request $request){
+    public function insertTypeBookForAuthor(Request $request)
+    {
         $request->validate([
             'type_id' => 'required|integer',
             'author_id' => 'required|integer'
         ]);
-        $type=$this->type->getType($request->get('type_id'));
-        $author=$this->author->getAuthor($request->get('author_id'));
-        if(!$author || !$type){
+        $type = $this->type->getType($request->get('type_id'));
+        $author = $this->author->getAuthor($request->get('author_id'));
+        if (!$author || !$type) {
             return response()->json(['message' => 'Not found author or type book'], 404);
         }
         $this->detailAuthorType->insertDetailAuthorType([
@@ -116,25 +122,28 @@ class AuthorController extends Controller
         ]);
         return response()->json(['message' => 'Insert type for author successful']);
     }
-    public function deleteTypeBookForAuthor($id){
-        $detail=$this->detailAuthorType->getDetailAuthorType($id);
-        if(!$detail){
+    public function deleteTypeBookForAuthor($id)
+    {
+        $detail = $this->detailAuthorType->getDetailAuthorType($id);
+        if (!$detail) {
             return response()->json(['message' => 'Not found type book of author'], 404);
         }
         $this->detailAuthorType->deleteDetailAuthorType($detail->id);
         return response()->json(['message' => 'Insert type for author successful']);
     }
-    public function getAllTypeOfAuthor($idAuthor){
-        $types=$this->detailAuthorType->getAllTypeWithAuthor($idAuthor);
-        if(!$types){
+    public function getAllTypeOfAuthor($idAuthor)
+    {
+        $types = $this->detailAuthorType->getAllTypeWithAuthor($idAuthor);
+        if (!$types) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         return response()->json($types);
     }
     //Book
-    public function getAllBookOfAuthor($idAuthor){
-        $book=$this->detailAuthorBook->getAllBookOfAuthor($idAuthor);
-        if(!$book){
+    public function getAllBookOfAuthor($idAuthor)
+    {
+        $book = $this->detailAuthorBook->getAllBookOfAuthor($idAuthor);
+        if (!$book) {
             return response()->json(['message' => 'Not found author with id'], 404);
         }
         return response()->json($book);
