@@ -36,7 +36,18 @@ class GroupController extends Controller
         }
         return response()->json($data);
     }
-
+    public function get($id){
+        $group=$this->group->getGroup($id);
+        if (!$group) {
+            return response()->json(['message' => 'Not found group with id'], 404);
+        }
+        $countPost=$this->post->getAllPostInGroup($id)->count();
+        return response()->json([
+            'group' => $group,
+            'users' => $group->user()->get(),
+            'count-post' =>$countPost
+        ]);
+    }
     public function insert(Request $request){
         $request->validate([
             'name' => 'required|string|max:255',

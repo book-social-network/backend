@@ -123,6 +123,7 @@ Route::group([
     'prefix' => 'group'
 ], function ($router) {
     Route::get('/get-all', [GroupController::class, 'index']);
+    Route::get('/get/{id}', [GroupController::class, 'get']);
     Route::post('/insert', [GroupController::class, 'insert']);
     Route::post('/update/{id}', [GroupController::class, 'update']);
     Route::delete('/delete/{id}', [GroupController::class, 'delete']);
