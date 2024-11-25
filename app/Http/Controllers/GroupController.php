@@ -102,13 +102,22 @@ class GroupController extends Controller
 
     public function delete($id)
     {
+        $user=auth()->user();
         $group=$this->group->getGroup($id);
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
-        $this->cloud->deleteCloud($group->image_group);
-        $this->group->deleteGroup($id);
-        return response()->json(['message' => 'Group is deleted']);
+        $admins=$this->detailGroupUser->getAdminGroup($group->id);
+        if($user->role!='admin'){
+            foreach($admins as $admin){
+                if($admin->user_id==$user->id){
+                    $this->cloud->deleteCloud($group->image_group);
+                    $this->group->deleteGroup($id);
+                    return response()->json(['message' => 'Group is deleted']);
+                }
+            }
+        }
+        return response()->json(['message' => 'You are not admin in group']);
     }
     // Post
     public function getAllPostInGroup($id){
@@ -116,6 +125,10 @@ class GroupController extends Controller
         $group=$this->group->getGroup($id);
         if (!$group || !$user) {
             return response()->json(['message' => 'Not found group with id'], 404);
+        }
+        $detail=$this->detailGroupUser->getDetail($group->id,$user->id);
+        if($detail->state==0 || $user->role!='admin'){
+            return response()->json(['message' => 'You are not in group'], 404);
         }
         $countPost=$this->post->getAllPostInGroup($id)->count();
         $posts=$this->post->getAllPostInGroup($id,1,10);

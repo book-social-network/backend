@@ -132,9 +132,10 @@ class DetailGroupUserController extends Controller
     public function updateState(Request $request)
     {
         $request->validate([
-            'id' => 'required'
+            'group_id' => 'required',
+            'user_id' => 'required',
         ]);
-        $detail = $this->detailGroupUser->getDetailGroupUser($request->get('id'));
+        $detail = $this->detailGroupUser->getDetail($request->get('group_id'),$request->get('user_id'));
         if (!$detail) {
             return response()->json(['message' => 'Not found user or group'], 404);
         }
@@ -154,10 +155,11 @@ class DetailGroupUserController extends Controller
     public function updateRole(Request $request)
     {
         $request->validate([
-            'id' => 'required',
+            'group_id' => 'required',
+            'user_id' => 'required',
             'role' => 'required'
         ]);
-        $detail = $this->detailGroupUser->getDetailGroupUser($request->get('id'));
+        $detail = $this->detailGroupUser->getDetail($request->get('group_id'),$request->get('user_id'));
         if (!$detail) {
             return response()->json(['message' => 'Not found user or group'], 404);
         }
@@ -179,9 +181,13 @@ class DetailGroupUserController extends Controller
         $this->detailGroupUser->updateDetailGroupUser($data, $detail->id);
         return response()->json(['message' => 'Update role for user successful']);
     }
-    public function delete($id)
+    public function delete(Request $request)
     {
-        $detail = $this->detailGroupUser->getDetailGroupUser($id);
+        $request->validate([
+            'group_id' => 'required',
+            'user_id' => 'required',
+        ]);
+        $detail = $this->detailGroupUser->getDetail($request->get('group_id'),$request->get('user_id'));
         if (!$detail) {
             return response()->json(['message' => 'Not found user or group to delete'], 404);
         }
