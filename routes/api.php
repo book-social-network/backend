@@ -104,6 +104,7 @@ Route::group([
     Route::get('/get-all-user-want-join/{idGroup}', [DetailGroupUserController::class, 'getAllUserWantJoinGroup']);
     Route::post('/insert', [DetailGroupUserController::class, 'insert']);
     Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
+    Route::post('/update-image-default', [DetailGroupUserController::class, 'updateDefaultImage']);
     Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);
     Route::delete('/delete/{id}', [DetailGroupUserController::class, 'delete']);
 });

@@ -140,6 +140,25 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Update user successful']);
     }
+    public function updateDefaultImage()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Not found user with id'], 404);
+        }
+        $cloudinaryImage = $user->image_url;
+        $avatar = 'http://res.cloudinary.com/dpqqqawyw/image/upload/v1731144261/avatar/avatar-gender-neutral-silhouette-vector-600nw-2526512481_o4lren.webp';
+
+        if ($cloudinaryImage && $cloudinaryImage != $avatar) {
+            $this->cloud->deleteCloud($cloudinaryImage);
+        }
+        $this->user->updateUser(
+            [
+                'image_url' => $avatar,
+            ], $user->id);
+
+        return response()->json(['message' => 'Update image default successful']);
+    }
     public function updatePoint(Request $request){
         $user = auth()->user();
         if (!$user) {

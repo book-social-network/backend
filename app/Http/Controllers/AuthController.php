@@ -164,11 +164,11 @@ class AuthController extends Controller
             'user' => $user,
             'groups' => $groups,
             'followers'=>[
-                'user' => $dataFollowing,
+                'user' => $dataFollower,
                 'quantity' => $followers->count()
             ],
             'following'=>[
-                'user' => $dataFollower,
+                'user' => $dataFollowing,
                 'quantity' => $following->count()
             ],
             'posts'=> $data,
