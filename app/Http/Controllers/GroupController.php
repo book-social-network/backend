@@ -127,8 +127,12 @@ class GroupController extends Controller
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $detail=$this->detailGroupUser->getDetail($group->id,$user->id);
-        if($detail->state==0){
-            return response()->json(['message' => 'You are not in group'], 404);
+        if($group->state==1){
+            if($detail==null){
+                return response()->json(['message' => 'You are not in group'], 404);
+            }else if($detail->state==0){
+                return response()->json(['message' => 'You are not in group'], 404);
+            }
         }
         $countPost=$this->post->getAllPostInGroup($id)->count();
         $posts=$this->post->getAllPostInGroup($id,1,10);
