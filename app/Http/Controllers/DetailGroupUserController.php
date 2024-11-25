@@ -6,18 +6,20 @@ use App\Events\NotificationSent;
 use App\Repositories\Interfaces\DetailGroupUserInterface;
 use App\Repositories\Interfaces\GroupInterface;
 use App\Repositories\Interfaces\NotificationInterface;
+use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Http\Request;
 
 class DetailGroupUserController extends Controller
 {
     private $group;
     private $detailGroupUser;
-    private $notification;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, NotificationInterface $notificationInterface)
+    private $notification,$user;
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, NotificationInterface $notificationInterface, UserInterface $userInterface)
     {
         $this->detailGroupUser = $detailGroupUserInterface;
         $this->notification = $notificationInterface;
         $this->group = $groupInterface;
+        $this->user=$userInterface;
     }
     public function index()
     {
@@ -85,12 +87,16 @@ class DetailGroupUserController extends Controller
     {
         $request->validate([
             'group_id' => 'required',
+            'user_id' => 'required',
         ]);
         $group = $this->group->getGroup($request->get('group_id'));
         if (!$group) {
             return response()->json(['message' => 'Not found group to join'], 404);
         }
-        $user = auth()->user();
+        $user =$this->user->getUser($request->get('user_id'));
+        if(!$user){
+            return response()->json(['message' => 'Not found user'], 404);
+        }
         $data = [
             'group_id' => $group->id,
             'user_id' => $user->id,
