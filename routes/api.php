@@ -106,7 +106,7 @@ Route::group([
     Route::post('/update-state', [DetailGroupUserController::class, 'updateState']);
     Route::post('/update-image-default', [DetailGroupUserController::class, 'updateDefaultImage']);
     Route::post('/update-role', [DetailGroupUserController::class, 'updateRole']);
-    Route::delete('/delete/{id}', [DetailGroupUserController::class, 'delete']);
+    Route::post('/delete', [DetailGroupUserController::class, 'delete']);
 });
 
 // Follow finish test
