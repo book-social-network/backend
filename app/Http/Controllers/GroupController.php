@@ -127,7 +127,7 @@ class GroupController extends Controller
             return response()->json(['message' => 'Not found group with id'], 404);
         }
         $detail=$this->detailGroupUser->getDetail($group->id,$user->id);
-        if($detail->state==0 || $user->role!='admin'){
+        if($detail->state==0){
             return response()->json(['message' => 'You are not in group'], 404);
         }
         $countPost=$this->post->getAllPostInGroup($id)->count();
