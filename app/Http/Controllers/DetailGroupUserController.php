@@ -97,6 +97,10 @@ class DetailGroupUserController extends Controller
         if(!$user){
             return response()->json(['message' => 'Not found user'], 404);
         }
+        $detail=$this->detailGroupUser->getDetail($group->id,$user->id);
+        if($detail!=null){
+            return response()->json(['message' => 'You are join group'], 404);
+        }
         $data = [
             'group_id' => $group->id,
             'user_id' => $user->id,
