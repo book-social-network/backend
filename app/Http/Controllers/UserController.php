@@ -66,18 +66,18 @@ class UserController extends Controller
                 'books' => $books,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, $user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
             ];
         }
         return response()->json([
             'user' => $user,
             'groups' => $groups,
             'followers'=>[
-                'user' => $dataFollowing,
+                'user' => $dataFollower,
                 'quantity' => $followers->count()
             ],
             'following'=>[
-                'user' => $dataFollower,
+                'user' => $dataFollowing,
                 'quantity' => $following->count()
             ],
             'posts'=> $data,
