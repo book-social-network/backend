@@ -66,7 +66,7 @@ class UserController extends Controller
                 'books' => $books,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, $user()->id)
             ];
         }
         return response()->json([
