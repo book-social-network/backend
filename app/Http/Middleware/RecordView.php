@@ -17,16 +17,11 @@ class RecordView
     public function handle(Request $request, Closure $next)
     {
         $ipAddress = $request->ip();
-
+        $todayStart = now()->startOfDay();
         // Tìm lượt xem theo IP
-        $view = View::where('ip_address', $ipAddress)->first();
+        $view = View::where('ip_address', $ipAddress)->where('last_visited_at',$todayStart)->first();
 
-        if ($view) {
-            // Nếu đã có, cập nhật thời gian truy cập
-            $view->last_visited_at = now();
-            $view->save();
-        } else {
-            // Nếu chưa có, tạo mới bản ghi
+        if (!$view) {
             $view = new View();
             $view->ip_address = $ipAddress;
             $view->last_visited_at = now();
