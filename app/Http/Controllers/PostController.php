@@ -32,8 +32,8 @@ class PostController extends Controller
     public function index()
     {
         $user = auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $posts = $this->post->getAllPost();
         $data = [];
@@ -75,8 +75,8 @@ class PostController extends Controller
     public function getPostOnAllGroup()
     {
         $user = auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $posts = $this->post->getAllPostGroupWithUser($user->id);
         $data = [];
@@ -106,8 +106,8 @@ class PostController extends Controller
     public function getPost($id)
     {
         $user = auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $post = $this->post->getPost($id);
         if (!$post) {
@@ -152,7 +152,7 @@ class PostController extends Controller
         }
         $post = $this->post->insertPost([
             'description' => $request->get('description'),
-            'detail_group_user_id' => $detail?$detail->id:$detail,
+            'detail_group_user_id' => $detail ? $detail->id : $detail,
             'user_id' => $user->id
         ]);
 
@@ -160,15 +160,15 @@ class PostController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $user=auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $request->validate([
             'description' => 'required|string',
         ]);
         $post = $this->post->getPost($id);
-        if($post->user_id!=$user->id){
+        if ($post->user_id != $user->id) {
             return response()->json(['message' => 'It is not your post'], 404);
         }
         if (!$post) {
@@ -179,29 +179,28 @@ class PostController extends Controller
     }
     public function delete($id)
     {
-        $user=auth()->user();
-        if(!$user){
+        $user = auth()->user();
+        if (!$user) {
             return response()->json(['message' => 'Please login'], 404);
         }
         $post = $this->post->getPost($id);
         if (!$post) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
-        if($post->user_id!=$user->id){
+        if ($post->user_id != $user->id) {
             return response()->json(['message' => 'Thlis post is not your post'], 404);
-        }
-        if($post->detail_group_user_id!=null){
-            $group=$post->detail_group_user()->first()->group()->first();
-            $admins=$this->detailGroupUser->getAdminGroup($group->id);
-            foreach($admins as $admin){
-                if($admin->user_id==$user->id){
+        } else if ($post->detail_group_user_id != null) {
+            $group = $post->detail_group_user()->first()->group()->first();
+            $admins = $this->detailGroupUser->getAdminGroup($group->id);
+            foreach ($admins as $admin) {
+                if ($admin->user_id == $user->id) {
                     $this->notification->insertNotification([
                         'from_id' => $group->id,
                         'to_id' => $user->id,
-                        'information' =>'Bài viết của bạn đã bị xoá trong group '. $group->name,
+                        'information' => 'Bài viết của bạn đã bị xoá trong group ' . $group->name,
                         'from_type' => 'group',
                     ]);
-                    broadcast(new NotificationSent('Bài viết của bạn đã bị xoá trong group '. $group->name,$post->user_id));
+                    broadcast(new NotificationSent('Bài viết của bạn đã bị xoá trong group ' . $group->name, $post->user_id));
                 }
             }
         }
@@ -224,7 +223,7 @@ class PostController extends Controller
             'post_id' => 'required|integer',
             'book_id' => 'required|integer'
         ]);
-        $detail = $this->detailPostBook->getDetailPostBook($request->get('post_id'),$request->get('book_id'));
+        $detail = $this->detailPostBook->getDetailPostBook($request->get('post_id'), $request->get('book_id'));
         if (!$detail) {
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
@@ -234,20 +233,20 @@ class PostController extends Controller
     // Like
     public function insertLike(Request $request)
     {
-        $user=auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $request->validate([
             'post_id' => 'required',
         ]);
         $post = $this->post->getPost($request->get('post_id'));
-        if($post==null){
-            return response()->json(['message' => 'Not found post'],404);
+        if ($post == null) {
+            return response()->json(['message' => 'Not found post'], 404);
         }
-        if($post->detail_group_user_id != null){
+        if ($post->detail_group_user_id != null) {
             if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
-                return response()->json(['message' => 'User is not in a group'],404);
+                return response()->json(['message' => 'User is not in a group'], 404);
             }
         }
         $this->like->insertLike([
@@ -259,7 +258,7 @@ class PostController extends Controller
         $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
-        broadcast(new LikeEvent($post->id,$countLike));
+        broadcast(new LikeEvent($post->id, $countLike));
         if (empty($notification)) {
             $this->notification->insertNotification([
                 'from_id' => $post->id,
@@ -273,49 +272,49 @@ class PostController extends Controller
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
             ], $notification->id);
         }
-        broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',$post->user_id));
+        broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn', $post->user_id));
         return response()->json(['message' => 'Like in post successful']);
     }
     public function deleteLike($idPost)
     {
-        $user=auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
-        $like = $this->like->getLike($idPost,$user->id);
+        $like = $this->like->getLike($idPost, $user->id);
         if (!$like) {
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
-        $this->like->deleteLike($idPost,$user->id);
+        $this->like->deleteLike($idPost, $user->id);
         $countLike = $this->like->getAllLikeOfPost($idPost)->count();
         // handle Realtime like
-        broadcast(new LikeEvent($idPost,$countLike));
+        broadcast(new LikeEvent($idPost, $countLike));
         return response()->json(['message' => 'Delete like in post successful']);
     }
     // Comment
     public function insertComment(Request $request)
     {
-        $user=auth()->user();
-        if(!$user){
-            return response()->json(['message' => 'Please login'],404);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
         }
         $request->validate([
             'post_id' => 'required|integer',
             'description' => 'required'
         ]);
         $post = $this->post->getPost($request->get('post_id'));
-        if($post->detail_group_user_id!=null){
+        if ($post->detail_group_user_id != null) {
             if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id)) {
                 return response()->json(['message' => 'User is not in a group']);
             }
         }
-        $cmt=$this->comment->insertComment([
-            'description'=>$request->get('description'),
-            'post_id'=>$request->get('post_id'),
+        $cmt = $this->comment->insertComment([
+            'description' => $request->get('description'),
+            'post_id' => $request->get('post_id'),
             'user_id' => $user->id
         ]);
         // handle realtime comment
-        broadcast(new CommentEvent($request->get('post_id'),$cmt));
+        broadcast(new CommentEvent($request->get('post_id'), $cmt));
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $post->user_id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
@@ -328,7 +327,7 @@ class PostController extends Controller
                 'from_type' => 'post',
             ]);
             // handle Realtime notification
-            broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',$post->user_id));
+            broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn', $post->user_id));
         } else {
             $this->notification->updateNotification([
                 'from_id' => $post->id,
@@ -346,9 +345,9 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $comments = $this->comment->getComment($id);
-        $cmt=$this->comment->updateComment($request->all(), $id);
+        $cmt = $this->comment->updateComment($request->all(), $id);
         // handle realtime comment
-        broadcast(new CommentEvent($request->get('post_id'),$cmt));
+        broadcast(new CommentEvent($request->get('post_id'), $cmt));
         return response()->json($comments);
     }
     public function deleteComment($id)
@@ -358,7 +357,7 @@ class PostController extends Controller
             return response()->json(['message' => 'Not found book in post with id'], 404);
         }
         // handle realtime comment
-        broadcast(new CommentEvent($comment->post_id,$comment));
+        broadcast(new CommentEvent($comment->post_id, $comment));
         $this->comment->deleteComment($id);
         return response()->json(['message' => 'Delete comment in post successful']);
     }
