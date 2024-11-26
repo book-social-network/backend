@@ -47,7 +47,7 @@ class FollowController extends Controller
             'from_id' => $user->id,
             'to_id' => $follower->id,
             'information' => $follower->name . ' vừa gửi theo dõi bạn',
-            'from_type' => 'user',
+            'from_type' => 'member',
         ]);
         return response()->json(['message' => 'Follow successful']);
     }

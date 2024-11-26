@@ -17,7 +17,17 @@ class NotificationController extends Controller
             return response()->json(['message' => 'Please login'],404);
         }
         $notifications=$this->notification->getAllNotificationOfUser($user->id);
-        return response()->json($notifications);
+        $data=[];
+        foreach($notifications as $notification){
+            $data[]=[
+                'id' => $notification->id,
+                'information' =>$notification->information,
+                'state' => $notification->state,
+                'type_id' => $notification->from_id.'-'.$notification->to_id,
+                'type' => $notification->from_type.'-'.$notification->to_type,
+            ];
+        }
+        return response()->json($data);
     }
     public function updateState($id){
         $notification=$this->notification->getNotification($id);

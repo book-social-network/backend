@@ -93,7 +93,7 @@ class GroupController extends Controller
                 'to_id' => $admin->id,
                 'information' => $user->name . ' đã yêu cầu tham gia group ' . $group->name,
                 'from_type' => 'group',
-                'to_type' => 'user'
+                'to_type' => 'member'
             ]);
             // notification realtime
             broadcast(new NotificationSent($user->name . ' đã yêu cầu tham gia group ' . $group->name, $admin->id));
