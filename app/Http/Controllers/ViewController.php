@@ -24,8 +24,7 @@ class ViewController extends Controller
     }
     public function getTotalViews()
     {
-        $todayStart = now()->startOfDay();
-        $count = View::where('last_visited_at', '>=', $todayStart)->count();
+        $count = View::get()->count();
 
         return response()->json(['total_views' => $count]);
     }
