@@ -101,6 +101,7 @@ class DetailGroupUserController extends Controller
         if($detail!=null){
             return response()->json(['message' => 'You are join group'], 404);
         }
+
         $data = [
             'group_id' => $group->id,
             'user_id' => $user->id,
@@ -108,15 +109,27 @@ class DetailGroupUserController extends Controller
             'role' => 'member'
         ];
         $detail = $this->detailGroupUser->insertDetailGroupUser($data);
-        //  Handle Realtime Notifications
-        $information=$group->state == true ? 'Bạn đã tham gia group ' . $group->name . ' thành công.' : 'Bạn vừa gửi yêu cầu tham gia nhóm ' . $group->name;
-        // send notification for member
-        $this->notification->insertNotification([
-            'from_id' => $group->id,
-            'to_id' => $user->id,
-            'information' => $information,
-            'from_type' => 'group',
-        ]);
+        $information=null;
+        if($request->get('invite')){
+            $information=$group->state != true ? 'Bạn đã tham được thêm vào group ' . $group->name : 'Bạn đã tham được mời tham gia group ' . $group->name;
+            // send notification for member
+            $this->notification->insertNotification([
+                'from_id' => $group->id,
+                'to_id' => $user->id,
+                'information' => $information,
+                'from_type' => 'group',
+            ]);
+        }else{
+            //  Handle Realtime Notifications
+            $information=$group->state != true ? 'Bạn đã tham gia group ' . $group->name . ' thành công.' : 'Bạn vừa gửi yêu cầu tham gia nhóm ' . $group->name;
+            // send notification for member
+            $this->notification->insertNotification([
+                'from_id' => $group->id,
+                'to_id' => $user->id,
+                'information' => $information,
+                'from_type' => 'group',
+            ]);
+        }
         broadcast(new NotificationSent($information,$user->id));
 
         if ($group->state == false) {
