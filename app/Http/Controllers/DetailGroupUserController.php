@@ -111,7 +111,7 @@ class DetailGroupUserController extends Controller
         $detail = $this->detailGroupUser->insertDetailGroupUser($data);
         $information=null;
         if($request->get('invite')){
-            $information=$group->state != true ? 'Bạn đã tham được thêm vào group ' . $group->name : 'Bạn đã tham được mời tham gia group ' . $group->name;
+            $information=$group->state != true ? 'Bạn đã tham được thêm vào group ' . $group->name : 'Bạn đã được mời tham gia group ' . $group->name;
             // send notification for member
             $this->notification->insertNotification([
                 'from_id' => $group->id,
