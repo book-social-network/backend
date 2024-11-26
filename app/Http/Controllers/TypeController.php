@@ -22,7 +22,15 @@ class TypeController extends Controller
     public function index()
     {
         $types = $this->type->getAllType();
-        return response()->json($types);
+        $data=[];
+        foreach($types as $type){
+            $data[]= [
+                'type'=>$type,
+                'books' =>$type->book()->get(),
+                'count-book'=>$type->book()->get()->count()
+            ];
+        }
+        return response()->json($data);
     }
     public function insert(Request $request)
     {
