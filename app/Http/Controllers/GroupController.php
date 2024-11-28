@@ -25,7 +25,7 @@ class GroupController extends Controller
         $this->user = $userInterface;
         $this->like = $likeInterface;
         $this->notification = $notificationInterface;
-        $this->cloud=$cloudInterface;
+        $this->cloud = $cloudInterface;
     }
 
     public function index()
