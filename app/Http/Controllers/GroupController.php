@@ -73,7 +73,6 @@ class GroupController extends Controller
         $cloudinaryImage = null;
         if ($request->hasFile('image')) {
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'group');
-            die($cloudinaryImage);
         }
         $group = $this->group->insertGroup(array_merge(
             $request->all(),
