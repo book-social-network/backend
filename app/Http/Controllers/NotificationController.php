@@ -11,12 +11,15 @@ class NotificationController extends Controller
     public function __construct(NotificationInterface $notificationInterface){
         $this->notification = $notificationInterface;
     }
-    public function index(){
+    public function index(Request $request){
+        $page = $request->input('page', 1);
+
         $user=auth()->user();
         if(empty($user)){
             return response()->json(['message' => 'Please login'],404);
         }
-        $notifications=$this->notification->getAllNotificationOfUser($user->id);
+        $notifications=$this->notification->getAllNotificationOfUser($user->id,$page,10 );
+        $quantityPages=$this->notification->getQuantityPageNotificationOfUser($user->id,10);
         $data=[];
         foreach($notifications as $notification){
             $data[]=[
@@ -27,7 +30,10 @@ class NotificationController extends Controller
                 'type' => $notification->from_type.'-'.$notification->to_type,
             ];
         }
-        return response()->json($data);
+        return response()->json([
+            'notifications' => $data,
+            'quantity_pages' => $quantityPages
+        ]);
     }
     public function updateState($id){
         $notification=$this->notification->getNotification($id);

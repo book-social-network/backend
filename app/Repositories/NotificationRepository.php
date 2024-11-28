@@ -6,8 +6,18 @@ use App\Models\Notification;
 use App\Repositories\Interfaces\NotificationInterface;
 
 class NotificationRepository implements NotificationInterface{
-    public function getAllNotificationOfUser($idUser){
-        return Notification::where('to_id', $idUser)->where('to_type','member')->get();
+    public function getAllNotificationOfUser($idUser,$page , $num){
+        return Notification::where('to_id', $idUser)
+        ->where('to_type','member')
+        ->skip(($page - 1) * $num)->take($num)
+        ->orderBy('updated_at', 'asc')
+        ->get();
+    }
+    public function getQuantityPageNotificationOfUser($idUser, $num){
+        $totalNotifications = Notification::where('to_id', $idUser)
+            ->where('to_type', 'member')
+            ->count();
+        return ceil($totalNotifications / $num);
     }
     public function getNotification($id){
         return Notification::find($id);
@@ -16,6 +26,7 @@ class NotificationRepository implements NotificationInterface{
         return Notification::where('from_id', $idPost)
         ->where('from_type', 'post')
         ->where('to_id', $idUser)
+        ->orderBy('updated_at', 'asc')
         ->first();
     }
     public function insertNotification($data){
@@ -31,16 +42,38 @@ class NotificationRepository implements NotificationInterface{
             $Notification->delete();
         }
     }
-    public function getNotificationsByUser($idUser){
-        $Notifications=Notification::where('to_id', $idUser)->get();
+    public function getNotificationsByUser($idUser,$page , $num){
+        $Notifications=Notification::where('from_id', $idUser)
+        ->where('from_type','member')
+        ->orderBy('updated_at', 'asc')
+        ->skip(($page - 1) * $num)->take($num)
+        ->get();
         if(!empty($Notification)){
             return $Notifications;
         }
     }
-    public function getNotificationsByGroup($idGroup){
-        $Notifications=Notification::where('to_id', $idGroup)->get();
+    public function getNotificationsByGroup($idGroup,$page , $num){
+        $Notifications=Notification::where('from_id', $idGroup)
+        ->where('from_type','group')
+        ->orderBy('updated_at', 'asc')
+        ->skip(($page - 1) * $num)->take($num)
+        ->get();
         if(!empty($Notification)){
             return $Notifications;
         }
+    }
+    public function getQuantityPageNotificationByUser($idUser, $num){
+        $totalNotifications = Notification::where('from_id', $idUser)
+            ->where('from_type', 'member')
+            ->orderBy('updated_at', 'asc')
+            ->count();
+        return ceil($totalNotifications / $num);
+    }
+    public function getQuantityPageNotificationByGroup($idUser, $num){
+        $totalNotifications = Notification::where('from_id', $idUser)
+            ->where('from_type', 'group')
+            ->orderBy('updated_at', 'asc')
+            ->count();
+        return ceil($totalNotifications / $num);
     }
 }
