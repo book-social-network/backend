@@ -138,7 +138,7 @@ class AuthController extends Controller
             $dataFollowing[]=$follow->user()->first();
         }
         foreach($followers as $follow){
-            $dataFollower[]=$follow->user()->first();
+            $dataFollower[]=$this->user->getUser($follow->follower);
         }
         $data=[];
         foreach ($posts as $post) {
