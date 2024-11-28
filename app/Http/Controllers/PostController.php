@@ -341,13 +341,12 @@ class PostController extends Controller
     public function updateComment(Request $request, $id)
     {
         $request->validate([
-            'post_id' => 'required|integer',
             'description' => 'required'
         ]);
         $comments = $this->comment->getComment($id);
         $cmt = $this->comment->updateComment($request->all(), $id);
         // handle realtime comment
-        broadcast(new CommentEvent($request->get('post_id'), $cmt));
+        // broadcast(new CommentEvent($request->get('post_id'), $cmt));
         return response()->json($comments);
     }
     public function deleteComment($id)

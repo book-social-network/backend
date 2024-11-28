@@ -157,8 +157,8 @@ Route::group([
     Route::delete('/delete-like/{idPost}', [PostController::class, 'deleteLike']);
     // Comment
     Route::post('/insert-comment', [PostController::class, 'insertComment']);
-    Route::post('/upate-comment/{idPost}', [PostController::class, 'updateComment']);
-    Route::delete('/delete-comment/{idPost}', [PostController::class, 'deleteComment']);
+    Route::post('/update-comment/{idComment}', [PostController::class, 'updateComment']);
+    Route::delete('/delete-comment/{idComment}', [PostController::class, 'deleteComment']);
 });
 
 // Profession
@@ -166,7 +166,7 @@ Route::group([
     'prefix' => 'profession'
 ], function ($router) {
     Route::post('/search', [ProfessionController::class, 'search']);
-    Route::post('/sort', [ProfessionController::class,'sort']);
+    Route::post('/sort', [ProfessionController::class, 'sort']);
 });
 // Share
 Route::group([
