@@ -33,7 +33,7 @@ class ViewController extends Controller
     {
         $views = View::selectRaw('DATE(last_visited_at) as date, COUNT(*) as count')
                      ->groupBy('date')
-                     ->orderBy('date', 'desc')
+                     ->orderBy('date', 'asc')
                      ->get();
 
         return response()->json($views);
@@ -43,8 +43,8 @@ class ViewController extends Controller
     {
         $views = View::selectRaw('WEEK(last_visited_at) as week, YEAR(last_visited_at) as year, COUNT(*) as count')
                      ->groupBy('week', 'year')
-                     ->orderBy('year', 'desc')
-                     ->orderBy('week', 'desc')
+                     ->orderBy('year', 'asc')
+                     ->orderBy('week', 'asc')
                      ->get();
 
         return response()->json($views);
@@ -54,8 +54,8 @@ class ViewController extends Controller
     {
         $views = View::selectRaw('MONTH(last_visited_at) as month, YEAR(last_visited_at) as year, COUNT(*) as count')
                      ->groupBy('month', 'year')
-                     ->orderBy('year', 'desc')
-                     ->orderBy('month', 'desc')
+                     ->orderBy('year', 'asc')
+                     ->orderBy('month', 'asc')
                      ->get();
 
         return response()->json($views);
@@ -65,7 +65,7 @@ class ViewController extends Controller
     {
         $views = View::selectRaw('YEAR(last_visited_at) as year, COUNT(*) as count')
                      ->groupBy('year')
-                     ->orderBy('year', 'desc')
+                     ->orderBy('year', 'asc')
                      ->get();
 
         return response()->json($views);

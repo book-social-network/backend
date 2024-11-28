@@ -17,7 +17,7 @@ class GroupController extends Controller
 {
     private $group;
     private $detailGroupUser, $post, $user, $cloud, $like, $notification;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface, NotificationInterface $notificationInterface)
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface, NotificationInterface $notificationInterface, CloudInterface $cloudInterface)
     {
         $this->group = $groupInterface;
         $this->detailGroupUser = $detailGroupUserInterface;
@@ -25,6 +25,7 @@ class GroupController extends Controller
         $this->user = $userInterface;
         $this->like = $likeInterface;
         $this->notification = $notificationInterface;
+        $this->cloud=$cloudInterface;
     }
 
     public function index()
@@ -71,8 +72,8 @@ class GroupController extends Controller
         }
         $cloudinaryImage = null;
         if ($request->hasFile('image')) {
-
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'group');
+            die($cloudinaryImage);
         }
         $group = $this->group->insertGroup(array_merge(
             $request->all(),
