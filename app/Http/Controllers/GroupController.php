@@ -17,7 +17,7 @@ class GroupController extends Controller
 {
     private $group;
     private $detailGroupUser, $post, $user, $cloud, $like, $notification;
-    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface, NotificationInterface $notificationInterface, CloudInterface $cloudInterface)
+    public function __construct(GroupInterface $groupInterface, DetailGroupUserInterface $detailGroupUserInterface, PostInterface $postInterface, UserInterface $userInterface, CloudInterface $cloudInterface, LikeInterface $likeInterface, NotificationInterface $notificationInterface)
     {
         $this->group = $groupInterface;
         $this->detailGroupUser = $detailGroupUserInterface;
