@@ -25,7 +25,7 @@ class GroupController extends Controller
         $this->user = $userInterface;
         $this->like = $likeInterface;
         $this->notification = $notificationInterface;
-        $this->cloud=$cloudInterface;
+        $this->cloud = $cloudInterface;
     }
 
     public function index()
@@ -73,7 +73,6 @@ class GroupController extends Controller
         $cloudinaryImage = null;
         if ($request->hasFile('image')) {
             $cloudinaryImage = $this->cloud->insertCloud($request->file('image'), 'group');
-            die($cloudinaryImage);
         }
         $group = $this->group->insertGroup(array_merge(
             $request->all(),
