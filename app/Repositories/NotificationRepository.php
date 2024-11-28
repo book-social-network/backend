@@ -13,12 +13,7 @@ class NotificationRepository implements NotificationInterface{
         ->orderBy('updated_at', 'asc')
         ->get();
     }
-    public function getQuantityPageNotificationOfUser($idUser, $num){
-        $totalNotifications = Notification::where('to_id', $idUser)
-            ->where('to_type', 'member')
-            ->count();
-        return ceil($totalNotifications / $num);
-    }
+
     public function getNotification($id){
         return Notification::find($id);
     }
@@ -61,6 +56,13 @@ class NotificationRepository implements NotificationInterface{
         if(!empty($Notification)){
             return $Notifications;
         }
+    }
+    // quantity page
+    public function getQuantityPageNotificationOfUser($idUser, $num){
+        $totalNotifications = Notification::where('to_id', $idUser)
+            ->where('to_type', 'member')
+            ->count();
+        return ceil($totalNotifications / $num);
     }
     public function getQuantityPageNotificationByUser($idUser, $num){
         $totalNotifications = Notification::where('from_id', $idUser)

@@ -46,6 +46,7 @@ class FollowRepository implements FollowInterface{
                 $query->whereIn('follower', $friends);
             }])
             ->orderByDesc('common_friends_count')
+            ->inRandomOrder()
             ->take(20)
             ->get();
 
