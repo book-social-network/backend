@@ -8,10 +8,10 @@ use App\Repositories\Interfaces\FollowInterface;
 
 class FollowRepository implements FollowInterface{
     public function getAllFollowOfUser($idUser){
-        return Follow::where('user_id', $idUser)->get();
+        return Follow::where('follower', $idUser)->get();
     }
     public function getAllUserFollow($idUser){
-        return Follow::where('follower', $idUser)->get();
+        return Follow::where('user_id', $idUser)->get();
     }
     public function getFollow($idFollower, $idUser){
         return Follow::where('follower', $idFollower)->where('user_id', $idUser)->first();
