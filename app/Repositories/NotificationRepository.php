@@ -6,6 +6,12 @@ use App\Models\Notification;
 use App\Repositories\Interfaces\NotificationInterface;
 
 class NotificationRepository implements NotificationInterface{
+    public function getQuantityNotification($idUser){
+        return Notification::where('to_id', $idUser)
+        ->where('to_type','member')
+        ->orderBy('updated_at', 'asc')
+        ->get()->count();
+    }
     public function getAllNotificationOfUser($idUser,$page , $num){
         return Notification::where('to_id', $idUser)
         ->where('to_type','member')

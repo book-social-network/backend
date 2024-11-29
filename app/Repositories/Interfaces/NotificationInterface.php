@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface NotificationInterface
 {
-
+    public function getQuantityNotification($idUser);
     public function getAllNotificationOfUser($idUser,$page , $num);
     public function getNotification($id);
     public function getNotificationWithPost($idPost, $idUser);

@@ -17,6 +17,7 @@ class NotificationController extends Controller
         if(empty($user)){
             return response()->json(['message' => 'Please login'],404);
         }
+        $quantity=$this->notification->getQuantityNotification($user->id);
         $notifications=$this->notification->getAllNotificationOfUser($user->id,$page,10 );
         $quantityPages=$this->notification->getQuantityPageNotificationOfUser($user->id,10);
         $data=[];
@@ -31,7 +32,8 @@ class NotificationController extends Controller
         }
         return response()->json([
             'notifications' => $data,
-            'quantity_pages' => $quantityPages
+            'quantity_pages' => $quantityPages,
+            'quantity' => $quantity
         ]);
     }
     public function updateState($id){
