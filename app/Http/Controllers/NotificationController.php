@@ -12,8 +12,7 @@ class NotificationController extends Controller
         $this->notification = $notificationInterface;
     }
     public function index(Request $request){
-        $page = $request->input('page', 1);
-
+        $page = $request->get('page', 1);
         $user=auth()->user();
         if(empty($user)){
             return response()->json(['message' => 'Please login'],404);

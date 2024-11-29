@@ -19,8 +19,8 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook, $cloud;
-    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface, CloudInterface $cloudInterface)
+    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook, $cloud,$post;
+    public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface, CloudInterface $cloudInterface, PostInterface $postInterface)
     {
         $this->book = $bookInterface;
         $this->type = $typeInterface;
@@ -30,6 +30,7 @@ class BookController extends Controller
         $this->assessment = $assessmentInterface;
         $this->detailPostBook = $detailPostBookInterface;
         $this->cloud = $cloudInterface;
+        $this->post=$postInterface;
     }
     public function index()
     {
@@ -104,6 +105,10 @@ class BookController extends Controller
         $book = $this->book->getBook($id);
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
+        }
+        $posts=$book->post()->get();
+        foreach($posts as $post){
+            $this->post->deletePost($post->id);
         }
         $this->cloud->deleteCloud($book->image);
         $this->book->deleteBook($id);

@@ -24,11 +24,6 @@ class CommentEvent implements ShouldBroadcast
         $this->comment = $comment; // Nội dung comment
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn()
     {
         return new Channel('post.' . $this->postId);

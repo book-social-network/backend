@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class LikeEvent implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use  InteractsWithSockets, SerializesModels;
     public $postId;
     public $quantity;
     /**
@@ -24,11 +24,6 @@ class LikeEvent implements ShouldBroadcast
         $this->quantity = $quantity;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn()
     {
         return new Channel('post.' . $this->postId);
