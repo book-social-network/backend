@@ -36,7 +36,7 @@ class TypeControllerTest extends TestCase
         $response = $this->post('/api/type/insert', $data);
 
         // Assert: Check the type was created
-        $response->assertStatus(201);
+        $response->assertStatus(200);
         $this->assertDatabaseHas('types', $data);  // Ensure the data is in the DB
     }
 

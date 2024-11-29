@@ -4,89 +4,112 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Share;
+use App\Models\Book;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ShareControllerTest extends TestCase
 {
-    use RefreshDatabase; // Đảm bảo database luôn ở trạng thái ban đầu cho mỗi test
+    use RefreshDatabase;  // Đảm bảo dữ liệu được reset sau mỗi test
 
-    /**
-     * Test lấy tất cả các share.
-     *
-     * @return void
-     */
-    public function test_get_all_shares()
+    protected $shareRepository;
+
+    protected function setUp(): void
     {
-        // Tạo dữ liệu mẫu
-        Share::factory()->count(5)->create();
-
-        // Gọi API getAllShare
-        $response = $this->getJson('/api/share/get-all');
-
-        // Kiểm tra kết quả trả về
-        $response->assertStatus(200)
-            ->assertJsonCount(5); // Kiểm tra số lượng share trả về là 5
+        parent::setUp();
+        $this->shareRepository = new \App\Repositories\ShareRepository();
     }
 
-    /**
-     * Test lấy một share cụ thể theo ID.
-     *
-     * @return void
-     */
-    public function test_get_specific_share()
+    /** @test */
+    public function it_can_get_all_shares()
     {
-        // Tạo một share
+        // Tạo một vài bản ghi share
         $share = Share::factory()->create();
 
-        // Gọi API getShare
-        $response = $this->getJson("/api/share/get/{$share->id}");
+        // Lấy tất cả shares
+        $shares = $this->shareRepository->getAllShare();
 
-        // Kiểm tra kết quả trả về
-        $response->assertStatus(200)
-            ->assertJson([
-                'book_id' => $share->book_id,
-                'user_id' => $share->user_id,
-                'link_share' => $share->link_share, // Kiểm tra link_share thay vì content
-            ]);
+        // Kiểm tra xem danh sách shares có chứa share vừa tạo không
+        $this->assertCount(1, $shares);
+        $this->assertEquals($share->id, $shares->first()->id);
     }
 
-    /**
-     * Test thêm mới share.
-     *
-     * @return void
-     */
-    public function test_insert_share()
+    /** @test */
+    public function it_can_get_a_share_by_id()
     {
-        // Dữ liệu mới
+        $share = Share::factory()->create();
+
+        // Tìm kiếm share theo ID
+        $fetchedShare = $this->shareRepository->getShare($share->id);
+
+        $this->assertEquals($share->id, $fetchedShare->id);
+    }
+
+    /** @test */
+    public function it_can_get_all_shares_of_a_book()
+    {
+        $book = Book::factory()->create();
+        $share = Share::factory()->create(['book_id' => $book->id]);
+
+        // Lấy tất cả shares của một book
+        $shares = $this->shareRepository->getAllShareOfBook($book->id);
+
+        // Kiểm tra xem share của book có được lấy đúng không
+        $this->assertCount(1, $shares);
+        $this->assertEquals($book->id, $shares->first()->book_id);
+    }
+
+    /** @test */
+    public function it_can_get_all_shares_of_a_user()
+    {
+        $user = User::factory()->create();
+        $share = Share::factory()->create(['user_id' => $user->id]);
+
+        // Lấy tất cả shares của một user
+        $shares = $this->shareRepository->getAllShareOfUser($user->id);
+
+        // Kiểm tra xem share của user có được lấy đúng không
+        $this->assertCount(1, $shares);
+        $this->assertEquals($user->id, $shares->first()->user_id);
+    }
+
+    /** @test */
+    public function it_can_insert_a_share()
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
         $data = [
-            'book_id' => 1,
-            'user_id' => 1,
-            'link_share' => 'https://example.com/share/1', // Sửa thành URL hợp lệ
+            'user_id' => $user->id,
+            'book_id' => $book->id,
+            'link_share' => 'https://example.com/share', // Thêm giá trị cho link_share
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
 
-        // Gọi API insertShare
-        $response = $this->postJson('/api/share/insert', $data);
+        // Kiểm tra số lượng share trước khi insert
+        $this->assertCount(0, Share::all());
 
-        // Kiểm tra kết quả
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('share', $data); // Kiểm tra dữ liệu có trong cơ sở dữ liệu
+        // Thực hiện insert
+        $this->shareRepository->insertShare($data);
+
+        // Kiểm tra số lượng share sau khi insert
+        $this->assertCount(1, Share::all());
     }
 
-    /**
-     * Test xóa share.
-     *
-     * @return void
-     */
-    public function test_delete_share()
+
+    /** @test */
+    public function it_can_delete_a_share()
     {
-        // Tạo một share
         $share = Share::factory()->create();
 
-        // Gọi API deleteShare
-        $response = $this->deleteJson("/api/share/delete/{$share->id}");
+        // Kiểm tra số lượng share trước khi delete
+        $this->assertCount(1, Share::all());
 
-        // Kiểm tra kết quả
-        $response->assertStatus(200);
-        $this->assertDatabaseMissing('share', ['id' => $share->id]); // Kiểm tra dữ liệu đã bị xóa khỏi cơ sở dữ liệu
+        // Thực hiện delete
+        $this->shareRepository->deleteShare($share->id);
+
+        // Kiểm tra số lượng share sau khi delete
+        $this->assertCount(0, Share::all());
     }
 }

@@ -2,75 +2,111 @@
 
 namespace Tests\Feature;
 
-use App\Models\Notification;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Notification;
 
 class NotificationControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_get_all_notifications_of_user()
+    protected $user;
+    protected $notifications;
+
+    protected function setUp(): void
     {
-        // Tạo người dùng giả
-        $user = User::factory()->create();
+        parent::setUp();
 
-        // Tạo một số notification cho người dùng này
-        Notification::factory()->count(5)->create([
-            'to_id' => $user->id,
-            'to_type' => 'member',
-        ]);
+        // Tạo một user
+        $this->user = User::factory()->create();
 
-        // Gọi API get-all để lấy tất cả notifications của người dùng
-        $response = $this->getJson("/api/notification/get-all");
-
-        // Kiểm tra kết quả trả về
-        $response->assertStatus(200)
-            ->assertJsonCount(5); // Kiểm tra số lượng notification trả về là 5
+        // Tạo dữ liệu mẫu thông báo
+        $this->notifications = Notification::factory()
+            ->count(15)
+            ->sequence(
+                fn($sequence) => [
+                    'to_id' => $this->user->id,
+                    'to_type' => 'member',
+                    'from_id' => $sequence->index + 1,
+                    'from_type' => 'post',
+                ]
+            )
+            ->create();
     }
 
     /** @test */
-    public function it_can_update_notification_state()
+    public function it_can_get_all_notifications_of_a_user()
     {
-        $notification = Notification::factory()->create();
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
 
-        $data = ['state' => 'read'];
+        $notifications = $repository->getAllNotificationOfUser($this->user->id, 1, 5);
 
-        // Gọi API update-state để cập nhật trạng thái
-        $response = $this->postJson("/api/notification/update-state/{$notification->id}", $data);
+        $this->assertCount(5, $notifications);
+        $this->assertEquals($this->user->id, $notifications->first()->to_id);
+    }
 
-        // Kiểm tra kết quả trả về
-        $response->assertStatus(200)
-            ->assertJson([
-                'state' => 'read',
-            ]);
+    /** @test */
+    public function it_can_get_a_single_notification()
+    {
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
+        $notification = $this->notifications->first();
 
-        // Kiểm tra dữ liệu trong cơ sở dữ liệu đã được cập nhật
-        $this->assertDatabaseHas('notifications', [
-            'id' => $notification->id,
-            'state' => 'read',
-        ]);
+        $retrieved = $repository->getNotification($notification->id);
+
+        $this->assertNotNull($retrieved);
+        $this->assertEquals($notification->id, $retrieved->id);
+    }
+
+    /** @test */
+    public function it_can_insert_a_notification()
+    {
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
+
+        $data = [
+            'to_id' => $this->user->id,
+            'to_type' => 'member',
+            'from_id' => 9,
+            'from_type' => 'post',
+            'information' => 'Test notification',
+            'state' => 0,
+        ];
+
+        $notification = $repository->insertNotification($data);
+
+        $this->assertDatabaseHas('notifications', ['information' => 'Test notification']);
+        $this->assertEquals($data['to_id'], $notification->to_id);
+    }
+
+    /** @test */
+    public function it_can_update_a_notification()
+    {
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
+        $notification = $this->notifications->first();
+
+        $repository->updateNotification(['state' => 1], $notification->id);
+
+        $this->assertDatabaseHas('notifications', ['id' => $notification->id, 'state' => 1]);
     }
 
     /** @test */
     public function it_can_delete_a_notification()
     {
-        $notification = Notification::factory()->create();
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
+        $notification = $this->notifications->first();
 
-        // Gọi API delete để xóa notification
-        $response = $this->deleteJson("/api/notification/delete/{$notification->id}");
+        $repository->deleteNotification($notification->id);
 
-        // Kiểm tra kết quả trả về
-        $response->assertStatus(200)
-            ->assertJson([
-                'message' => 'Notification deleted',
-            ]);
+        $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);
+    }
 
-        // Kiểm tra trong cơ sở dữ liệu đã không còn notification này
-        $this->assertDatabaseMissing('notifications', [
-            'id' => $notification->id,
-        ]);
+    /** @test */
+    public function it_can_get_the_quantity_of_pages_for_notifications()
+    {
+        $repository = app()->make(\App\Repositories\NotificationRepository::class);
+
+        $quantityPages = $repository->getQuantityPageNotificationOfUser($this->user->id, 5);
+
+        $this->assertEquals(3, $quantityPages);
     }
 }

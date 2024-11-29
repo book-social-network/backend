@@ -13,9 +13,10 @@ class GroupFactory extends Factory
     {
         return [
             'name' => $this->faker->company,
-            'title' => $this->faker->word,
-            'image_group' => $this->faker->imageUrl(),
-            'state' => $this->faker->boolean,
+            'title' => $this->faker->jobTitle,
+            'description' => $this->faker->sentence,
+            'created_at' => fake()->dateTimeBetween('-1 year', 'now'), // Ngày tạo
+            'updated_at' => fake()->dateTimeBetween('-1 year', 'now'), // Ngày cập nhật
         ];
     }
 }
