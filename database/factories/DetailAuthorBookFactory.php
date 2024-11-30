@@ -15,8 +15,8 @@ class DetailAuthorBookFactory extends Factory
     public function definition()
     {
         return [
-            'author_id' => Author::factory(), // Tự động tạo một Author và lấy ID
-            'book_id' => Book::factory(),     // Tự động tạo một Book và lấy ID
+            'author_id' => Author::factory(), 
+            'book_id' => Book::factory(),    
         ];
     }
 }

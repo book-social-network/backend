@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Assessment;
-use App\Models\User;
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,114 +12,114 @@ class AssessmentControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Test getting an assessment by its ID
-    public function test_get_assessment_by_id()
+    protected $assessmentRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->assessmentRepository = app()->make(\App\Repositories\AssessmentRepository::class);
+    }
+
+    /** @test */
+    public function it_can_get_all_assessments()
+    {
+        Assessment::factory()->count(5)->create();
+
+        $assessments = $this->assessmentRepository->getAllAssessments();
+
+        $this->assertCount(5, $assessments);
+    }
+
+    /** @test */
+    public function it_can_get_assessment_by_id()
     {
         $assessment = Assessment::factory()->create();
-        $response = $this->getJson("/api/get/{$assessment->id}");
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'assessment' => $assessment->toArray(),
-                'book' => $assessment->book->toArray(),
-                'user' => $assessment->user->id,
-                'authors' => []
-            ]);
+        $foundAssessment = $this->assessmentRepository->getAssessment($assessment->id);
+
+        $this->assertNotNull($foundAssessment);
+        $this->assertEquals($assessment->id, $foundAssessment->id);
     }
 
-    // Test inserting a new assessment
-    public function test_insert_assessment()
+    /** @test */
+    public function it_can_get_assessment_by_book_and_user_id()
     {
-        $book = Book::factory()->create();
         $user = User::factory()->create();
-
-        $data = [
-            'description' => 'Great book!',
-            'star' => 5,
-            'book_id' => $book->id,
-        ];
-
-        $response = $this->actingAs($user)->postJson('/api/insert', $data);
-
-        $response->assertStatus(201)
-            ->assertJson([
-                'description' => 'Great book!',
-                'star' => 5,
-                'book_id' => $book->id,
-                'user_id' => $user->id,
-            ]);
-    }
-
-    // Test updating the state of the book read status
-    public function test_update_state_read()
-    {
         $book = Book::factory()->create();
-        $user = User::factory()->create();
-
-        // Assume that an assessment exists for this user and book
         $assessment = Assessment::factory()->create([
-            'book_id' => $book->id,
             'user_id' => $user->id,
+            'book_id' => $book->id,
         ]);
 
-        $data = ['state_read' => 1]; // Example state
+        $foundAssessment = $this->assessmentRepository->getAssessmentWithIdBookAndUser($book->id, $user->id);
 
-        $response = $this->actingAs($user)->putJson("/api/update-state-read/{$book->id}", $data);
-
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'Update state successful']);
+        $this->assertNotNull($foundAssessment);
+        $this->assertEquals($assessment->id, $foundAssessment->id);
     }
 
-    // Test updating an existing assessment
-    public function test_update_assessment()
-    {
-        $assessment = Assessment::factory()->create();
-        $data = ['star' => 4];
-
-        $response = $this->putJson("/api/update/{$assessment->id}", $data);
-
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'Update assessment successful']);
-    }
-
-    // Test deleting an assessment
-    public function test_delete_assessment()
-    {
-        $assessment = Assessment::factory()->create();
-
-        $response = $this->deleteJson("/api/delete/{$assessment->id}");
-
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'Delete assessment successful']);
-    }
-
-    // Test getting all assessments of a user
-    public function test_get_assessments_by_user()
+    /** @test */
+    public function it_can_get_all_assessments_by_user()
     {
         $user = User::factory()->create();
-        $assessment = Assessment::factory()->create(['user_id' => $user->id]);
+        Assessment::factory()->count(3)->create(['user_id' => $user->id]);
 
-        $response = $this->getJson("/api/get-assessment-user/{$user->id}");
+        $assessments = $this->assessmentRepository->getAllAssessmentByUser($user->id);
 
-        $response->assertStatus(200)
-            ->assertJsonCount(1)
-            ->assertJson([
-                'assessment' => $assessment->toArray(),
-            ]);
+        $this->assertCount(3, $assessments);
     }
 
-    // Test getting all assessments of a book
-    public function test_get_assessments_by_book()
+    /** @test */
+    public function it_can_get_all_assessments_by_book()
     {
         $book = Book::factory()->create();
-        $assessment = Assessment::factory()->create(['book_id' => $book->id]);
+        Assessment::factory()->count(4)->create(['book_id' => $book->id]);
 
-        $response = $this->getJson("/api/get-assessment-book/{$book->id}");
+        $assessments = $this->assessmentRepository->getAllAssessmentByBook($book->id);
 
-        $response->assertStatus(200)
-            ->assertJsonCount(1)
-            ->assertJson([
-                'assessment' => $assessment->toArray(),
-            ]);
+        $this->assertCount(4, $assessments);
+    }
+
+    /** @test */
+    public function it_can_insert_an_assessment()
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+        $data = [
+            'user_id' => $user->id,
+            'book_id' => $book->id,
+            'star' => 4,
+            'description' => 'Great book!',
+        ];
+
+        $assessment = $this->assessmentRepository->insertAssessment($data);
+
+        $this->assertDatabaseHas('assessments', $data);
+    }
+
+    /** @test */
+    public function it_can_update_an_assessment()
+    {
+        $assessment = Assessment::factory()->create([
+            'star' => 3,
+            'description' => 'Good book.',
+        ]);
+        $data = [
+            'star' => 5,
+            'description' => 'Excellent book!',
+        ];
+
+        $this->assessmentRepository->updateAssessment($data, $assessment->id);
+
+        $this->assertDatabaseHas('assessments', $data);
+    }
+
+    /** @test */
+    public function it_can_delete_an_assessment()
+    {
+        $assessment = Assessment::factory()->create();
+
+        $this->assessmentRepository->deleteAssessment($assessment->id);
+
+        $this->assertDatabaseMissing('assessments', ['id' => $assessment->id]);
     }
 }

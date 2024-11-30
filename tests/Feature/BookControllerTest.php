@@ -1,104 +1,101 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
-use App\Models\Book;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Http\Testing\File;
+use App\Models\Book;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 
 class BookControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testGetAllBooks()
+    protected $user;
+    protected $bookRepository;
+
+    protected function setUp(): void
     {
-        // Tạo 5 bản ghi Book giả để kiểm tra
-        Book::factory()->count(5)->create();
+        parent::setUp();
 
-        // Gửi yêu cầu GET tới API để lấy tất cả sách
-        $response = $this->getJson('/api/book/get-all');
+        // Tạo người dùng giả để kiểm tra quyền truy cập
+        $this->user = User::factory()->create();
 
-        // Kiểm tra xem status code là 200 và số lượng sách trả về là 5
-        $response->assertStatus(200);
-        $response->assertJsonCount(5);
+        // Giả lập việc sử dụng BookRepository
+        $this->bookRepository = app()->make('App\Repositories\BookRepository');
     }
 
-    public function testGetBook()
+    /** @test */
+    public function it_can_get_all_books()
     {
-        // Tạo một bản ghi Book giả
+        // Tạo một số sách giả lập
+        $book1 = Book::factory()->create();
+        $book2 = Book::factory()->create();
+
+        // Lấy tất cả sách thông qua repository
+        $books = $this->bookRepository->getAllBooks();
+
+        // Kiểm tra rằng các sách đã được lấy ra đúng
+        $this->assertCount(2, $books);
+        $this->assertTrue($books->contains('id', $book1->id));
+        $this->assertTrue($books->contains('id', $book2->id));
+    }
+
+    /** @test */
+    public function it_can_get_book_by_id()
+    {
+        // Tạo một sách giả lập
         $book = Book::factory()->create();
 
-        // Đảm bảo rằng $book không phải là null trước khi truy xuất thuộc tính
-        $this->assertNotNull($book, 'Book should be created successfully.');
+        // Lấy sách thông qua repository theo ID
+        $foundBook = $this->bookRepository->getBook($book->id);
 
-        // Tạo một người dùng và đăng nhập
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        // Gửi yêu cầu GET để lấy thông tin sách theo ID
-        $response = $this->getJson("/api/book/get/{$book->id}");
-
-        // Kiểm tra status code và dữ liệu trả về có chứa các thông tin mong muốn
-        $response->assertStatus(200);
-        $response->assertJson([
-            'book' => [
-                'id' => $book->id,
-                'name' => $book->name,
-            ]
-        ]);
+        // Kiểm tra xem sách có tồn tại và đúng ID
+        $this->assertNotNull($foundBook);
+        $this->assertEquals($book->id, $foundBook->id);
     }
 
-
-    public function testInsertBook()
+    /** @test */
+    public function it_can_get_books_by_name()
     {
-        $image = File::image('book_image.jpg', 200, 300);
-        $data = [
-            'name' => 'New Book',
-            'ratings' => 10,
-            'reviews' => 5,
-            'assessment_score' => 4.5,
-            'image' => $image,  // URL mẫu .jpg,
-            'link_book' => 'https://example.com',
-            'description' => 'Description of the new book.',
-        ];
+        // Tạo một số sách giả lập
+        $book1 = Book::factory()->create(['name' => 'Test Book']);
+        $book2 = Book::factory()->create(['name' => 'Another Book']);
 
-        // Gửi yêu cầu POST để thêm sách
-        $response = $this->postJson('/api/book/insert', $data);
+        // Tìm sách theo tên thông qua repository
+        $books = $this->bookRepository->getByName('Test');
 
-        // Kiểm tra status code và xác nhận dữ liệu đã được lưu vào database
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('books', $data);
+        // Kiểm tra rằng sách có tên chứa 'Test' được tìm thấy
+        $this->assertCount(1, $books);
+        $this->assertEquals('Test Book', $books->first()->name);
     }
-
-    public function testUpdateBook()
+    /** @test */
+    public function it_can_update_book()
     {
-        // Tạo một bản ghi Book giả
+        // Tạo sách mẫu
         $book = Book::factory()->create();
 
-        // Dữ liệu cập nhật sách
-        $data = [
-            'name' => 'Updated Book',
-        ];
+        // Dữ liệu cập nhật
+        $data = ['name' => 'Updated Book Title'];
 
-        // Gửi yêu cầu POST để cập nhật sách
-        $response = $this->putJson("/api/book/update/{$book->id}", $data);
+        // Cập nhật sách thông qua repository
+        $this->bookRepository->updateBook($data, $book->id);
 
-        // Kiểm tra status code và xác nhận dữ liệu đã được cập nhật trong database
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('books', $data);
+        // Kiểm tra xem sách đã được cập nhật trong cơ sở dữ liệu
+        $this->assertDatabaseHas('books', ['id' => $book->id, 'name' => 'Updated Book Title']);
     }
 
-    public function testDeleteBook()
+    /** @test */
+    public function it_can_delete_book()
     {
-        // Tạo một bản ghi Book giả
+        // Tạo sách mẫu
         $book = Book::factory()->create();
-        $response = $this->deleteJson("/api/book/delete/{$book->id}");
 
-        // Kiểm tra status code và xác nhận sách đã bị xóa khỏi database
-        $response->assertStatus(200);
+        // Xóa sách thông qua repository
+        $this->bookRepository->deleteBook($book->id);
+
+        // Kiểm tra xem sách đã bị xóa khỏi cơ sở dữ liệu
         $this->assertDatabaseMissing('books', ['id' => $book->id]);
     }
 }

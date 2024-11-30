@@ -12,11 +12,8 @@ class GroupFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->company,
-            'title' => $this->faker->jobTitle,
-            'description' => $this->faker->sentence,
-            'created_at' => fake()->dateTimeBetween('-1 year', 'now'), // Ngày tạo
-            'updated_at' => fake()->dateTimeBetween('-1 year', 'now'), // Ngày cập nhật
+            'name' => $this->faker->word(),
+            'title' => $this->faker->sentence(),
         ];
     }
 }

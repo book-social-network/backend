@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Assessment;
-use App\Models\User;
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AssessmentFactory extends Factory
@@ -14,15 +14,10 @@ class AssessmentFactory extends Factory
     public function definition()
     {
         return [
-            'description' => $this->faker->paragraph,
-            'star' => $this->faker->numberBetween(1, 5),
-            'state_read' => $this->faker->randomElement([
-                1, // 'Want to Read'
-                2, // 'Reading'
-                3, // 'Read'
-            ]),
-            'book_id' => Book::factory(),
             'user_id' => User::factory(),
+            'book_id' => Book::factory(),
+            'star' => $this->faker->numberBetween(1, 5),
+            'description' => $this->faker->sentence,
         ];
     }
 }

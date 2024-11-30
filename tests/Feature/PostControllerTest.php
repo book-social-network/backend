@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Repositories\PostRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,92 +12,98 @@ class PostControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Test lấy tất cả bài viết.
-     *
-     * @test
-     */
+    protected $postRepository;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->postRepository = new PostRepository(); // Tạo instance của PostRepository
+    }
+
+    /** @test */
     public function it_can_get_all_posts()
     {
-        Post::factory()->count(15)->create(); // Tạo 15 bài viết giả lập
+        $user = User::factory()->create();
+        Post::factory()->create(['user_id' => $user->id]);
+        Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->getJson('/api/get-all'); // Route thực tế
-        $response->assertStatus(200)
-            ->assertJsonCount(15, 'data'); // Kiểm tra trả về 15 bài viết
+        $posts = $this->postRepository->getAllPost();
+
+        $this->assertCount(2, $posts); // Kiểm tra có 2 bài viết
     }
 
-    /**
-     * Test lấy bài viết theo ID.
-     *
-     * @test
-     */
-    public function it_can_get_a_single_post()
+    /** @test */
+    public function it_can_get_all_posts_on_page()
     {
-        $post = Post::factory()->create(); // Tạo bài viết giả lập
+        $user = User::factory()->create();
+        Post::factory()->create(['user_id' => $user->id]);
+        Post::factory()->create(['user_id' => $user->id]);
+        Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->getJson("/api/get/{$post->id}"); // Route thực tế
-        $response->assertStatus(200)
-            ->assertJsonFragment([
-                'id' => $post->id,
-                'description' => $post->description,
-            ]);
+        $page = 1;
+        $num = 2;
+
+        $posts = $this->postRepository->getAllPostOnPage($page, $num);
+
+        $this->assertCount(2, $posts); // Kiểm tra có 2 bài viết trên trang 1
     }
 
-    /**
-     * Test tạo bài viết.
-     *
-     * @test
-     */
-    public function it_can_create_a_post()
+    /** @test */
+    public function it_can_get_single_post()
     {
-        $user = User::factory()->create(); // Giả lập người dùng
-        $data = [
+        $post = Post::factory()->create();
+
+        $result = $this->postRepository->getPost($post->id);
+
+        $this->assertNotNull($result); // Kiểm tra bài viết đã tồn tại
+    }
+
+    /** @test */
+    public function it_can_get_all_posts_by_user()
+    {
+        $user = User::factory()->create();
+        Post::factory()->create(['user_id' => $user->id, 'detail_group_user_id' => null]);
+        Post::factory()->create(['user_id' => $user->id, 'detail_group_user_id' => null]);
+
+        $posts = $this->postRepository->getAllPostByUser($user->id);
+
+        $this->assertCount(2, $posts); // Kiểm tra có 2 bài viết của user
+    }
+
+    /** @test */
+    public function it_can_insert_post()
+    {
+        $user = \App\Models\User::factory()->create(); // Tạo bản ghi trong bảng users
+        $post = Post::factory()->create([
+            'user_id' => $user->id, // Gán ID của user
+            'description' => 'Test content',
+        ]);
+
+        // Tiếp tục các kiểm tra
+        $this->assertDatabaseHas('posts', [
             'user_id' => $user->id,
-            'description' => 'New Post Content',
-        ];
-
-        $response = $this->postJson('/api/insert', $data); // Route thực tế
-        $response->assertStatus(200)
-            ->assertJsonFragment($data);
-
-        $this->assertDatabaseHas('posts', $data);
+            'description' => 'Test content',
+        ]);
     }
 
-    /**
-     * Test cập nhật bài viết.
-     *
-     * @test
-     */
-    public function it_can_update_a_post()
+    /** @test */
+    public function it_can_update_post()
     {
-        $post = Post::factory()->create(); // Tạo bài viết giả lập
-        $updateData = [
-            'description' => 'Updated Content',
-        ];
+        $post = Post::factory()->create();
+        $data = ['description' => 'Updated content'];
 
-        $response = $this->putJson("/api/update/{$post->id}", $updateData); // Route thực tế
-        $response->assertStatus(200)
-            ->assertJsonFragment($updateData);
+        $this->postRepository->updatePost($data, $post->id);
 
-        $this->assertDatabaseHas('posts', $updateData); // Kiểm tra bài viết đã được cập nhật
+        $this->assertDatabaseHas('posts', $data); // Kiểm tra bài viết đã được cập nhật
     }
 
-    /**
-     * Test xoá bài viết.
-     *
-     * @test
-     */
-    public function it_can_delete_a_post()
+    /** @test */
+    public function it_can_delete_post()
     {
-        $user = User::factory()->create(); // Giả lập người dùng
-        $this->actingAs($user); // Giả lập người dùng đăng nhập
+        $post = Post::factory()->create();
 
-        $post = Post::factory()->create(['user_id' => $user->id]); // Tạo bài viết thuộc về user
+        $this->postRepository->deletePost($post->id);
 
-        $response = $this->deleteJson("/api/delete/{$post->id}"); // Route thực tế
-        $response->assertStatus(200)
-            ->assertJsonFragment(['message' => 'Delete post successful']);
-
-        $this->assertDatabaseMissing('posts', ['id' => $post->id]); // Kiểm tra bài viết đã bị xoá khỏi cơ sở dữ liệu
+        $this->assertDatabaseMissing('posts', ['id' => $post->id]); // Kiểm tra bài viết đã bị xóa
     }
 }

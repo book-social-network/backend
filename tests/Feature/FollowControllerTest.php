@@ -4,160 +4,131 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Follow;
-use Tests\TestCase;
+use App\Repositories\FollowRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class FollowControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Helper function to get the authentication token
-     */
-    private function getAuthToken()
+    protected $followRepository;
+
+    // Khởi tạo FollowRepository trong phương thức setUp
+    public function setUp(): void
     {
-        // Đăng nhập và lấy token
-        $response = $this->postJson('/api/login', [
-            'email' => 'johndoe@example.com',  // Thay đổi thành email hợp lệ của bạn
-            'password' => 'password123'       // Thay đổi mật khẩu nếu cần
-        ]);
-
-        $token = $response->json('access_token');
-        $this->assertNotNull($token, 'Token không tồn tại trong response');
-
-        return $token;
+        parent::setUp();
+        $this->followRepository = new FollowRepository();  // Tạo instance của FollowRepository
     }
 
     /**
-     * Test getAllFollow - Lấy tất cả người theo dõi của người dùng
+     * Test user can follow another user.
+     *
+     * @return void
      */
-    public function testGetAllFollow()
+    // Test getAllFollowOfUser method
+    public function testGetAllFollowOfUser()
     {
-        // Lấy token thông qua phương thức đăng nhập
-        $token = $this->getAuthToken();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $user3 = User::factory()->create();
 
-        // Đăng nhập với token
-        $this->withHeaders([
-            'Authorization' => "Bearer $token"
+        Follow::factory()->create([
+            'follower' => $user1->id,
+            'user_id' => $user2->id,
+        ]);
+        Follow::factory()->create([
+            'follower' => $user1->id,
+            'user_id' => $user3->id,
+        ]);
+        Follow::factory()->create([
+            'follower' => $user2->id,
+            'user_id' => $user3->id,
         ]);
 
-        // Tạo người dùng và follow một số người
-        $user = User::factory()->create();
-        $followers = Follow::factory()->count(5)->create(['user_id' => $user->id]);
-
-        // Gửi yêu cầu đến API lấy tất cả người theo dõi
-        $response = $this->getJson('/api/follow/get-all');
-
-        // Kiểm tra phản hồi trả về có đúng mã trạng thái 200
-        $response->assertStatus(200);
-
-        // Kiểm tra cấu trúc JSON trả về
-        $response->assertJsonStructure([
-            'user' => ['id', 'name', 'email'],
-            'followers' => ['*' => ['id', 'user_id', 'follower']]
-        ]);
-
-        // Kiểm tra danh sách followers có đúng 5 bản ghi
-        $response->assertJsonCount(5, 'followers');
+        // Gọi phương thức từ FollowRepository
+        $follows = $this->followRepository->getAllFollowOfUser($user1->id);
+        $this->assertCount(2, $follows); // Kiểm tra có 2 follow từ user1
     }
 
-    /**
-     * Test handleFollow - Xử lý theo dõi một người dùng
-     */
-    public function testHandleFollow()
+    // Test getAllUserFollow method
+    public function testGetAllUserFollow()
     {
-        // Lấy token thông qua phương thức đăng nhập
-        $token = $this->getAuthToken();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
 
-        // Đăng nhập với token
-        $this->withHeaders([
-            'Authorization' => "Bearer $token"
+        Follow::factory()->create([
+            'follower' => $user1->id,
+            'user_id' => $user2->id,
         ]);
 
-        // Tạo người dùng và người được theo dõi
-        $user = User::factory()->create();
-        $followUser = User::factory()->create();
-
-        // Gửi yêu cầu follow người dùng
-        $response = $this->postJson('/api/follow', [
-            'user_id' => $followUser->id
-        ]);
-
-        // Kiểm tra phản hồi trả về có đúng mã trạng thái 201 (Created)
-        $response->assertStatus(201);
-
-        // Kiểm tra đã follow thành công
-        $response->assertJson([
-            'message' => 'Đã theo dõi thành công.'
-        ]);
+        // Gọi phương thức từ FollowRepository
+        $follows = $this->followRepository->getAllUserFollow($user2->id);
+        $this->assertCount(1, $follows); // Kiểm tra có 1 follow của user2
     }
 
-    /**
-     * Test handleUnfollow - Xử lý bỏ theo dõi một người dùng
-     */
-    public function testHandleUnfollow()
+    // Test getFollow method
+    public function testGetFollow()
     {
-        // Lấy token thông qua phương thức đăng nhập
-        $token = $this->getAuthToken();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
 
-        // Đăng nhập với token
-        $this->withHeaders([
-            'Authorization' => "Bearer $token"
+        $follow = Follow::factory()->create([
+            'follower' => $user1->id,
+            'user_id' => $user2->id,
         ]);
 
-        // Tạo người dùng và người được theo dõi
-        $user = User::factory()->create();
-        $followUser = User::factory()->create();
-
-        // Follow trước khi bỏ theo dõi
-        $follow = Follow::create([
-            'user_id' => $user->id,
-            'follower' => $followUser->id
-        ]);
-
-        // Gửi yêu cầu bỏ theo dõi người dùng
-        $response = $this->deleteJson('/api/follow', [
-            'user_id' => $followUser->id
-        ]);
-
-        // Kiểm tra phản hồi trả về có đúng mã trạng thái 200
-        $response->assertStatus(200);
-
-        // Kiểm tra đã bỏ theo dõi thành công
-        $response->assertJson([
-            'message' => 'Đã bỏ theo dõi thành công.'
-        ]);
+        // Gọi phương thức từ FollowRepository
+        $followResult = $this->followRepository->getFollow($user1->id, $user2->id);
+        $this->assertNotNull($followResult); // Kiểm tra follow tồn tại
     }
 
-    /**
-     * Test suggestFriends - Đề xuất bạn bè cho người dùng
-     */
-    public function testSuggestFriends()
+    // Test insertFollow method
+    public function testInsertFollow()
     {
-        // Lấy token thông qua phương thức đăng nhập
-        $token = $this->getAuthToken();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
 
-        // Đăng nhập với token
-        $this->withHeaders([
-            'Authorization' => "Bearer $token"
+        $data = [
+            'follower' => $user1->id,
+            'user_id' => $user2->id,
+        ];
+
+        // Gọi phương thức từ FollowRepository
+        $follow = $this->followRepository->insertFollow($data);
+        $this->assertDatabaseHas('follows', $data); // Kiểm tra dữ liệu có trong DB
+    }
+
+    // Test deleteFollow method
+    public function testDeleteFollow()
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        $follow = Follow::factory()->create([
+            'follower' => $user1->id,
+            'user_id' => $user2->id,
         ]);
 
-        // Tạo người dùng và một số người bạn để gợi ý
+        // Gọi phương thức từ FollowRepository
+        $this->followRepository->deleteFollow($follow->id);
+        $this->assertDatabaseMissing('follows', ['id' => $follow->id]); // Kiểm tra follow đã bị xóa
+    }
+    /**
+     * Test user can suggest friends.
+     *
+     * @return void
+     */
+    public function test_user_can_suggest_friends()
+    {
+        // Tạo người dùng và người bạn
         $user = User::factory()->create();
-        $suggestedFriends = User::factory()->count(5)->create();
-
-        // Gửi yêu cầu đề xuất bạn bè
+        User::factory(20)->create();
+        $this->actingAs($user);
         $response = $this->getJson('/api/follow/suggest-friends');
-
-        // Kiểm tra phản hồi trả về có đúng mã trạng thái 200
         $response->assertStatus(200);
 
-        // Kiểm tra cấu trúc JSON trả về
-        $response->assertJsonStructure([
-            '*' => ['id', 'name', 'email']
-        ]);
-
-        // Kiểm tra danh sách bạn bè gợi ý có đúng 5 bản ghi
-        $response->assertJsonCount(5);
+        // Kiểm tra số lượng bạn bè được đề xuất
+        $response->assertJsonCount(20); // Kiểm tra có 20 người bạn được đề xuất
     }
 }

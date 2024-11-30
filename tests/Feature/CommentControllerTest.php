@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Comment;
-use App\Models\User;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,84 +12,89 @@ class CommentControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_comment()
+    protected $commentRepository;
+
+    protected function setUp(): void
     {
-        $comment = Comment::factory()->create(); // Tạo comment mẫu
-
-        $response = $this->getJson('/api/get/' . $comment->id);
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'id' => $comment->id,
-                'description' => $comment->content,
-            ]);
+        parent::setUp();
+        $this->commentRepository = app()->make(\App\Repositories\CommentRepository::class);
     }
 
-    public function test_get_all_comments_by_user()
+    /** @test */
+    public function it_can_get_a_comment_by_id()
     {
-        $user = User::factory()->create(); // Tạo user mẫu
-        $comments = Comment::factory()->count(5)->create(['user_id' => $user->id]); // Tạo 5 comment cho user
+        $comment = Comment::factory()->create();
 
-        $response = $this->getJson('/api/get-all-comment/' . $user->id);
+        $foundComment = $this->commentRepository->getComment($comment->id);
 
-        $response->assertStatus(200)
-            ->assertJsonCount(5)
-            ->assertJsonFragment(['user_id' => $user->id]);
+        $this->assertNotNull($foundComment);
+        $this->assertEquals($comment->id, $foundComment->id);
     }
 
-    public function test_get_all_comments_on_post()
+    /** @test */
+    public function it_can_get_all_comments_by_user()
     {
-        $post = Post::factory()->create(); // Tạo post mẫu
-        $comments = Comment::factory()->count(3)->create(['post_id' => $post->id]); // Tạo 3 comment cho post
+        $user = User::factory()->create();
+        Comment::factory()->count(3)->create(['user_id' => $user->id]);
 
-        $response = $this->getJson('/api/comments/post/' . $post->id);
+        $comments = $this->commentRepository->getAllCommentByUser($user->id);
 
-        $response->assertStatus(200)
-            ->assertJsonCount(3)
-            ->assertJsonFragment(['post_id' => $post->id]);
+        $this->assertCount(3, $comments);
+        $this->assertEquals($user->id, $comments->first()->user_id);
     }
 
-    public function test_insert_comment()
+    /** @test */
+    public function it_can_get_all_comments_on_post()
     {
-        $user = User::factory()->create(); // Tạo user mẫu
-        $post = Post::factory()->create(); // Tạo post mẫu
+        $post = Post::factory()->create();
+        Comment::factory()->count(4)->create(['post_id' => $post->id]);
 
+        $comments = $this->commentRepository->getAllCommentOnPost($post->id);
+
+        $this->assertCount(4, $comments);
+        $this->assertEquals($post->id, $comments->first()->post_id);
+    }
+
+    /** @test */
+    public function it_can_insert_a_comment()
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->create();
         $data = [
             'user_id' => $user->id,
             'post_id' => $post->id,
             'description' => 'This is a comment',
         ];
 
-        $response = $this->postJson('/api/insert-comment', $data);
+        $comment = $this->commentRepository->insertComment($data);
 
-        $response->assertStatus(201)
-            ->assertJson([
-                'user_id' => $user->id,
-                'post_id' => $post->id,
-                'description' => 'This is a comment',
-            ]);
+        $this->assertDatabaseHas('comments', $data);
+        $this->assertEquals('This is a comment', $comment->description);
     }
 
-    public function test_update_comment()
+    /** @test */
+    public function it_can_update_a_comment()
     {
-        $comment = Comment::factory()->create(); // Tạo comment mẫu
-        $data = ['decription' => 'Updated comment content'];
+        $comment = Comment::factory()->create([
+            'description' => 'Old comment content',
+        ]);
+        $data = [
+            'description' => 'Updated comment content',
+        ];
 
-        $response = $this->putJson('/api/update-comment/' . $comment->id, $data);
+        $updatedComment = $this->commentRepository->updateComment($data, $comment->id);
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'description' => 'Updated comment content',
-            ]);
+        $this->assertDatabaseHas('comments', $data);
+        $this->assertEquals('Updated comment content', $updatedComment->description);
     }
 
-    public function test_delete_comment()
+    /** @test */
+    public function it_can_delete_a_comment()
     {
-        $comment = Comment::factory()->create(); // Tạo comment mẫu
+        $comment = Comment::factory()->create();
 
-        $response = $this->deleteJson('/api/delete-comment/' . $comment->id);
+        $this->commentRepository->deleteComment($comment->id);
 
-        $response->assertStatus(200);
         $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
     }
 }

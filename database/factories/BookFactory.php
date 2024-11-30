@@ -20,7 +20,7 @@ class BookFactory extends Factory
             'image' => $this->faker->imageUrl(200, 300, 'books', true, 'Faker'), // URL giả lập cho ảnh sách
             'link_book' => $this->faker->url, // URL giả lập cho liên kết sách
             'description' => substr($this->faker->paragraphs(3, true), 0, 255),
-            // Mô tả sách
+
         ];
     }
 }

@@ -20,7 +20,7 @@ class Type extends Model
         return $this->belongsToMany(Book::class, 'detail_book_types', 'type_id', 'book_id');
     }
     public function author(){
-        return $this->belongsToMany(Author::class, 'detail_auhtor_types', 'type_id', 'author_id');
+        return $this->belongsToMany(Author::class, 'detail_author_types', 'type_id', 'author_id');
     }
     // many
     public function detail_book_types(){
