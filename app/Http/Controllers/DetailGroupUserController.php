@@ -146,6 +146,34 @@ class DetailGroupUserController extends Controller
 
         return response()->json($detail);
     }
+    public function inviteGroup(Request $request){
+        $request->validate([
+            'group_id'=>'required',
+            'user_id'=> 'required'
+        ]);
+        $group=$this->group->getGroup($request->get('group_id'));
+        $user=$this->user->getUser($request->get('user_id'));
+        if(!$group||!$user){
+            return response()->json(['message' => 'Not found user or group'], 404);
+        }
+        $detail=$this->detailGroupUser->getDetail($group->id,$user->id);
+        if($detail){
+            if($detail->state==0){
+                return response()->json(['message' => 'The user has sent an invitation to join the group'], 404);
+            }else{
+                return response()->json(['message' => 'User is in group']);
+            }
+        }
+        $this->notification->insertNotification([
+            'to_id' => $group->id,
+            'from_id' => $user->id,
+            'information' => $user->name . ' vừa gửi yêu cầu tham gia nhóm '.$group->name,
+            'to_type' => 'group',
+        ]);
+        broadcast(new NotificationSent($user->name . ' vừa gửi yêu cầu tham gia nhóm '.$group->name,$user->id));
+        return response()->json($detail);
+
+    }
     public function updateState(Request $request)
     {
         $request->validate([
