@@ -41,8 +41,8 @@ class NotificationController extends Controller
         if(empty($notification)){
             return response()->json(['message' => 'Not found notification'],404);
         }
-        $this->notification->updateNotification(['state'=>1],$notification->id);
-        return response()->json(['message' => 'update notification successfully'],);
+        $notification=$this->notification->updateNotification(['state'=>1],$notification->id);
+        return response()->json($notification);
     }
     public function delete($id){
         $notification=$this->notification->getNotification($id);
