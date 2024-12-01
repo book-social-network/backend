@@ -171,9 +171,10 @@ class DetailGroupUserController extends Controller
                 return response()->json(['message' => 'User is in group']);
             }
         }
+        $detail=$this->detailGroupUser->insertDetailGroupUser($request->all());
         $notification=$this->notification->insertNotification([
-            'to_id' => $group->id,
-            'from_id' => $user->id,
+            'from_id' => $group->id,
+            'to_id' => $user->id,
             'information' =>'Nhóm '.$group->name . 'vừa mời bạn tham gia',
             'to_type' => 'group',
         ]);
