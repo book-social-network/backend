@@ -38,6 +38,18 @@ class NotificationController extends Controller
             'quantity' => $quantity
         ]);
     }
+    public function get($id)
+    {
+        $notification = $this->notification->getNotification($id);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if ($notification->to_id == $user->id && $notification->to_type == 'member') {
+            return response()->json($notification);
+        }
+        return response()->json(['message' => 'Not found notification'], 404);
+    }
     public function updateState($id)
     {
         $notification = $this->notification->getNotification($id);
