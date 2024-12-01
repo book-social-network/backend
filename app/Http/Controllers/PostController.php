@@ -275,7 +275,7 @@ class PostController extends Controller
         if (empty($notification)) {
             $notification=$this->notification->insertNotification([
                 'from_id' => $post->id,
-                'to_id' => $user->id,
+                'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
                 'from_type' => 'post',
             ]);
@@ -327,7 +327,7 @@ class PostController extends Controller
             'user_id' => $user->id
         ]);
         // handle realtime comment
-        broadcast(new CommentEvent($request->get('post_id'), $cmt));
+        broadcast(new CommentEvent($post->id, $cmt));
         // notification
         $notification = $this->notification->getNotificationWithPost($post->id, $post->user_id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
