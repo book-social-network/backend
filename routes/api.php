@@ -236,6 +236,7 @@ Route::group([
     'prefix' => 'notification'
 ], function ($router) {
     Route::get('/get-all', [NotificationController::class, 'index']);
+    Route::get('/get/{id}', [NotificationController::class, 'get']);
     Route::post('/update-state/{id}', [NotificationController::class, 'updateState']);
     Route::delete('/delete/{id}', [NotificationController::class, 'delete']);
 });
