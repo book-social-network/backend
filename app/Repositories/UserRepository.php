@@ -11,6 +11,10 @@ class UserRepository implements UserInterface
     {
         return User::get();
     }
+    public function getAllPointOfUsers()
+    {
+        return User::orderBy('point', 'desc')->get();
+    }
     public function getUser($id)
     {
         return User::find($id);

@@ -168,6 +168,7 @@ Route::group([
 ], function ($router) {
     Route::post('/search', [ProfessionController::class, 'search']);
     Route::post('/sort', [ProfessionController::class, 'sort']);
+    Route::get('/get-points', [ProfessionController::class, 'getAllPoint']);
 });
 // Share
 Route::group([

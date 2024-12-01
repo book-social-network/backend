@@ -36,6 +36,7 @@ class NotificationRepository implements NotificationInterface{
     public function updateNotification($data, $id){
         $Notification=Notification::find($id);
         $Notification->update($data);
+        return $Notification;
     }
     public function deleteNotification($id){
         $Notification=Notification::find($id);

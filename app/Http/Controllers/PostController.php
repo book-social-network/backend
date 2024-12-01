@@ -194,13 +194,13 @@ class PostController extends Controller
             $admins = $this->detailGroupUser->getAdminGroup($group->id);
             foreach ($admins as $admin) {
                 if ($admin->user_id == $user->id) {
-                    $this->notification->insertNotification([
+                    $notification=$this->notification->insertNotification([
                         'from_id' => $group->id,
                         'to_id' => $user->id,
                         'information' => 'Bài viết của bạn đã bị xoá trong group ' . $group->name,
                         'from_type' => 'group',
                     ]);
-                    broadcast(new NotificationSent('Bài viết của bạn đã bị xoá trong group ' . $group->name, $post->user_id));
+                    broadcast(new NotificationSent($notification, $post->user_id));
                 }
             }
         }
@@ -260,7 +260,7 @@ class PostController extends Controller
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         broadcast(new LikeEvent($post->id, $countLike));
         if (empty($notification)) {
-            $this->notification->insertNotification([
+            $notification=$this->notification->insertNotification([
                 'from_id' => $post->id,
                 'to_id' => $user->id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
@@ -268,11 +268,11 @@ class PostController extends Controller
             ]);
             // handle Realtime notification
         } else {
-            $this->notification->updateNotification([
+            $notification=$this->notification->updateNotification([
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
             ], $notification->id);
         }
-        broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn', $post->user_id));
+        broadcast(new NotificationSent($notification, $post->user_id));
         return response()->json(['message' => 'Like in post successful']);
     }
     public function deleteLike($idPost)
@@ -320,21 +320,22 @@ class PostController extends Controller
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         if (empty($notification)) {
-            $this->notification->insertNotification([
+            $notification=$this->notification->insertNotification([
                 'from_id' => $post->id,
                 'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
                 'from_type' => 'post',
             ]);
             // handle Realtime notification
-            broadcast(new NotificationSent('Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn', $post->user_id));
+            broadcast(new NotificationSent($notification, $post->user_id));
         } else {
-            $this->notification->updateNotification([
+            $notification=$this->notification->updateNotification([
                 'from_id' => $post->id,
                 'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
                 'from_type' => 'post',
             ], $notification->id);
+            broadcast(new NotificationSent($notification, $post->user_id));
         }
         return response()->json(['message' => 'Comment in post successful']);
     }
@@ -344,9 +345,12 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $comments = $this->comment->getComment($id);
+        if(!$comments){
+            return response()->json(['message' => 'Not found comment'],404);
+        }
         $cmt = $this->comment->updateComment($request->all(), $id);
         // handle realtime comment
-        // broadcast(new CommentEvent($request->get('post_id'), $cmt));
+        broadcast(new CommentEvent($comments->post_id, $cmt));
         return response()->json($comments);
     }
     public function deleteComment($id)

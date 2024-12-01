@@ -50,14 +50,22 @@ class AssessmentController extends Controller
             'star'=> 'required',
             'book_id' =>'required',
         ]);
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login'],404);
+        }
+        $book=$this->book->getBook($request->get('book_id'));
+        if(!$book){
+            return response()->json(['message' => 'Not found this book'],404);
+        }
         $data=[
             'description' => $request->get('description'),
             'star' =>$request->get('star'),
-            'book_id'=>$request->get('book_id'),
-            'user_id'=>auth()->user()->id
+            'book_id'=>$book->id,
+            'user_id'=>$user->id
         ];
         $assessment=$this->assessment->insertAssessment($data);
-        $this->book->updateScore($request->get('book_id'));
+        $this->book->updateScore($book->id);
         return response()->json($assessment);
     }
     public function updateStateRead(Request $request,$idBook){
@@ -68,7 +76,7 @@ class AssessmentController extends Controller
         if(!$book){
             return response()->json(['message' => 'Not found book '], 404);
         }
-        $user=$this->user->getUser(auth()->user()->id);
+        $user=auth()->user();
         if(!$user){
             return response()->json(['message' => 'Not found user '], 404);
         }

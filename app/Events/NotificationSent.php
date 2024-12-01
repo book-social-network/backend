@@ -19,12 +19,11 @@ class NotificationSent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public $message;
-    public $userId;
-    public function __construct($message,$userId)
+    public $userId,$notification;
+    public function __construct($notifications,$userId)
     {
         $this->userId=$userId;
-        $this->message=$message;
+        $this->notification=$notifications;
     }
 
     public function broadcastOn()
@@ -35,5 +34,12 @@ class NotificationSent implements ShouldBroadcast
     public function broadcastAs()
     {
         return 'notification-event';
+    }
+    public function broadcastWith()
+    {
+        return [
+            'notification' => $this->notification,
+            'userId' => $this->userId
+        ];
     }
 }

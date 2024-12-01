@@ -88,7 +88,7 @@ class GroupController extends Controller
         ];
         $admins = $this->detailGroupUser->getAdminGroup($group->id);
         foreach ($admins as $admin) {
-            $this->notification->insertNotification([
+            $notification=$this->notification->insertNotification([
                 'from_id' => $group->id,
                 'to_id' => $admin->id,
                 'information' => $user->name . ' đã yêu cầu tham gia group ' . $group->name,
@@ -96,7 +96,7 @@ class GroupController extends Controller
                 'to_type' => 'member'
             ]);
             // notification realtime
-            broadcast(new NotificationSent($user->name . ' đã yêu cầu tham gia group ' . $group->name, $admin->id));
+            broadcast(new NotificationSent($notification, $admin->id));
         }
         $this->detailGroupUser->insertDetailGroupUser($data);
         return response()->json($group);
@@ -127,7 +127,11 @@ class GroupController extends Controller
     public function delete($id)
     {
         $user = auth()->user();
+
         $group = $this->group->getGroup($id);
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
         if (!$group) {
             return response()->json(['message' => 'Not found group with id'], 404);
         }
@@ -178,7 +182,7 @@ class GroupController extends Controller
                 'group' => $group,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, $user->id)
             ];
         }
         return response()->json([

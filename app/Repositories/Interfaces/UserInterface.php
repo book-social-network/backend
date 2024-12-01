@@ -8,4 +8,5 @@ interface UserInterface{
     public function updateUser($data,$id);
     public function deleteUser($id);
     public function getByName($name);
+    public function getAllPointOfUsers();
 }

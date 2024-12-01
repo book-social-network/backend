@@ -48,4 +48,8 @@ class ProfessionController extends Controller
         }
         return response()->json(['message'=> 'Not found value in search'],404);
     }
+    public function getAllPoint(){
+        $points=$this->user->getAllPointOfUsers();
+        return response()->json($points);
+    }
 }
