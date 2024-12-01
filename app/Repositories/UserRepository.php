@@ -13,7 +13,7 @@ class UserRepository implements UserInterface
     }
     public function getAllPointOfUsers()
     {
-        return User::orderBy('point', 'desc')->get();
+        return User::orderBy('point', 'desc')->take(10)->get();
     }
     public function getUser($id)
     {
