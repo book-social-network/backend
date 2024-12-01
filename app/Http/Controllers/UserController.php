@@ -32,6 +32,10 @@ class UserController extends Controller
     }
     public function getUser($id)
     {
+        $auth=auth()->user();
+        if (!$auth) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
         $user = $this->user->getUser($id);
         if (!$user) {
             return response()->json(['message' => 'Not found user'], 404);
@@ -81,7 +85,7 @@ class UserController extends Controller
                 'quantity' => $following->count()
             ],
             'posts'=> $data,
-
+            'state-follow'=>$this->follow->getFollow($user->id,$auth->id)!=null?1:0
         ]);
     }
     public function insert(Request $request)

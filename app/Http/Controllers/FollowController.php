@@ -51,7 +51,7 @@ class FollowController extends Controller
         $notification = $this->notification->insertNotification([
             'from_id' => $user->id,
             'to_id' => $follower->id,
-            'information' => $follower->name . ' vừa gửi theo dõi bạn',
+            'information' => $follower->name . ' vừa theo dõi bạn',
             'from_type' => 'member',
         ]);
         broadcast(new NotificationSent($notification,$id));
