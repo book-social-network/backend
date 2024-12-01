@@ -58,6 +58,10 @@ class AssessmentController extends Controller
         if(!$book){
             return response()->json(['message' => 'Not found this book'],404);
         }
+        $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id,$user->id);
+        if($assessment){
+            return response()->json(['message' => 'You have rated this book'],404);
+        }
         $data=[
             'description' => $request->get('description'),
             'star' =>$request->get('star'),

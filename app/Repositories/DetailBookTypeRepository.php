@@ -15,6 +15,9 @@ class DetailBookTypeRepository implements DetailBookTypeInterface{
         $book=Book::find($idBook);
         return $book->type()->get();
     }
+    public function getDetail($type,$book){
+        return DetailBookType::where('type_id', $type)->where('book_id', $book)->first();
+    }
     public function getAllBookOfType($idType){
         $type=Type::find($idType);
         return $type->book()->get();

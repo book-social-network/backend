@@ -126,6 +126,10 @@ class BookController extends Controller
         if (!$book || !$type) {
             return response()->json(['message' => 'Not found book or type book'], 404);
         }
+        $detail=$this->detailBookType->getDetail($type->id,$book->id);
+        if($detail){
+            return response()->json(['message' => 'You had type for this book'], 404);
+        }
         $this->detailBookType->insertDetailBookType([
             'book_id' => $book->id,
             'type_id' => $type->id
@@ -172,6 +176,9 @@ class BookController extends Controller
     public function getAllPostOfBook($idBook)
     {
         $book = $this->book->getBook($idBook);
+        if (!$book) {
+            return response()->json(['message' => 'Not found book with id'], 404);
+        }
         $posts = $book->post()->get();
         if (!$posts) {
             return response()->json(['message' => 'Not found post with id'], 404);

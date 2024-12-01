@@ -214,6 +214,15 @@ class PostController extends Controller
             'post_id' => 'required|integer',
             'book_id' => 'required|integer'
         ]);
+        $post=$this->post->getPost($request->get('post_id'));
+        $book=$this->book->getBook($request->get('book_id'));
+        if(!$post || !$book){
+            return response()->json(['message' => 'Not found post or book'], 404);
+        }
+        $detail=$this->detailPostBook->getDetailPostBook($post->id,$book->id);
+        if($detail){
+            return response()->json(['message' => 'You had insert book in post'], 404);
+        }
         $this->detailPostBook->insertDetailPostBook($request->all());
         return response()->json(['message' => 'Insert book in post successful']);
     }
@@ -249,8 +258,12 @@ class PostController extends Controller
                 return response()->json(['message' => 'User is not in a group'], 404);
             }
         }
+        $like=$this->like->getLike($post->id,$user->id);
+        if($like){
+            return response()->json(['message' => 'You liked this post'], 404);
+        }
         $this->like->insertLike([
-            'post_id' => $request->get('post_id'),
+            'post_id' => $post->id,
             'user_id' => $user->id
         ]);
 
