@@ -176,7 +176,7 @@ class DetailGroupUserController extends Controller
             'from_id' => $group->id,
             'to_id' => $user->id,
             'information' =>'Nhóm '.$group->name . 'vừa mời bạn tham gia',
-            'to_type' => 'group',
+            'from_type' => 'group',
         ]);
         broadcast(new NotificationSent($notification,$user->id));
         return response()->json($detail);
