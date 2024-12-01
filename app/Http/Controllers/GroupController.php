@@ -48,10 +48,13 @@ class GroupController extends Controller
         }
         $data = [];
         foreach ($group->user()->get() as $user) {
-            $data[] = [
-                'user' => $user,
-                'role-in-group' => $this->detailGroupUser->getDetail($group->id, $user->id)->role
-            ];
+            $detail=$this->detailGroupUser->getDetail($group->id, $user->id);
+            if($detail->state==1){
+                $data[] = [
+                    'user' => $user,
+                    'role-in-group' => $detail->role
+                ];
+            }
         }
         $countPost = $this->post->getAllPostInGroup($id)->count();
         return response()->json([

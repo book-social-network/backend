@@ -75,9 +75,12 @@ class DetailGroupUserController extends Controller
         $data = [];
 
         foreach ($users as $user) {
-            $userData = $user->toArray();
-            $userData['role_in_group'] = $user->detail_group_users()->first()->role;
-            $data[] = $userData;
+            $detail=$this->detailGroupUser->getDetail($group->id, $user->id);
+            if($detail->state==1){
+                $userData = $user->toArray();
+                $userData['role_in_group'] = $user->detail_group_users()->first()->role;
+                $data[] = $userData;
+            }
         }
 
         return response()->json([
@@ -196,7 +199,7 @@ class DetailGroupUserController extends Controller
         $notification=$this->notification->insertNotification([
             'from_id' => $detail->group_id,
             'to_id' => $detail->user_id,
-            'information' => 'Bạn đã tham gia group ' . $detail->group()->name . ' thành công.',
+            'information' => 'Bạn đã tham gia group ' . $detail->group()->first()->name . ' thành công.',
             'from_type' => 'group',
         ]);
         // handle Realtime notification

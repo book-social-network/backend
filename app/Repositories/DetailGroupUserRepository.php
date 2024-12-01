@@ -10,7 +10,14 @@ use App\Repositories\Interfaces\DetailGroupUserInterface;
 class DetailGroupUserRepository implements DetailGroupUserInterface{
     public function getAllUserInGroup($idGroup){
         $group=Group::find($idGroup);
-        return $group->user()->get();
+        $details=$group->detail_group_users()->get();
+        $data=[];
+        foreach ($details as $detail){
+            if($detail->state==1){
+                $data[] = $detail->user()->first();
+            }
+        }
+        return $data;
     }
     public function getAllGroupOfUser($idUser){
         $user=User::find($idUser);
