@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('born')->nullable();
             $table->date('dob')->nullable();
             $table->date('died')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->string('image')->nullable();
             $table->timestamps();
         });

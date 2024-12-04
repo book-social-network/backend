@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('assessments', function (Blueprint $table) {
             $table->id();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->integer('star')->nullable();
             $table->tinyInteger('state_read')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

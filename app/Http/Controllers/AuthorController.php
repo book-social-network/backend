@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\CloudInterface;
 use App\Repositories\Interfaces\DetailAuthorBookInterface;
 use App\Repositories\Interfaces\DetailAuthorTypeInterface;
 use App\Repositories\Interfaces\TypeInterface;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AuthorController extends Controller
@@ -60,15 +61,16 @@ class AuthorController extends Controller
         }
 
         // Tạo dữ liệu sách
-        $authorData = array_merge($request->all(), ['image' => $cloudinaryImage]);
+        $authorData = array_merge($request->all(), [
+            'dob' => Carbon::parse($request->get('dob')),
+            'died' => Carbon::parse($request->get('died')),
+            'image' => $cloudinaryImage
+        ]);
 
-        try {
             // Chèn vào cơ sở dữ liệu
-            $authorData = $this->author->insertAuthor($authorData);
-            return response()->json($authorData, 201); // Trả về mã trạng thái 201 để chỉ ra rằng tài nguyên đã được tạo
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Unable to insert book.'], 500);
-        }
+        $authorData = $this->author->insertAuthor($authorData);
+        return response()->json($authorData); // Trả về mã trạng thái 201 để chỉ ra rằng tài nguyên đã được tạo
+
     }
     public function update(Request $request, $id)
     {

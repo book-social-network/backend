@@ -12,7 +12,9 @@ class TypeRepository implements TypeInterface{
     public function getType($id){
         return Type::find($id);
     }
-
+    public function getNameType($name){
+        return Type::where('name',$name)->first();
+    }
     public function insertType($data){
         return Type::create($data);
     }

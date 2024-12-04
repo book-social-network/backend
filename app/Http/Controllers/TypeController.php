@@ -35,8 +35,12 @@ class TypeController extends Controller
     public function insert(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:types|string|max:255'
+            'name' => 'required|string|max:255'
         ]);
+        $type=$this->type->getNameType($request->get('name'));
+        if($type){
+            return response()->json(['message' => 'Same name, please re-enter'], 404);
+        }
         $type = $this->type->insertType($request->all());
         return response()->json($type);
     }
@@ -46,6 +50,10 @@ class TypeController extends Controller
         $type = $this->type->getType($id);
         if (!$type) {
             return response()->json(['message' => 'Not found type with id'], 404);
+        }
+        $type=$this->type->getNameType($request->get('name'));
+        if($type && $type->id != $id){
+            return response()->json(['message' => 'Same name, please re-enter'], 404);
         }
         $this->type->updateType($request->all(), $id);
         return response()->json(['message' => 'Type is updated']);
