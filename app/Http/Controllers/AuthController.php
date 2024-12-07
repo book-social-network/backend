@@ -28,7 +28,7 @@ class AuthController extends Controller
         $this->user = $userInterface;
         $this->follow = $followInterface;
         $this->post = $postInterface;
-        $this->like=$likeInterface;
+        $this->like = $likeInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -126,21 +126,21 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        $user=auth()->user();
-        $groups=$user->group;
-        $following=$this->follow->getAllUserFollow($user->id);
-        $followers=$this->follow->getAllFollowOfUser($user->id);
-        $posts=$this->post->getAllPostByUser($user->id);
+        $user = auth()->user();
+        $groups = $user->group;
+        $following = $this->follow->getAllUserFollow($user->id);
+        $followers = $this->follow->getAllFollowOfUser($user->id);
+        $posts = $this->post->getAllPostByUser($user->id);
 
-        $dataFollowing=[];
-        $dataFollower=[];
-        foreach($following as $follow){
-            $dataFollowing[]=$this->user->getUser($follow->follower);
+        $dataFollowing = [];
+        $dataFollower = [];
+        foreach ($following as $follow) {
+            $dataFollowing[] = $this->user->getUser($follow->follower);
         }
-        foreach($followers as $follow){
-            $dataFollower[]=$this->user->getUser($follow->user_id);
+        foreach ($followers as $follow) {
+            $dataFollower[] = $this->user->getUser($follow->user_id);
         }
-        $data=[];
+        $data = [];
         foreach ($posts as $post) {
             $commemts = [];
             foreach ($post->comment()->get() as $comment) {
@@ -163,15 +163,15 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'groups' => $groups,
-            'followers'=>[
+            'followers' => [
                 'user' => $dataFollower,
                 'quantity' => $followers->count()
             ],
-            'following'=>[
+            'following' => [
                 'user' => $dataFollowing,
                 'quantity' => $following->count()
             ],
-            'posts'=> $data,
+            'posts' => $data,
 
         ]);
     }
@@ -189,6 +189,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
+            // 'expires_in' => 1,
             'user' => auth()->user()
         ]);
     }
