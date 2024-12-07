@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class DetailBookType extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='detail_book_types';
     protected $fillable=[
         'id',

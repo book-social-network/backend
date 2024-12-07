@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Follow extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='follows';
     protected $fillable=[
         'id',

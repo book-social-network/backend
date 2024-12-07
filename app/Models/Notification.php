@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
-    public $timestamps = true;
     protected $table='notifications';
     protected $fillable=[
         'id',

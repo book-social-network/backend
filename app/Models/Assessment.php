@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Assessment extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='assessments';
     protected $fillable=[
         'id',

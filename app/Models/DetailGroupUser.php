@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class DetailGroupUser extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='detail_group_users';
     protected $fillable=[
         'id',
