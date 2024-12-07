@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class DetailPostBook extends Model
 {
     use HasFactory;
-    public $timestamps = false;
     protected $table='detail_post_books';
     protected $fillable=[
         'id',
