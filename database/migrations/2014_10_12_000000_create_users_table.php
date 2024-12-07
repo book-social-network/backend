@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->date('dob')->nullable();
             $table->date('lasted_login')->default(now());
+            $table->integer('notified_inactive')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
