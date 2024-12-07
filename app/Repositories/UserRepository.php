@@ -16,6 +16,11 @@ class UserRepository implements UserInterface
         $sevenDaysAgo = now()->subDays(7);
         return User::where('created_at', '>=', $sevenDaysAgo)->get();
     }
+    public function getAllUsersOld()
+    {
+        $dateThreshold = now()->subDays(90);
+        return User::where('lasted_login', '<', $dateThreshold)->get();
+    }
     public function getAllPointOfUsers()
     {
         return User::orderBy('point', 'desc')->take(10)->get();
