@@ -12,6 +12,10 @@ class GroupRepository implements GroupInterface{
     public function getAllGroup(){
         return Group::get();
     }
+    public function getAllNewGroup(){
+        $sevenDaysAgo = now()->subDays(7);
+        return Group::where('created_at', '>=', $sevenDaysAgo)->get();
+    }
     public function insertGroup($data){
         return Group::create($data);
     }

@@ -81,6 +81,7 @@ Route::group([
     'prefix' => 'book'
 ], function ($router) {
     Route::get('/get-all', [BookController::class, 'index']);
+    Route::get('/suggest-book', [BookController::class, 'suggestBooks']);
     Route::get('/get/{id}', [BookController::class, 'getBook']);
     Route::post('/insert', [BookController::class, 'insert']);
     Route::post('/update/{id}', [BookController::class, 'update']);
@@ -124,6 +125,7 @@ Route::group([
     'prefix' => 'group'
 ], function ($router) {
     Route::get('/get-all', [GroupController::class, 'index']);
+    Route::get('/get-all-group-new', [GroupController::class, 'getAllGroupsNew']);
     Route::get('/get/{id}', [GroupController::class, 'get']);
     Route::post('/insert', [GroupController::class, 'insert']);
     Route::post('/update/{id}', [GroupController::class, 'update']);
@@ -145,6 +147,7 @@ Route::group([
     'prefix' => 'post'
 ], function ($router) {
     Route::get('/get-all', [PostController::class, 'index']);
+    Route::get('/get-all-post-new', [PostController::class, 'getAllPostsNew']);
     Route::get('/get/{id}', [PostController::class, 'getPost']);
     Route::get('/get-post-in-group', [PostController::class, 'getPostOnAllGroup']);
     Route::post('/insert', [PostController::class, 'insert']);
@@ -202,6 +205,7 @@ Route::group([
     'prefix' => 'user'
 ], function ($router) {
     Route::get('/get-all', [UserController::class, 'index']);
+    Route::get('/get-all-user-new', [UserController::class, 'geAllUsersNew']);
     Route::get('/get/{id}', [UserController::class, 'getUser']);
     Route::post('/insert', [UserController::class, 'insert']);
     Route::post('/update', [UserController::class, 'update']);

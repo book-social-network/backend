@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('role')->default('member');
             $table->string('phone')->nullable();
             $table->date('dob')->nullable();
+            $table->date('lasted_login')->default(now());
             $table->rememberToken();
             $table->timestamps();
         });

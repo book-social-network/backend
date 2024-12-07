@@ -11,6 +11,11 @@ class UserRepository implements UserInterface
     {
         return User::get();
     }
+    public function getAllUsersNew()
+    {
+        $sevenDaysAgo = now()->subDays(7);
+        return User::where('created_at', '>=', $sevenDaysAgo)->get();
+    }
     public function getAllPointOfUsers()
     {
         return User::orderBy('point', 'desc')->take(10)->get();

@@ -8,7 +8,7 @@ use App\Repositories\Interfaces\BookInterface;
 
 class BookRepository implements BookInterface{
     public function getAllBooks(){
-        return Book::get();
+        return Book::orderBy('ratings', 'desc')->get();
     }
     public function getBook($id){
         return Book::find($id);

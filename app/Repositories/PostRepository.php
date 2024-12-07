@@ -12,6 +12,10 @@ class PostRepository implements PostInterface{
     public function getAllPost(){
         return Post::orderBy('created_at', 'desc')->get();
     }
+    public function getAllPostNew(){
+        $sevenDaysAgo = now()->subDays(7);
+        return Post::where('created_at', '>=', $sevenDaysAgo)->orderBy('created_at', 'desc')->get();
+    }
     public function getAllPostOnPage($page , $num){
         return Post::orderBy('created_at', 'desc')->skip(($page - 1) * $num)->take($num)->get();
     }

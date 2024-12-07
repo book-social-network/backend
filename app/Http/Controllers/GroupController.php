@@ -40,6 +40,17 @@ class GroupController extends Controller
         }
         return response()->json($data);
     }
+    public function getAllGroupsNew(){
+        $groups=$this->group->getAllNewGroup();
+        $data = [];
+        foreach ($groups as $group) {
+            $data[] = [
+                'group' => $group,
+                'users' => $group->user()->get()
+            ];
+        }
+        return response()->json($data);
+    }
     public function get($id)
     {
         $group = $this->group->getGroup($id);
@@ -147,6 +158,10 @@ class GroupController extends Controller
                     return response()->json(['message' => 'Group is deleted']);
                 }
             }
+        }else{
+            $this->cloud->deleteCloud($group->image_group);
+            $this->group->deleteGroup($id);
+            return response()->json(['message' => 'Group is deleted']);
         }
         return response()->json(['message' => 'You are not admin in group']);
     }

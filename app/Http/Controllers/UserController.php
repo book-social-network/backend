@@ -30,6 +30,11 @@ class UserController extends Controller
         $users = $this->user->getAllUsers();
         return response()->json($users);
     }
+    public function geAllUsersNew()
+    {
+        $users = $this->user->getAllUsersNew();
+        return response()->json($users);
+    }
     public function getUser($id)
     {
         $auth=auth()->user();
@@ -112,7 +117,14 @@ class UserController extends Controller
     }
     public function update(Request $request)
     {
-        $user = auth()->user();
+        $auth=auth()->user();
+        $user = null;
+        if($auth->role='admin'){
+            $user=$this->user->getUser($request->get('id'));
+        }else{
+            $user=$auth;
+        }
+
         if (!$user) {
             return response()->json(['message' => 'Not found user with id'], 404);
         }

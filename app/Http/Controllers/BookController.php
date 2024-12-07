@@ -37,6 +37,21 @@ class BookController extends Controller
         $books = $this->book->getAllBooks();
         return response()->json($books);
     }
+    public function suggestBooks()
+    {
+        $user = auth()->user();
+        $books = $this->book->getAllBooks();
+        $data=[];
+        foreach($books as $book){
+            $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id,$user->id);
+            if($assessment==null){
+                $data[]=$book;
+            } else if($assessment->state_read==0){
+                $data[]=$book;
+            }
+        }
+        return response()->json($data);
+    }
     public function getBook($id)
     {
         $book = $this->book->getBook($id);

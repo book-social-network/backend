@@ -72,6 +72,40 @@ class PostController extends Controller
         }
         return response()->json($data);
     }
+    public function getAllPostsNew()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if ($user->role!='admin') {
+            return response()->json(['message' => 'You aren not admin'], 404);
+        }
+        $posts = $this->post->getAllPostNew();
+        $data = [];
+        foreach ($posts as $post) {
+            $commemts = [];
+            foreach ($post->comment()->get() as $comment) {
+                $commemts[] = [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $books = $post->book()->get();
+            $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
+            $data[] = [
+                'post' => $post,
+                'user' => $post->user()->first(),
+                'books' => $books,
+                'group' => $group,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+            ];
+
+        }
+        return response()->json($data);
+    }
     public function getPostOnAllGroup()
     {
         $user = auth()->user();
@@ -168,7 +202,7 @@ class PostController extends Controller
             'description' => 'required|string',
         ]);
         $post = $this->post->getPost($id);
-        if ($post->user_id != $user->id) {
+        if ($post->user_id != $user->id && $user->role!='admin') {
             return response()->json(['message' => 'It is not your post'], 404);
         }
         if (!$post) {
@@ -187,8 +221,14 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
-        if ($post->user_id != $user->id) {
-            return response()->json(['message' => 'Thlis post is not your post'], 404);
+        if($user->role=='admin'){
+            $notification=$this->notification->insertNotification([
+                'from_id' => $user->id,
+                'to_id' => $post->user_id,
+                'information' => 'Cảnh báo: Bài viết của bạn đã vi phạm tiêu chuẩn cộng đồng',
+                'from_type' => 'admin',
+            ]);
+            broadcast(new NotificationSent($notification, $post->user_id));
         } else if ($post->detail_group_user_id != null) {
             $group = $post->detail_group_user()->first()->group()->first();
             $admins = $this->detailGroupUser->getAdminGroup($group->id);
@@ -203,6 +243,8 @@ class PostController extends Controller
                     broadcast(new NotificationSent($notification, $post->user_id));
                 }
             }
+        } else if ($post->user_id != $user->id) {
+            return response()->json(['message' => 'This post is not your post'], 404);
         }
         $this->post->deletePost($id);
         return response()->json(['message' => 'Delete post successful']);

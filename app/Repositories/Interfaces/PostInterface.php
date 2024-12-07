@@ -6,6 +6,7 @@ interface PostInterface
 {
     public function getAllPostOnPage($page , $num);
     public function getAllPost();
+    public function getAllPostNew();
     public function getPost($id);
     public function getAllPostByUser($id);
     public function getAllPostByUserNotInGroup($id);
