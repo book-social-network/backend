@@ -32,11 +32,25 @@ class UserController extends Controller
     }
     public function geAllUsersNew()
     {
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if($user->role!='admin'){
+            return response()->json(['message' => 'You are not admin'], 404);
+        }
         $users = $this->user->getAllUsersNew();
         return response()->json($users);
     }
     public function getAllUsersOld()
     {
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if($user->role!='admin'){
+            return response()->json(['message' => 'You are not admin'], 404);
+        }
         $users = $this->user->getAllUsersOld();
         return response()->json($users);
     }
@@ -124,7 +138,7 @@ class UserController extends Controller
     {
         $auth=auth()->user();
         $user = null;
-        if($auth->role='admin'){
+        if($auth->role=='admin'){
             $user=$this->user->getUser($request->get('id'));
         }else{
             $user=$auth;

@@ -41,6 +41,13 @@ class GroupController extends Controller
         return response()->json($data);
     }
     public function getAllGroupsNew(){
+        $user=auth()->user();
+        if(!$user){
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if($user->role!='admin'){
+            return response()->json(['message' => 'You are not admin'], 404);
+        }
         $groups=$this->group->getAllNewGroup();
         $data = [];
         foreach ($groups as $group) {
