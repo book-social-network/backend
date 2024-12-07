@@ -51,7 +51,10 @@ class AuthController extends Controller
         if (! $token = auth('api')->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+        $user=$this->user->getUserByEmail($request->get('email'));
+        $this->user->updateUser([
+            'lasted_login' => now()
+        ],$user->id);
         return $this->createNewToken($token);
     }
 
