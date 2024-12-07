@@ -206,6 +206,7 @@ Route::group([
 ], function ($router) {
     Route::get('/get-all', [UserController::class, 'index']);
     Route::get('/get-all-user-new', [UserController::class, 'geAllUsersNew']);
+    Route::get('/get-all-user-old', [UserController::class, 'getAllUsersOld']);
     Route::get('/get/{id}', [UserController::class, 'getUser']);
     Route::post('/insert', [UserController::class, 'insert']);
     Route::post('/update', [UserController::class, 'update']);

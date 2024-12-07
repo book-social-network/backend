@@ -35,7 +35,7 @@ class UserController extends Controller
         $users = $this->user->getAllUsersNew();
         return response()->json($users);
     }
-    public function geAllUsersOld()
+    public function getAllUsersOld()
     {
         $users = $this->user->getAllUsersOld();
         return response()->json($users);
