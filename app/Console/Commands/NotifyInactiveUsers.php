@@ -35,6 +35,8 @@ class NotifyInactiveUsers extends Command
                 'to_id' => $user->id,
                 'information' => 'Đã 3 tháng bạn chưa đăng nhập vào trang web',
                 'from_type' => 'website',
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             $user->update([
                 'lasted_login' => now(),
