@@ -42,12 +42,17 @@ class BookController extends Controller
         $user = auth()->user();
         $books = $this->book->getAllBooks();
         $data=[];
+        $count=0;
         foreach($books as $book){
-            $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id,$user->id);
-            if($assessment==null){
-                $data[]=$book;
-            } else if($assessment->state_read==0){
-                $data[]=$book;
+            if($count<10){
+                $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id,$user->id);
+                if($assessment==null){
+                    $data[]=$book;
+                    $count++;
+                } else if($assessment->state_read==0){
+                    $data[]=$book;
+                    $count++;
+                }
             }
         }
         return response()->json($data);
