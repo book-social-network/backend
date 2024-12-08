@@ -53,7 +53,8 @@ class AuthController extends Controller
         }
         $user=$this->user->getUserByEmail($request->get('email'));
         $this->user->updateUser([
-            'lasted_login' => now()
+            'lasted_login' => now(),
+            'notified_inactive' => 0
         ],$user->id);
         return $this->createNewToken($token);
     }
