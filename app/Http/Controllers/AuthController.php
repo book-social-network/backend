@@ -52,11 +52,11 @@ class AuthController extends Controller
         if (! $token = auth('api')->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $user=$this->user->getUserByEmail($request->get('email'));
+        $user = $this->user->getUserByEmail($request->get('email'));
         $this->user->updateUser([
             'lasted_login' => now(),
             'notified_inactive' => 0
-        ],$user->id);
+        ], $user->id);
         return $this->createNewToken($token);
     }
 
@@ -203,18 +203,18 @@ class AuthController extends Controller
     {
         $request->validate([
             'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|min:6',
+            'new_password' => 'required|confirmed|string|min:6',
         ]);
 
-        if ($request->get('old_password')==null || $request->get('new_password')==null) {
-            return response()->json(['message'=>'Please enter fill full form'], 404);
+        if ($request->get('old_password') == null || $request->get('new_password') == null) {
+            return response()->json(['message' => 'Please enter fill full form'], 404);
         }
         $user = auth()->user();
-        $user=User::where('email',$user->email)->first();
-        if($request->get('old_password')==$request->get('new_password')){
-            return response()->json(['message'=>'Please enter different password'], 404);
+        $user = User::where('email', $user->email)->first();
+        if ($request->get('old_password') == $request->get('new_password')) {
+            return response()->json(['message' => 'Please enter different password'], 404);
         }
-        if (Hash::check($request->get('old_password'), $user->password)){
+        if (Hash::check($request->get('old_password'), $user->password)) {
             $user = User::where('id', $user->id)->update(
                 ['password' => bcrypt($request->new_password)]
             );
@@ -224,6 +224,6 @@ class AuthController extends Controller
             ], 201);
         }
         // die($user);
-        return response()->json(['message' => 'Password is incorrect'],404);
+        return response()->json(['message' => 'Password is incorrect'], 404);
     }
 }
