@@ -65,12 +65,12 @@ class BookController extends Controller
         }
         $types = $this->detailBookType->getAllTypeOfBook($id);
         $authors = $this->detailAuthorBook->getAllAuthorOfBook($id);
-        $assessment = $this->assessment->getAssessmentWithIdBookAndUser($book->id, auth()->user()->id);
+        $assessments=$this->assessment->getAllAssessmentByBook($id);
         return response()->json([
             'book' => $book,
             'types' => $types,
             'authors' => $authors,
-            'assessment' => $assessment
+            'assessments' => $assessments
         ]);
     }
     public function insert(Request $request)
