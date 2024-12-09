@@ -47,7 +47,6 @@ class AssessmentController extends Controller
     public function insert(Request $request){
         $request->validate([
             'description' => 'required|string',
-            'star'=> 'required',
             'book_id' =>'required',
         ]);
         $user=auth()->user();
@@ -64,7 +63,7 @@ class AssessmentController extends Controller
         }
         $data=[
             'description' => $request->get('description'),
-            'star' =>$request->get('star'),
+            'star' =>$request->get('star')?$request->get('star'):null,
             'book_id'=>$book->id,
             'user_id'=>$user->id
         ];
