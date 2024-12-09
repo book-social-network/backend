@@ -11,6 +11,7 @@ use App\Repositories\Interfaces\FollowInterface;
 use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 use Cloudinary;
 
@@ -28,7 +29,7 @@ class AuthController extends Controller
         $this->user = $userInterface;
         $this->follow = $followInterface;
         $this->post = $postInterface;
-        $this->like=$likeInterface;
+        $this->like = $likeInterface;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -51,11 +52,11 @@ class AuthController extends Controller
         if (! $token = auth('api')->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $user=$this->user->getUserByEmail($request->get('email'));
+        $user = $this->user->getUserByEmail($request->get('email'));
         $this->user->updateUser([
             'lasted_login' => now(),
             'notified_inactive' => 0
-        ],$user->id);
+        ], $user->id);
         return $this->createNewToken($token);
     }
 
@@ -130,21 +131,21 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        $user=auth()->user();
-        $groups=$user->group;
-        $following=$this->follow->getAllUserFollow($user->id);
-        $followers=$this->follow->getAllFollowOfUser($user->id);
-        $posts=$this->post->getAllPostByUser($user->id);
+        $user = auth()->user();
+        $groups = $user->group;
+        $following = $this->follow->getAllUserFollow($user->id);
+        $followers = $this->follow->getAllFollowOfUser($user->id);
+        $posts = $this->post->getAllPostByUser($user->id);
 
-        $dataFollowing=[];
-        $dataFollower=[];
-        foreach($following as $follow){
-            $dataFollowing[]=$this->user->getUser($follow->follower);
+        $dataFollowing = [];
+        $dataFollower = [];
+        foreach ($following as $follow) {
+            $dataFollowing[] = $this->user->getUser($follow->follower);
         }
-        foreach($followers as $follow){
-            $dataFollower[]=$this->user->getUser($follow->user_id);
+        foreach ($followers as $follow) {
+            $dataFollower[] = $this->user->getUser($follow->user_id);
         }
-        $data=[];
+        $data = [];
         foreach ($posts as $post) {
             $commemts = [];
             foreach ($post->comment()->get() as $comment) {
@@ -167,15 +168,15 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'groups' => $groups,
-            'followers'=>[
+            'followers' => [
                 'user' => $dataFollower,
                 'quantity' => $followers->count()
             ],
-            'following'=>[
+            'following' => [
                 'user' => $dataFollowing,
                 'quantity' => $following->count()
             ],
-            'posts'=> $data,
+            'posts' => $data,
 
         ]);
     }
@@ -193,29 +194,36 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
+            // 'expires_in' => 1,
             'user' => auth()->user()
         ]);
     }
 
     public function changePassWord(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|confirmed|min:6',
+            'new_password' => 'required|confirmed|string|min:6',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+        if ($request->get('old_password') == null || $request->get('new_password') == null) {
+            return response()->json(['message' => 'Please enter fill full form'], 404);
         }
-        $userId = auth()->user()->id;
-
-        $user = User::where('id', $userId)->update(
-            ['password' => bcrypt($request->new_password)]
-        );
-
-        return response()->json([
-            'message' => 'User successfully changed password',
-            'user' => $user,
-        ], 201);
+        $user = auth()->user();
+        $user = User::where('email', $user->email)->first();
+        if ($request->get('old_password') == $request->get('new_password')) {
+            return response()->json(['message' => 'Please enter different password'], 404);
+        }
+        if (Hash::check($request->get('old_password'), $user->password)) {
+            $user = User::where('id', $user->id)->update(
+                ['password' => bcrypt($request->new_password)]
+            );
+            return response()->json([
+                'message' => 'User successfully changed password',
+                'user' => $user,
+            ], 201);
+        }
+        // die($user);
+        return response()->json(['message' => 'Password is incorrect'], 404);
     }
 }
