@@ -11,6 +11,7 @@ use App\Repositories\Interfaces\FollowInterface;
 use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 use Cloudinary;
 
@@ -200,23 +201,29 @@ class AuthController extends Controller
 
     public function changePassWord(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|confirmed|min:6',
+            'new_password' => 'required|string|min:6',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+        if ($request->get('old_password')==null || $request->get('new_password')==null) {
+            return response()->json(['message'=>'Please enter fill full form'], 404);
         }
-        $userId = auth()->user()->id;
-
-        $user = User::where('id', $userId)->update(
-            ['password' => bcrypt($request->new_password)]
-        );
-
-        return response()->json([
-            'message' => 'User successfully changed password',
-            'user' => $user,
-        ], 201);
+        $user = auth()->user();
+        $user=User::where('email',$user->email)->first();
+        if($request->get('old_password')==$request->get('new_password')){
+            return response()->json(['message'=>'Please enter different password'], 404);
+        }
+        if (Hash::check($request->get('old_password'), $user->password)){
+            $user = User::where('id', $user->id)->update(
+                ['password' => bcrypt($request->new_password)]
+            );
+            return response()->json([
+                'message' => 'User successfully changed password',
+                'user' => $user,
+            ], 201);
+        }
+        // die($user);
+        return response()->json(['message' => 'Password is incorrect'],404);
     }
 }
