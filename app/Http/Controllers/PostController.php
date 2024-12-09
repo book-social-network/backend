@@ -310,7 +310,7 @@ class PostController extends Controller
         ]);
 
         // notification
-        $notification = $this->notification->getNotificationWithPost($post->id, $user->id);
+        $notification = $this->notification->getNotificationWithPost($post->id, $post->user_id);
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         broadcast(new LikeEvent($post->id, $countLike));
