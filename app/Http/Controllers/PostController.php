@@ -59,6 +59,10 @@ class PostController extends Controller
                 }
                 $books = $post->book()->get();
                 $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
+                $postShare=null;
+                if($post->share_id!=null){
+                    $postShare=$this->post->getPost($post->share_id);
+                }
                 $data[] = [
                     'post' => $post,
                     'user' => $post->user()->first(),
@@ -66,7 +70,13 @@ class PostController extends Controller
                     'group' => $group,
                     'commemts' => $commemts,
                     'likes' => $post->user_on_likes()->get(),
-                    'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                    'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
+                    'share' => $postShare==null ? null : [
+                        'post' => $this->post->getPost($postShare->id),
+                        'user' => $postShare->user()->first(),
+                        'books' => $postShare->book()->get(),
+                        'group' => $postShare->detail_group_user()->first()->group()->first(),
+                    ]
                 ];
             }
         }
@@ -91,6 +101,10 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
+            $postShare=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+            }
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
             $data[] = [
@@ -100,7 +114,13 @@ class PostController extends Controller
                 'group' => $group,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
+                'share' => $postShare==null ? null : [
+                    'post' => $this->post->getPost($postShare->id),
+                    'user' => $postShare->user()->first(),
+                    'books' => $postShare->book()->get(),
+                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                ]
             ];
 
         }
@@ -122,6 +142,10 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
+            $postShare=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+            }
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
 
@@ -132,7 +156,13 @@ class PostController extends Controller
                 'group' => $group,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
+                'share' => $postShare==null ? null : [
+                    'post' => $this->post->getPost($postShare->id),
+                    'user' => $postShare->user()->first(),
+                    'books' => $postShare->book()->get(),
+                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                ]
             ];
         }
         return response()->json($data);
@@ -146,6 +176,10 @@ class PostController extends Controller
         $post = $this->post->getPost($id);
         if (!$post) {
             return response()->json(['message' => 'Not found post'], 404);
+        }
+        $postShare=null;
+        if($post->share_id!=null){
+            $postShare=$this->post->getPost($post->share_id);
         }
         if ($post->detail_group_user_id != null) {
             $state = $post->detail_group_user()->first()->group()->first()->state;
@@ -168,7 +202,13 @@ class PostController extends Controller
             'group' => $group,
             'comments' => $commemts,
             'likes' => $post->user_on_likes()->get(),
-            'state-like' => $this->like->getStateOfPost($post->id, $user->id)
+            'state-like' => $this->like->getStateOfPost($post->id, $user->id),
+            'share' => $postShare==null ? null : [
+                'post' => $this->post->getPost($postShare->id),
+                'user' => $postShare->user()->first(),
+                'books' => $postShare->book()->get(),
+                'group' => $postShare->detail_group_user()->first()->group()->first(),
+            ]
         ]);
     }
     public function insert(Request $request)
@@ -248,6 +288,24 @@ class PostController extends Controller
         }
         $this->post->deletePost($id);
         return response()->json(['message' => 'Delete post successful']);
+    }
+    public function sharePost(Request $request){
+        $user = auth()->user();
+        if (empty($user)) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        $request->validate([
+            'share_id' => 'required|integer',
+        ]);
+
+        $post=$this->post->getPost($request->get('share_id'));
+        if($post==null)
+        {
+            return response()->json(['message' => 'Not found post with id'], 404);
+        }
+
+        $post=$this->post->insertPost(array_merge(['user_id'=>$user->id],$request->all()));
+        return response()->json(['message' => 'Share post successful','post' => $post]);
     }
     // Book
     public function insertBook(Request $request)
