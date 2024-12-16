@@ -126,6 +126,50 @@ class PostController extends Controller
         }
         return response()->json($data);
     }
+    public function getAllPostsReport()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please login'], 404);
+        }
+        if ($user->role!='admin') {
+            return response()->json(['message' => 'You aren not admin'], 404);
+        }
+        $posts = $this->post->getAllPostReport();
+        $data = [];
+        foreach ($posts as $post) {
+            $commemts = [];
+            foreach ($post->comment()->get() as $comment) {
+                $commemts[] = [
+                    'comment' => $comment,
+                    'user' => $comment->user()->get()
+                ];
+            }
+            $postShare=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+            }
+            $books = $post->book()->get();
+            $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
+            $data[] = [
+                'post' => $post,
+                'user' => $post->user()->first(),
+                'books' => $books,
+                'group' => $group,
+                'commemts' => $commemts,
+                'likes' => $post->user_on_likes()->get(),
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
+                'share' => $postShare==null ? null : [
+                    'post' => $this->post->getPost($postShare->id),
+                    'user' => $postShare->user()->first(),
+                    'books' => $postShare->book()->get(),
+                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                ]
+            ];
+
+        }
+        return response()->json($data);
+    }
     public function getPostOnAllGroup()
     {
         $user = auth()->user();

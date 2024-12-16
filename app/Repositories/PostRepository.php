@@ -22,6 +22,12 @@ class PostRepository implements PostInterface{
     public function getPost($id){
         return Post::find($id);
     }
+    public function getAllPostReport(){
+        return Post::withCount('warnings')
+        ->having('warnings_count', '>=', 1)
+        ->orderBy('warnings_count', 'desc')
+        ->get();
+    }
     public function getAllPostInGroup($id, $page=null, $num=null){
         if($page==null && $num==null){
             return Post::whereHas('detail_group_user', function ($query) use ($id) {

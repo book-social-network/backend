@@ -14,6 +14,7 @@ use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewController;
+use App\Http\Controllers\WarningsController;
 use App\Models\DetailGroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -148,6 +149,7 @@ Route::group([
 ], function ($router) {
     Route::get('/get-all', [PostController::class, 'index']);
     Route::get('/get-all-post-new', [PostController::class, 'getAllPostsNew']);
+    Route::get('/get-all-post-report', [PostController::class, 'getAllPostsReport']);
     Route::get('/get/{id}', [PostController::class, 'getPost']);
     Route::get('/get-post-in-group', [PostController::class, 'getPostOnAllGroup']);
     Route::post('/insert', [PostController::class, 'insert']);
@@ -257,4 +259,13 @@ Route::group([
     Route::get('/views-by-month', [ViewController::class, 'getViewsByMonth']);
     Route::get('/views-by-year', [ViewController::class, 'getViewsByYear']);
     Route::get('/statistical', [ViewController::class, 'statistical']);
+});
+
+// warning
+Route::group([
+    'prefix' => 'warnings'
+], function ($router) {
+    Route::get('/get-all-of-user/{id}', [WarningsController::class, 'getWarningsOfUser']);
+    Route::get('/get-all-of-post/{id}', [WarningsController::class, 'getWarningsOfUser']);
+    Route::post('/report/{id}', [WarningsController::class, 'reportPost']);
 });

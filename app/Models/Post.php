@@ -38,6 +38,9 @@ class Post extends Model
     public function detail_post_book(){
         return $this->hasMany(DetailPostBook::class);
     }
+    public function warnings(){
+        return $this->hasMany(Warnings::class);
+    }
     // one
     public function detail_group_user(){
         return $this->belongsTo(DetailGroupUser::class);
