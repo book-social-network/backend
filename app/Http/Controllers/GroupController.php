@@ -189,7 +189,7 @@ class GroupController extends Controller
             }
         }
         $countPost = $this->post->getAllPostInGroup($id)->count();
-        $posts = $this->post->getAllPostInGroup($id, 1, 10);
+        $posts = $this->post->getAllPostInGroup($id);
         $data = [];
         foreach ($posts as $post) {
             $commemts = [];

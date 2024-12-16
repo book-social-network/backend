@@ -85,6 +85,9 @@ class AssessmentController extends Controller
         }
         $assessment=$this->assessment->getAssessmentWithIdBookAndUser($idBook,$user->id);
         if(!empty($assessment)){
+            if(!empty($assessment->star)){
+                return response()->json(['message'=> 'You can not update state after rating this book'], 404);
+            }
             $this->assessment->updateAssessment(['state_read' => $request->get('state_read')],$assessment->id);
         }else{
             $this->assessment->insertAssessment([

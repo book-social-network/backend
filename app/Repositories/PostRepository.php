@@ -24,9 +24,18 @@ class PostRepository implements PostInterface{
     }
     public function getAllPostInGroup($id, $page=null, $num=null){
         if($page==null && $num==null){
-            return Post::where('detail_group_user_id', $id)->orderBy('created_at', 'desc')->get();
+            return Post::whereHas('detail_group_user', function ($query) use ($id) {
+                $query->where('group_id', $id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
         }
-        return Post::where('detail_group_user_id', $id)->skip(($page - 1) * $num)->take($num)->orderBy('created_at', 'desc')->get();
+        return Post::whereHas('detail_group_user', function ($query) use ($id) {
+            $query->where('group_id', $id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->skip(($page - 1) * $num)->take($num)
+        ->get();
     }
 
     public function getAllPostByUser($id){

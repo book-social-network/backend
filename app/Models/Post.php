@@ -14,6 +14,7 @@ class Post extends Model
         'detail_group_user_id',
         'user_id',
         'description',
+        'warning',
     ];
     // many to many
     public function user_on_comments(){
