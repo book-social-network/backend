@@ -11,6 +11,7 @@ class Warnings extends Model
     protected $table='warnings';
     protected $fillable=[
         'id',
+        'description',
         'post_id',
         'user_id',
     ];

@@ -32,7 +32,7 @@ class WarningsController extends Controller
         $warnings=$this->warnings->getAllWarningsOfUser($id);
         return response()->json($warnings);
     }
-    public function reportPost($id){
+    public function reportPost(Request $request, $id){
         $user=auth()->user();
         if (!$user) {
             return response()->json(['message' => 'Please login'], 404);
@@ -41,10 +41,14 @@ class WarningsController extends Controller
         if(!$post){
             return response()->json(['message' => 'Not found this post'], 404);
         }
+        $request->validate([
+            'description' => 'required'
+        ]);
         if(!$this->warnings->checkMaxQuantityReport($post->id,$user->id)){
             return response()->json(['message' => 'You reported max quantity'], 404);
         }
         $warnings=$this->warnings->insertWarnings([
+            'description' => $request->get('description'),
             'post_id' => $post->id,
             'user_id' => $user->id
         ]);
