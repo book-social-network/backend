@@ -91,6 +91,7 @@ class UserController extends Controller
             if($post->share_id!=null){
                 $postShare=$this->post->getPost($post->share_id);
             }
+            $detail=$postShare->detail_group_user()->first();
             $data[] = [
                 'post' => $post,
                 'user' => $post->user()->first(),
@@ -102,7 +103,7 @@ class UserController extends Controller
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
-                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                    'group' => $detail!=null?$detail->group()->first():null,
                 ]
             ];
         }

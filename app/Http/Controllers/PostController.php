@@ -65,6 +65,8 @@ class PostController extends Controller
                 if ($post->share_id != null) {
                     $postShare = $this->post->getPost($post->share_id);
                 }
+            $detail=$postShare->detail_group_user()->first();
+
                 $data[] = [
                     'post' => $post,
                     'user' => $post->user()->first(),
@@ -77,7 +79,7 @@ class PostController extends Controller
                         'post' => $this->post->getPost($postShare->id),
                         'user' => $postShare->user()->first(),
                         'books' => $postShare->book()->get(),
-                        'group' => $postShare->detail_group_user()->first()->group()->first(),
+                        'group' => $detail!=null?$detail->group()->first():null,
                     ],
                     'warning' => $this->warning->getAllWarningsOfPost($post->id)
                 ];
@@ -108,6 +110,7 @@ class PostController extends Controller
             if ($post->share_id != null) {
                 $postShare = $this->post->getPost($post->share_id);
             }
+            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
             $data[] = [
@@ -122,7 +125,7 @@ class PostController extends Controller
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
-                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                    'group' => $detail!=null?$detail->group()->first():null,
                 ],
                 'warning' => $this->warning->getAllWarningsOfPost($post->id)
             ];
@@ -152,6 +155,7 @@ class PostController extends Controller
             if ($post->share_id != null) {
                 $postShare = $this->post->getPost($post->share_id);
             }
+            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
             $data[] = [
@@ -166,7 +170,7 @@ class PostController extends Controller
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
-                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                    'group' => $detail!=null?$detail->group()->first():null,
                 ]
             ];
         }
@@ -192,6 +196,7 @@ class PostController extends Controller
             if ($post->share_id != null) {
                 $postShare = $this->post->getPost($post->share_id);
             }
+            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
 
@@ -207,7 +212,7 @@ class PostController extends Controller
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
-                    'group' => $postShare->detail_group_user()->first()->group()->first(),
+                    'group' => $detail!=null?$detail->group()->first():null,
                 ]
             ];
         }
@@ -227,6 +232,7 @@ class PostController extends Controller
         if ($post->share_id != null) {
             $postShare = $this->post->getPost($post->share_id);
         }
+        $detail=$postShare->detail_group_user()->first();
         if ($post->detail_group_user_id != null) {
             $state = $post->detail_group_user()->first()->group()->first()->state;
             if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $state == 1) {
@@ -253,7 +259,7 @@ class PostController extends Controller
                 'post' => $this->post->getPost($postShare->id),
                 'user' => $postShare->user()->first(),
                 'books' => $postShare->book()->get(),
-                'group' => $postShare->detail_group_user()->first()->group()->first(),
+                'group' => $detail!=null?$detail->group()->first():null,
             ]
         ]);
     }

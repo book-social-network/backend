@@ -155,14 +155,24 @@ class AuthController extends Controller
                 ];
             }
             $books = $post->book()->get();
-
+            $postShare=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+            }
+            $detail=$postShare->detail_group_user()->first();
             $data[] = [
                 'post' => $post,
                 'user' => $post->user()->first(),
                 'books' => $books,
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
-                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id)
+                'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
+                'share' => $postShare==null ? null : [
+                    'post' => $this->post->getPost($postShare->id),
+                    'user' => $postShare->user()->first(),
+                    'books' => $postShare->book()->get(),
+                    'group' => $detail!=null?$detail->group()->first():null,
+                ]
             ];
         }
         return response()->json([
