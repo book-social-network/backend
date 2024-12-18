@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook, $cloud,$post;
+    private $book, $type, $author, $detailAuthorBook, $detailBookType, $assessment, $detailPostBook, $cloud, $post;
     public function __construct(BookInterface $bookInterface, TypeInterface $typeInterface, AuthorInterface $authorInterface, DetailAuthorBookInterface $detailAuthorBookInterface, DetailBookTypeInterface $detailBookTypeInterface, AssessmentInterface $assessmentInterface, DetailPostBookInterface $detailPostBookInterface, CloudInterface $cloudInterface, PostInterface $postInterface)
     {
         $this->book = $bookInterface;
@@ -30,7 +30,7 @@ class BookController extends Controller
         $this->assessment = $assessmentInterface;
         $this->detailPostBook = $detailPostBookInterface;
         $this->cloud = $cloudInterface;
-        $this->post=$postInterface;
+        $this->post = $postInterface;
     }
     public function index()
     {
@@ -41,16 +41,16 @@ class BookController extends Controller
     {
         $user = auth()->user();
         $books = $this->book->getAllBooks();
-        $data=[];
-        $count=0;
-        foreach($books as $book){
-            if($count<10){
-                $assessment=$this->assessment->getAssessmentWithIdBookAndUser($book->id,$user->id);
-                if($assessment==null){
-                    $data[]=$book;
+        $data = [];
+        $count = 0;
+        foreach ($books as $book) {
+            if ($count < 10) {
+                $assessment = $this->assessment->getAssessmentWithIdBookAndUser($book->id, $user->id);
+                if ($assessment == null) {
+                    $data[] = $book;
                     $count++;
-                } else if($assessment->state_read==0){
-                    $data[]=$book;
+                } else if ($assessment->state_read == 0) {
+                    $data[] = $book;
                     $count++;
                 }
             }
@@ -65,7 +65,7 @@ class BookController extends Controller
         }
         $types = $this->detailBookType->getAllTypeOfBook($id);
         $authors = $this->detailAuthorBook->getAllAuthorOfBook($id);
-        $assessments=$this->assessment->getAllAssessmentByBook($id);
+        $assessments = $this->assessment->getAllAssessmentByBook($id);
         return response()->json([
             'book' => $book,
             'types' => $types,
@@ -126,8 +126,8 @@ class BookController extends Controller
         if (!$book) {
             return response()->json(['message' => 'Not found book with id'], 404);
         }
-        $posts=$book->post()->get();
-        foreach($posts as $post){
+        $posts = $book->post()->get();
+        foreach ($posts as $post) {
             $this->post->deletePost($post->id);
         }
         $this->cloud->deleteCloud($book->image);
@@ -146,8 +146,8 @@ class BookController extends Controller
         if (!$book || !$type) {
             return response()->json(['message' => 'Not found book or type book'], 404);
         }
-        $detail=$this->detailBookType->getDetail($type->id,$book->id);
-        if($detail){
+        $detail = $this->detailBookType->getDetail($type->id, $book->id);
+        if ($detail) {
             return response()->json(['message' => 'You had type for this book'], 404);
         }
         $this->detailBookType->insertDetailBookType([

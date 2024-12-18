@@ -13,12 +13,13 @@ use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
+use App\Repositories\Interfaces\WarningsInterface;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    private $post, $book, $detailPostBook, $like, $comment, $notification, $user, $detailGroupUser;
-    public function __construct(PostInterface $postInterface, BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface, UserInterface $userInterface, DetailGroupUserInterface $detailGroupUserInterface)
+    private $post, $book, $detailPostBook, $like, $comment, $notification, $user, $detailGroupUser, $warning;
+    public function __construct(PostInterface $postInterface, BookInterface $bookInterface, DetailPostBookInterface $detailPostBookInterface, LikeInterface $likeInterface, CommentInterface $commentInterface, NotificationInterface $notificationInterface, UserInterface $userInterface, DetailGroupUserInterface $detailGroupUserInterface, WarningsInterface $warningsInterface)
     {
         $this->post = $postInterface;
         $this->book = $bookInterface;
@@ -28,6 +29,7 @@ class PostController extends Controller
         $this->notification = $notificationInterface;
         $this->user = $userInterface;
         $this->detailGroupUser = $detailGroupUserInterface;
+        $this->warning = $warningsInterface;
     }
     public function index()
     {
@@ -59,9 +61,9 @@ class PostController extends Controller
                 }
                 $books = $post->book()->get();
                 $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
-                $postShare=null;
-                if($post->share_id!=null){
-                    $postShare=$this->post->getPost($post->share_id);
+                $postShare = null;
+                if ($post->share_id != null) {
+                    $postShare = $this->post->getPost($post->share_id);
                 }
                 $data[] = [
                     'post' => $post,
@@ -71,12 +73,13 @@ class PostController extends Controller
                     'commemts' => $commemts,
                     'likes' => $post->user_on_likes()->get(),
                     'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
-                    'share' => $postShare==null ? null : [
+                    'share' => $postShare == null ? null : [
                         'post' => $this->post->getPost($postShare->id),
                         'user' => $postShare->user()->first(),
                         'books' => $postShare->book()->get(),
                         'group' => $postShare->detail_group_user()->first()->group()->first(),
-                    ]
+                    ],
+                    'warning' => $this->warning->getAllWarningsOfPost($post->id)
                 ];
             }
         }
@@ -88,7 +91,7 @@ class PostController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Please login'], 404);
         }
-        if ($user->role!='admin') {
+        if ($user->role != 'admin') {
             return response()->json(['message' => 'You aren not admin'], 404);
         }
         $posts = $this->post->getAllPostNew();
@@ -101,9 +104,9 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare=null;
-            if($post->share_id!=null){
-                $postShare=$this->post->getPost($post->share_id);
+            $postShare = null;
+            if ($post->share_id != null) {
+                $postShare = $this->post->getPost($post->share_id);
             }
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
@@ -115,14 +118,14 @@ class PostController extends Controller
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
                 'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
-                'share' => $postShare==null ? null : [
+                'share' => $postShare == null ? null : [
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
                     'group' => $postShare->detail_group_user()->first()->group()->first(),
-                ]
+                ],
+                'warning' => $this->warning->getAllWarningsOfPost($post->id)
             ];
-
         }
         return response()->json($data);
     }
@@ -132,7 +135,7 @@ class PostController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Please login'], 404);
         }
-        if ($user->role!='admin') {
+        if ($user->role != 'admin') {
             return response()->json(['message' => 'You aren not admin'], 404);
         }
         $posts = $this->post->getAllPostReport();
@@ -145,9 +148,9 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare=null;
-            if($post->share_id!=null){
-                $postShare=$this->post->getPost($post->share_id);
+            $postShare = null;
+            if ($post->share_id != null) {
+                $postShare = $this->post->getPost($post->share_id);
             }
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
@@ -159,14 +162,13 @@ class PostController extends Controller
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
                 'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
-                'share' => $postShare==null ? null : [
+                'share' => $postShare == null ? null : [
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
                     'group' => $postShare->detail_group_user()->first()->group()->first(),
                 ]
             ];
-
         }
         return response()->json($data);
     }
@@ -186,9 +188,9 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare=null;
-            if($post->share_id!=null){
-                $postShare=$this->post->getPost($post->share_id);
+            $postShare = null;
+            if ($post->share_id != null) {
+                $postShare = $this->post->getPost($post->share_id);
             }
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
@@ -201,7 +203,7 @@ class PostController extends Controller
                 'commemts' => $commemts,
                 'likes' => $post->user_on_likes()->get(),
                 'state-like' => $this->like->getStateOfPost($post->id, auth()->user()->id),
-                'share' => $postShare==null ? null : [
+                'share' => $postShare == null ? null : [
                     'post' => $this->post->getPost($postShare->id),
                     'user' => $postShare->user()->first(),
                     'books' => $postShare->book()->get(),
@@ -221,9 +223,9 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['message' => 'Not found post'], 404);
         }
-        $postShare=null;
-        if($post->share_id!=null){
-            $postShare=$this->post->getPost($post->share_id);
+        $postShare = null;
+        if ($post->share_id != null) {
+            $postShare = $this->post->getPost($post->share_id);
         }
         if ($post->detail_group_user_id != null) {
             $state = $post->detail_group_user()->first()->group()->first()->state;
@@ -247,7 +249,7 @@ class PostController extends Controller
             'comments' => $commemts,
             'likes' => $post->user_on_likes()->get(),
             'state-like' => $this->like->getStateOfPost($post->id, $user->id),
-            'share' => $postShare==null ? null : [
+            'share' => $postShare == null ? null : [
                 'post' => $this->post->getPost($postShare->id),
                 'user' => $postShare->user()->first(),
                 'books' => $postShare->book()->get(),
@@ -286,7 +288,7 @@ class PostController extends Controller
             'description' => 'required|string',
         ]);
         $post = $this->post->getPost($id);
-        if ($post->user_id != $user->id && $user->role!='admin') {
+        if ($post->user_id != $user->id && $user->role != 'admin') {
             return response()->json(['message' => 'It is not your post'], 404);
         }
         if (!$post) {
@@ -305,8 +307,8 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
-        if($user->role=='admin'){
-            $notification=$this->notification->insertNotification([
+        if ($user->role == 'admin') {
+            $notification = $this->notification->insertNotification([
                 'from_id' => $user->id,
                 'to_id' => $post->user_id,
                 'information' => 'Cảnh báo: Bài viết của bạn đã vi phạm tiêu chuẩn cộng đồng',
@@ -318,7 +320,7 @@ class PostController extends Controller
             $admins = $this->detailGroupUser->getAdminGroup($group->id);
             foreach ($admins as $admin) {
                 if ($admin->user_id == $user->id) {
-                    $notification=$this->notification->insertNotification([
+                    $notification = $this->notification->insertNotification([
                         'from_id' => $group->id,
                         'to_id' => $user->id,
                         'information' => 'Bài viết của bạn đã bị xoá trong group ' . $group->name,
@@ -333,7 +335,8 @@ class PostController extends Controller
         $this->post->deletePost($id);
         return response()->json(['message' => 'Delete post successful']);
     }
-    public function sharePost(Request $request){
+    public function sharePost(Request $request)
+    {
         $user = auth()->user();
         if (empty($user)) {
             return response()->json(['message' => 'Please login'], 404);
@@ -342,14 +345,13 @@ class PostController extends Controller
             'share_id' => 'required|integer',
         ]);
 
-        $post=$this->post->getPost($request->get('share_id'));
-        if($post==null)
-        {
+        $post = $this->post->getPost($request->get('share_id'));
+        if ($post == null) {
             return response()->json(['message' => 'Not found post with id'], 404);
         }
 
-        $post=$this->post->insertPost(array_merge(['user_id'=>$user->id],$request->all()));
-        return response()->json(['message' => 'Share post successful','post' => $post]);
+        $post = $this->post->insertPost(array_merge(['user_id' => $user->id], $request->all()));
+        return response()->json(['message' => 'Share post successful', 'post' => $post]);
     }
     // Book
     public function insertBook(Request $request)
@@ -358,13 +360,13 @@ class PostController extends Controller
             'post_id' => 'required|integer',
             'book_id' => 'required|integer'
         ]);
-        $post=$this->post->getPost($request->get('post_id'));
-        $book=$this->book->getBook($request->get('book_id'));
-        if(!$post || !$book){
+        $post = $this->post->getPost($request->get('post_id'));
+        $book = $this->book->getBook($request->get('book_id'));
+        if (!$post || !$book) {
             return response()->json(['message' => 'Not found post or book'], 404);
         }
-        $detail=$this->detailPostBook->getDetailPostBook($post->id,$book->id);
-        if($detail){
+        $detail = $this->detailPostBook->getDetailPostBook($post->id, $book->id);
+        if ($detail) {
             return response()->json(['message' => 'You had insert book in post'], 404);
         }
         $this->detailPostBook->insertDetailPostBook($request->all());
@@ -402,8 +404,8 @@ class PostController extends Controller
                 return response()->json(['message' => 'User is not in a group'], 404);
             }
         }
-        $like=$this->like->getLike($post->id,$user->id);
-        if($like){
+        $like = $this->like->getLike($post->id, $user->id);
+        if ($like) {
             return response()->json(['message' => 'You liked this post'], 404);
         }
         $this->like->insertLike([
@@ -417,7 +419,7 @@ class PostController extends Controller
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         broadcast(new LikeEvent($post->id, $countLike));
         if (empty($notification)) {
-            $notification=$this->notification->insertNotification([
+            $notification = $this->notification->insertNotification([
                 'from_id' => $post->id,
                 'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
@@ -425,7 +427,7 @@ class PostController extends Controller
             ]);
             // handle Realtime notification
         } else {
-            $notification=$this->notification->updateNotification([
+            $notification = $this->notification->updateNotification([
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
             ], $notification->id);
         }
@@ -477,7 +479,7 @@ class PostController extends Controller
         $countCmt = $this->comment->getAllCommentOnPost($post->id)->count();
         $countLike = $this->like->getAllLikeOfPost($post->id)->count();
         if (empty($notification)) {
-            $notification=$this->notification->insertNotification([
+            $notification = $this->notification->insertNotification([
                 'from_id' => $post->id,
                 'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
@@ -486,7 +488,7 @@ class PostController extends Controller
             // handle Realtime notification
             broadcast(new NotificationSent($notification, $post->user_id));
         } else {
-            $notification=$this->notification->updateNotification([
+            $notification = $this->notification->updateNotification([
                 'from_id' => $post->id,
                 'to_id' => $post->user_id,
                 'information' => 'Đã có ' . $countCmt . ' comment và ' . $countLike . ' like bài viết của bạn',
@@ -502,8 +504,8 @@ class PostController extends Controller
             'description' => 'required'
         ]);
         $comments = $this->comment->getComment($id);
-        if(!$comments){
-            return response()->json(['message' => 'Not found comment'],404);
+        if (!$comments) {
+            return response()->json(['message' => 'Not found comment'], 404);
         }
         $cmt = $this->comment->updateComment($request->all(), $id);
         // handle realtime comment
