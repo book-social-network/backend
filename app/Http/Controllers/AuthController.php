@@ -156,10 +156,11 @@ class AuthController extends Controller
             }
             $books = $post->book()->get();
             $postShare=null;
+            $detail=null;
             if($post->share_id!=null){
                 $postShare=$this->post->getPost($post->share_id);
+                $detail=$postShare->detail_group_user()->first();
             }
-            $detail=$postShare->detail_group_user()->first();
             $data[] = [
                 'post' => $post,
                 'user' => $post->user()->first(),

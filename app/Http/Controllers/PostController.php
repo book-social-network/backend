@@ -61,11 +61,12 @@ class PostController extends Controller
                 }
                 $books = $post->book()->get();
                 $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
-                $postShare = null;
-                if ($post->share_id != null) {
-                    $postShare = $this->post->getPost($post->share_id);
+                $postShare=null;
+                $detail=null;
+                if($post->share_id!=null){
+                    $postShare=$this->post->getPost($post->share_id);
+                    $detail=$postShare->detail_group_user()->first();
                 }
-            $detail=$postShare->detail_group_user()->first();
 
                 $data[] = [
                     'post' => $post,
@@ -106,11 +107,12 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare = null;
-            if ($post->share_id != null) {
-                $postShare = $this->post->getPost($post->share_id);
+            $postShare=null;
+            $detail=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+                $detail=$postShare->detail_group_user()->first();
             }
-            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
             $data[] = [
@@ -151,11 +153,12 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare = null;
-            if ($post->share_id != null) {
-                $postShare = $this->post->getPost($post->share_id);
+            $postShare=null;
+            $detail=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+                $detail=$postShare->detail_group_user()->first();
             }
-            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
             $data[] = [
@@ -192,11 +195,12 @@ class PostController extends Controller
                     'user' => $comment->user()->get()
                 ];
             }
-            $postShare = null;
-            if ($post->share_id != null) {
-                $postShare = $this->post->getPost($post->share_id);
+            $postShare=null;
+            $detail=null;
+            if($post->share_id!=null){
+                $postShare=$this->post->getPost($post->share_id);
+                $detail=$postShare->detail_group_user()->first();
             }
-            $detail=$postShare->detail_group_user()->first();
             $books = $post->book()->get();
             $group = $post->detail_group_user_id != null ? $post->detail_group_user()->first()->group()->first() : null;
 
@@ -228,11 +232,12 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['message' => 'Not found post'], 404);
         }
-        $postShare = null;
-        if ($post->share_id != null) {
-            $postShare = $this->post->getPost($post->share_id);
+        $postShare=null;
+        $detail=null;
+        if($post->share_id!=null){
+            $postShare=$this->post->getPost($post->share_id);
+            $detail=$postShare->detail_group_user()->first();
         }
-        $detail=$postShare->detail_group_user()->first();
         if ($post->detail_group_user_id != null) {
             $state = $post->detail_group_user()->first()->group()->first()->state;
             if (!$this->detailGroupUser->checkUserInGroup($post->detail_group_user_id, $user->id) && $state == 1) {
