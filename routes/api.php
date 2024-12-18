@@ -266,6 +266,6 @@ Route::group([
     'prefix' => 'warnings'
 ], function ($router) {
     Route::get('/get-all-of-user/{id}', [WarningsController::class, 'getWarningsOfUser']);
-    Route::get('/get-all-of-post/{id}', [WarningsController::class, 'getWarningsOfUser']);
+    Route::get('/get-all-of-post/{id}', [WarningsController::class, 'getWarningsOfPost']);
     Route::post('/report/{id}', [WarningsController::class, 'reportPost']);
 });
