@@ -11,6 +11,9 @@ use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Cloudinary;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -306,5 +309,26 @@ class UserController extends Controller
             ];
         }
         return response()->json($data);
+    }
+    public function forgetPassword(Request $request){
+        $request->validate([
+            'email' => 'required',
+        ]);
+        $user=$this->user->getUserByEmail($request->get('email'));
+        if(empty($user)){
+            return response()->json(['message' => 'Not found account with email'], 404);
+        }
+        $password = Str::random(6);
+        // die($user);
+        Mail::to($user->email)->send(new \App\Mail\ForgetPasswordNotification($user,$password));
+        $user->update(
+            ['password' => bcrypt($password)]
+        );
+
+
+        return response()->json([
+            'message' => 'Create new password success',
+            'user' => $user,
+        ]);
     }
 }

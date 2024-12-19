@@ -39,9 +39,9 @@ class NotifyInactiveUsers extends Command
                 'updated_at' => now()
             ]);
             $user->update([
-                'lasted_login' => now(),
                 'notified_inactive' => 1,
             ]);
+            Mail::to($user->email)->send(new \App\Mail\InactiveUserNotification($user));
         }
     }
 }

@@ -48,7 +48,7 @@ Route::group([
 });
 
 // Auth finish test
-Route::post('/login', action: [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::group([
     'middleware' => 'api',
@@ -215,6 +215,8 @@ Route::group([
     Route::post('/update', [UserController::class, 'update']);
     Route::post('/update-point', [UserController::class, 'updatePoint']);
     Route::delete('/delete/{id}', [UserController::class, 'delete']);
+    Route::post('/forget-password', [UserController::class, 'forgetPassword']);
+
     // post
     Route::get('/get-all-post/{id}', [UserController::class, 'getAllPostOfUser']);
     Route::get('/get-all-post-user-follow', [UserController::class, 'getAllPostUserFollow']);

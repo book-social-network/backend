@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('notify:inactive-users')->daily();
+        $schedule->command('notify:inactive-users')->weekly();
+        $schedule->command('notify:inactive-users-6-months')->weekly();
     }
 
     /**

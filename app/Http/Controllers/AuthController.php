@@ -12,8 +12,11 @@ use App\Repositories\Interfaces\LikeInterface;
 use App\Repositories\Interfaces\PostInterface;
 use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+
 use Validator;
 use Cloudinary;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -237,4 +240,5 @@ class AuthController extends Controller
         // die($user);
         return response()->json(['message' => 'Password is incorrect'], 404);
     }
+
 }
