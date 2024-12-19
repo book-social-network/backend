@@ -91,6 +91,7 @@ class AuthController extends Controller
             [
                 'password' => bcrypt($request->password),
                 'image_url' => $cloudinaryImage,
+                'role' => $request->get('role')!=null?$request->get('role'):'member'
             ]
         ));
 
