@@ -119,6 +119,7 @@ Route::group([
     Route::get('/get-all', [FollowController::class, 'getAllFollow']);
     Route::get('/follow/{id}', [FollowController::class, 'handleFollow']);
     Route::get('/unfollow/{id}', [FollowController::class, 'handleUnfollow']);
+    Route::get('/unfollowing/{id}', [FollowController::class, 'handleUnfollowing']);
     Route::get('/suggest-friends', [FollowController::class, 'suggestFriends']);
 });
 // Group finish test
